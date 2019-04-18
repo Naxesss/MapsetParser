@@ -1,0 +1,5 @@
+﻿.vs/
+/obj
+/bin
+MapsetParser.csproj
+MapsetParser.sln
