@@ -318,5 +318,23 @@ namespace MapsetParser.objects
                 ?? (this as HoldNote)?.endTime
                 ?? time;
         }
+
+        /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Circle" or "Spinner tail". </summary>
+        public string GetPartName(double aTime)
+        {
+            string edgeType =
+                GetEndTime() == aTime                ? "tail" :
+                aTime > time && aTime < GetEndTime() ? "body" :
+                                                       "head";
+
+            string hitObjectType =
+                this is Slider   ? "Slider"    :
+                this is Circle   ? "Circle"    :
+                this is Spinner  ? "Spinner"   :
+                this is HoldNote ? "Hold note" :
+                                   "Unknown object";
+
+            return hitObjectType + (!(this is Circle) ? " " + edgeType : "");
+        }
     }
 }

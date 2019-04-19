@@ -319,7 +319,8 @@ namespace MapsetParser.objects
                 ? theoreticalUnsnapSecond : theoreticalUnsnapThird;
         }
 
-        /// <summary> Returns the unsnap accounting for the way the game rounds (or more accurately floors) snapping. </summary>
+        /// <summary> Returns the unsnap accounting for the way the game rounds (or more accurately doesn't round) snapping. <para/>
+        /// The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
         public double GetPracticalUnsnap(double aTime, int aSecondDivisor = 16, int aThirdDivisor = 12)
         {
             UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
