@@ -334,7 +334,7 @@ namespace MapsetParser.objects
                 this is HoldNote ? "Hold note" :
                                    "Unknown object";
 
-            return hitObjectType + (!(this is Circle) ? " " + edgeType : "");
+            return hitObjectType + (!(this is Circle) ? (" " + edgeType) : "");
         }
     }
 }
