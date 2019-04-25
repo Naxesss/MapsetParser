@@ -1,6 +1,6 @@
 ﻿namespace MapsetParser.objects.hitobjects
 {
-    public class Circle : HitObject
+    public class Circle : Stackable
     {
         public Circle(string aCode, Beatmap aBeatmap)
             : base(aCode, aBeatmap)

@@ -7,7 +7,7 @@ using MapsetParser.objects.timinglines;
 
 namespace MapsetParser.objects.hitobjects
 {
-    public class Slider : HitObject
+    public class Slider : Stackable
     {
         // 319,179,1392,6,0,L|389:160,2,62.5,2|0|0,0:0|0:0|0:0,0:0:0:0:
         // x, y, time, typeFlags, hitsound, (sliderPath, edgeAmount, pixelLength, hitsoundEdges, additionEdges,) extras
@@ -82,7 +82,7 @@ namespace MapsetParser.objects.hitobjects
                 redAnchorPositions = GetRedAnchors().ToList();
                 pathPxPositions    = GetPathPxPositions();
                 endTime            = GetEndTime();
-                endPosition        = edgeAmount % 2 == 1 ? pathPxPositions.Last() : position;
+                endPosition        = edgeAmount % 2 == 1 ? pathPxPositions.Last() : Position;
                 sliderTickTimes    = GetSliderTickTimes();
             }
         }
@@ -104,7 +104,7 @@ namespace MapsetParser.objects.hitobjects
         private IEnumerable<Vector2> GetNodes(string aCode)
         {
             // the first position is also a node in the editor so we count that too
-            yield return position;
+            yield return Position;
 
             string sliderPath = aCode.Split(',')[5];
             foreach(string node in sliderPath.Split('|'))
@@ -247,7 +247,7 @@ namespace MapsetParser.objects.hitobjects
 
             // and then calculate this in steps accordingly
             Vector2 prevPosition;
-            Vector2 currentPosition = position;
+            Vector2 currentPosition = Position;
 
             // always start with the current position, means reverse sliders' end position is more accurate
             List<Vector2> positions = new List<Vector2>() { currentPosition };
@@ -449,7 +449,7 @@ namespace MapsetParser.objects.hitobjects
             double fraction = GetCurveFraction(aTime);
             
             List<double> pathLengths = new List<double>();
-            Vector2 previousPosition = position;
+            Vector2 previousPosition = Position;
             for(int i = 0; i < nodePositions.Count(); ++i)
             {
                 // since every node is interpreted as an anchor, we only need to worry about the last node
@@ -504,24 +504,24 @@ namespace MapsetParser.objects.hitobjects
             Vector2 thirdPoint    = nodePositions.ElementAt(2);
 
             // center and radius of the circle
-            double divisor = 2 * (position.X * (secondPoint.Y - thirdPoint.Y) + secondPoint.X *
-                (thirdPoint.Y - position.Y) + thirdPoint.X * (position.Y - secondPoint.Y));
+            double divisor = 2 * (Position.X * (secondPoint.Y - thirdPoint.Y) + secondPoint.X *
+                (thirdPoint.Y - Position.Y) + thirdPoint.X * (Position.Y - secondPoint.Y));
 
-            double centerX = ((position.X * position.X + position.Y * position.Y) *
+            double centerX = ((Position.X * Position.X + Position.Y * Position.Y) *
                 (secondPoint.Y - thirdPoint.Y) + (secondPoint.X * secondPoint.X + secondPoint.Y * secondPoint.Y) *
-                (thirdPoint.Y - position.Y) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
-                (position.Y - secondPoint.Y)) / divisor;
-            double centerY = ((position.X * position.X + position.Y * position.Y) *
+                (thirdPoint.Y - Position.Y) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
+                (Position.Y - secondPoint.Y)) / divisor;
+            double centerY = ((Position.X * Position.X + Position.Y * Position.Y) *
                 (thirdPoint.X - secondPoint.X) + (secondPoint.X * secondPoint.X + secondPoint.Y * secondPoint.Y) *
-                (position.X - thirdPoint.X) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
-                (secondPoint.X - position.X)) / divisor;
+                (Position.X - thirdPoint.X) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
+                (secondPoint.X - Position.X)) / divisor;
 
-            double radius = Math.Sqrt(Math.Pow((centerX - position.X), 2) + Math.Pow((centerY - position.Y), 2));
+            double radius = Math.Sqrt(Math.Pow((centerX - Position.X), 2) + Math.Pow((centerY - Position.Y), 2));
 
             double radians = GetCurveLength() / radius;
 
             // which direction to rotate based on which side the center is on
-            if (((secondPoint.X - position.X) * (thirdPoint.Y - position.Y) - (secondPoint.Y - position.Y) * (thirdPoint.X - position.X)) < 0)
+            if (((secondPoint.X - Position.X) * (thirdPoint.Y - Position.Y) - (secondPoint.Y - Position.Y) * (thirdPoint.X - Position.X)) < 0)
                 radians *= -1.0f;
             
             // getting the point on the circumference of the circle
@@ -530,8 +530,8 @@ namespace MapsetParser.objects.hitobjects
             double radianX = Math.Cos(fraction * radians);
             double radianY = Math.Sin(fraction * radians);
 
-            double x = (radianX * (position.X - centerX)) - (radianY * (position.Y - centerY)) + centerX;
-            double y = (radianY * (position.X - centerX)) + (radianX * (position.Y - centerY)) + centerY;
+            double x = (radianX * (Position.X - centerX)) - (radianY * (Position.Y - centerY)) + centerX;
+            double y = (radianY * (Position.X - centerX)) + (radianX * (Position.Y - centerY)) + centerY;
 
             return new Vector2((float)x, (float)y);
         }
@@ -541,7 +541,7 @@ namespace MapsetParser.objects.hitobjects
             // include the first point in the total slider points
             List<Vector2> sliderPoints = nodePositions.ToList();
 
-            Vector2 currentPoint = position;
+            Vector2 currentPoint = Position;
             List<Vector2> bezierPoints = new List<Vector2>() { currentPoint };
 
             // for each anchor, calculate the curve, until we find where we need to be
