@@ -21,8 +21,9 @@ namespace MapsetParser.objects
 
         public Beatmap beatmap;
         public string code;
+        
+        public virtual Vector2 Position { get; private set; }
 
-        public Vector2  position;
         public double   time;
         public int      type;
         public int      hitsound;
@@ -62,8 +63,9 @@ namespace MapsetParser.objects
         {
             beatmap = aBeatmap;
             code = aCode;
+            
+            Position = GetPosition(aCode);
 
-            position   = GetPosition(aCode);
             time       = GetTime(aCode);
             type       = GetTypeFlags(aCode);
             hitsound   = GetHitsound(aCode);
@@ -169,10 +171,10 @@ namespace MapsetParser.objects
             if (radius < 30)
                 scalingFactor *= 1 + Math.Min(30 - radius, 5) / 50;
 
-            Vector2 prevPosition = prevObject.position;                   // todo stacked position
-            double prevDistance = (position - prevPosition).Length();
+            Vector2 prevPosition = prevObject.Position;
+            double prevDistance = (Position - prevPosition).Length();
 
-            return prevDistance * scalingFactor;  // todo stacked position
+            return prevDistance * scalingFactor;
         }
 
         /*
@@ -210,11 +212,11 @@ namespace MapsetParser.objects
         {
             HitObject prevObject = beatmap.GetPrevHitObject(time);
 
-            Vector2 prevPosition = prevObject.position;                   // todo stacked position
+            Vector2 prevPosition = prevObject.Position;
             if (prevObject is Slider)
                 prevPosition = ((Slider)prevObject).endPosition;
 
-            return (position - prevPosition).Length();
+            return (Position - prevPosition).Length();
         }
 
         /// <summary> Returns the points in time where heads, tails or repeats exist (i.e. the start, end or reverses of any object). </summary>
