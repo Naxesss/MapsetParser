@@ -8,6 +8,7 @@ using MapsetParser.objects.events;
 using MapsetParser.objects.hitobjects;
 using MapsetParser.objects.timinglines;
 using MapsetParser.starrating.standard;
+using System.Numerics;
 
 namespace MapsetParser.objects
 {
@@ -90,10 +91,113 @@ namespace MapsetParser.objects
             timingLines        = GetTimingLines(aCode);
             hitObjects         = GetHitobjects(aCode);
 
+            ApplyStacking();
+
             // would do a mode check on this but while non-std modes aren't supported this is
             // the closest we have to sorting things by difficulty for those
             starRating = aStarRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
         }
+
+        /*
+         *  Stacking Methods
+        */
+
+        /// <summary> Applies stacking for objects in the beatmap, updating the stack index and position values. </summary>
+        private void ApplyStacking()
+        {
+            bool wasChanged;
+            do
+            {
+                wasChanged = false;
+
+                // Only hit objects that can be stacked can cause other objects to be stacked.
+                List<Stackable> iteratedObjects = new List<Stackable>();
+                foreach (Stackable hitObject in hitObjects.OfType<Stackable>())
+                {
+                    iteratedObjects.Add(hitObject);
+                    foreach (Stackable otherHitObject in hitObjects.OfType<Stackable>().Except(iteratedObjects))
+                    {
+                        if (!MeetsStackTime(hitObject, otherHitObject))
+                            break;
+                        
+                        // Circles on tails do nothing.
+                        if (hitObject is Circle && otherHitObject is Slider &&
+                            ShouldStackTail(otherHitObject as Slider, hitObject as Circle))
+                        {
+                            break;
+                        }
+
+                        if ((hitObject is Circle || otherHitObject is Circle) &&
+                            ShouldStack(hitObject, otherHitObject))
+                        {
+                            if (hitObject.stackIndex < 0)
+                            {
+                                // Objects stacked under slider tails will continue to stack downwards.
+                                --otherHitObject.stackIndex;
+                                wasChanged = true;
+                                break;
+                            }
+                            else
+                            {
+                                ++hitObject.stackIndex;
+                                wasChanged = true;
+                                break;
+                            }
+                        }
+                        
+                        if (hitObject is Slider && otherHitObject is Circle &&
+                            ShouldStackTail(hitObject as Slider, otherHitObject as Circle))
+                        {
+                            --otherHitObject.stackIndex;
+                            wasChanged = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            while (wasChanged);
+        }
+
+        /// <summary> Returns whether two stackable objects should be stacked, but currently are not. </summary>
+        private bool ShouldStack(Stackable anObject, Stackable anOtherObject)
+        {
+            bool isNearInTime = MeetsStackTime(anObject, anOtherObject);
+            bool isNearInSpace = MeetsStackDistance(anObject, anOtherObject);
+            bool wouldStackCorrectly =
+                anObject.stackIndex == anOtherObject.stackIndex ||
+                anObject.stackIndex < 0 && anObject.stackIndex < anOtherObject.stackIndex; // Allows negative stacks to line up.
+            
+            return isNearInTime && isNearInSpace && wouldStackCorrectly;
+        }
+
+        /// <summary> Returns whether a circle following a slider should be stacked under the slider tail, but currently is not. </summary>
+        private bool ShouldStackTail(Slider aSlider, Circle aCircle)
+        {
+            double distanceSq =
+                Vector2.DistanceSquared(
+                    aCircle.UnstackedPosition,
+                    aSlider.edgeAmount % 2 == 0 ?
+                        aSlider.UnstackedPosition :
+                        aSlider.UnstackedEndPosition); // todo UnstackedEndPosition
+            
+            bool isNearInTime = MeetsStackTime(aSlider, aCircle);
+            bool isNearInSpace = distanceSq < 3 * 3;
+            bool wouldStackCorrectly = aSlider.stackIndex == aCircle.stackIndex;
+
+            return isNearInTime && isNearInSpace && wouldStackCorrectly && aSlider.time < aCircle.time;
+        }
+
+        /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start time. </summary>
+        private bool MeetsStackTime(Stackable anObject, Stackable anOtherObject) =>
+            anOtherObject.time - anObject.GetEndTime() <= StackTimeThreshold();
+
+        /// <summary> Returns whether two stackable objects are close enough in space to be stacked. Measures from head to head. </summary>
+        private bool MeetsStackDistance(Stackable anObject, Stackable anOtherObject) =>
+            Vector2.DistanceSquared(anObject.UnstackedPosition, anOtherObject.UnstackedPosition) < 3 * 3;
+
+        /// <summary> Returns how far apart in time two objects can be and still be able to stack. </summary>
+        private double StackTimeThreshold() =>
+            difficultySettings.GetPreemptTime() * generalSettings.stackLeniency * 0.1;
 
         /*
          *  Helper Methods 

@@ -10,7 +10,7 @@ namespace MapsetParser.objects.hitobjects
         public int stackIndex;
 
         public Vector2 UnstackedPosition { get => base.Position; }
-        public override Vector2 Position { get => Offset(base.Position); }
+        public override Vector2 Position { get => GetStackOffset(base.Position); }
 
         public Stackable(string aCode, Beatmap aBeatmap)
             : base(aCode, aBeatmap)
@@ -18,14 +18,11 @@ namespace MapsetParser.objects.hitobjects
 
         }
 
-        private Vector2 Offset(Vector2 aPosition)
-        {
-            return new Vector2(Offset(aPosition.X), Offset(aPosition.Y));
-        }
+        /// <summary> Returns the same position but offseted to account for its stacking, if stacked. </summary>
+        public Vector2 GetStackOffset(Vector2 aPosition) =>
+            new Vector2(GetStackOffset(aPosition.X), GetStackOffset(aPosition.Y));
 
-        private float Offset(float aValue)
-        {
-            return aValue * beatmap.difficultySettings.GetCircleRadius() * -0.1f;
-        }
+        private float GetStackOffset(float aValue) =>
+            aValue + stackIndex * beatmap.difficultySettings.GetCircleRadius() * -0.1f;
     }
 }

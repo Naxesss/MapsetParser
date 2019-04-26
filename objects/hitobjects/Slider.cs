@@ -49,8 +49,10 @@ namespace MapsetParser.objects.hitobjects
 
         private double?      duration;
         public  double       endTime;
-        public  Vector2      endPosition;
         public  List<double> sliderTickTimes;
+        
+        public Vector2 UnstackedEndPosition { get; private set; }
+        public Vector2 EndPosition { get; private set; }
 
         public Slider(string aCode, Beatmap aBeatmap)
             : base(aCode, aBeatmap)
@@ -82,8 +84,10 @@ namespace MapsetParser.objects.hitobjects
                 redAnchorPositions = GetRedAnchors().ToList();
                 pathPxPositions    = GetPathPxPositions();
                 endTime            = GetEndTime();
-                endPosition        = edgeAmount % 2 == 1 ? pathPxPositions.Last() : Position;
                 sliderTickTimes    = GetSliderTickTimes();
+
+                UnstackedEndPosition = edgeAmount % 2 == 1 ? pathPxPositions.Last() : UnstackedPosition;
+                EndPosition          = GetStackOffset(UnstackedEndPosition);
             }
         }
 
@@ -247,7 +251,7 @@ namespace MapsetParser.objects.hitobjects
 
             // and then calculate this in steps accordingly
             Vector2 prevPosition;
-            Vector2 currentPosition = Position;
+            Vector2 currentPosition = UnstackedPosition;
 
             // always start with the current position, means reverse sliders' end position is more accurate
             List<Vector2> positions = new List<Vector2>() { currentPosition };
@@ -504,24 +508,24 @@ namespace MapsetParser.objects.hitobjects
             Vector2 thirdPoint    = nodePositions.ElementAt(2);
 
             // center and radius of the circle
-            double divisor = 2 * (Position.X * (secondPoint.Y - thirdPoint.Y) + secondPoint.X *
-                (thirdPoint.Y - Position.Y) + thirdPoint.X * (Position.Y - secondPoint.Y));
+            double divisor = 2 * (UnstackedPosition.X * (secondPoint.Y - thirdPoint.Y) + secondPoint.X *
+                (thirdPoint.Y - UnstackedPosition.Y) + thirdPoint.X * (UnstackedPosition.Y - secondPoint.Y));
 
-            double centerX = ((Position.X * Position.X + Position.Y * Position.Y) *
+            double centerX = ((UnstackedPosition.X * UnstackedPosition.X + UnstackedPosition.Y * UnstackedPosition.Y) *
                 (secondPoint.Y - thirdPoint.Y) + (secondPoint.X * secondPoint.X + secondPoint.Y * secondPoint.Y) *
-                (thirdPoint.Y - Position.Y) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
-                (Position.Y - secondPoint.Y)) / divisor;
-            double centerY = ((Position.X * Position.X + Position.Y * Position.Y) *
+                (thirdPoint.Y - UnstackedPosition.Y) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
+                (UnstackedPosition.Y - secondPoint.Y)) / divisor;
+            double centerY = ((UnstackedPosition.X * UnstackedPosition.X + UnstackedPosition.Y * UnstackedPosition.Y) *
                 (thirdPoint.X - secondPoint.X) + (secondPoint.X * secondPoint.X + secondPoint.Y * secondPoint.Y) *
-                (Position.X - thirdPoint.X) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
-                (secondPoint.X - Position.X)) / divisor;
+                (UnstackedPosition.X - thirdPoint.X) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
+                (secondPoint.X - UnstackedPosition.X)) / divisor;
 
-            double radius = Math.Sqrt(Math.Pow((centerX - Position.X), 2) + Math.Pow((centerY - Position.Y), 2));
+            double radius = Math.Sqrt(Math.Pow((centerX - UnstackedPosition.X), 2) + Math.Pow((centerY - UnstackedPosition.Y), 2));
 
             double radians = GetCurveLength() / radius;
 
             // which direction to rotate based on which side the center is on
-            if (((secondPoint.X - Position.X) * (thirdPoint.Y - Position.Y) - (secondPoint.Y - Position.Y) * (thirdPoint.X - Position.X)) < 0)
+            if (((secondPoint.X - UnstackedPosition.X) * (thirdPoint.Y - UnstackedPosition.Y) - (secondPoint.Y - UnstackedPosition.Y) * (thirdPoint.X - UnstackedPosition.X)) < 0)
                 radians *= -1.0f;
             
             // getting the point on the circumference of the circle
@@ -530,8 +534,8 @@ namespace MapsetParser.objects.hitobjects
             double radianX = Math.Cos(fraction * radians);
             double radianY = Math.Sin(fraction * radians);
 
-            double x = (radianX * (Position.X - centerX)) - (radianY * (Position.Y - centerY)) + centerX;
-            double y = (radianY * (Position.X - centerX)) + (radianX * (Position.Y - centerY)) + centerY;
+            double x = (radianX * (UnstackedPosition.X - centerX)) - (radianY * (UnstackedPosition.Y - centerY)) + centerX;
+            double y = (radianY * (UnstackedPosition.X - centerX)) + (radianX * (UnstackedPosition.Y - centerY)) + centerY;
 
             return new Vector2((float)x, (float)y);
         }

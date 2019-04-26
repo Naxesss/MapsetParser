@@ -214,7 +214,7 @@ namespace MapsetParser.objects
 
             Vector2 prevPosition = prevObject.Position;
             if (prevObject is Slider)
-                prevPosition = ((Slider)prevObject).endPosition;
+                prevPosition = ((Slider)prevObject).EndPosition;
 
             return (Position - prevPosition).Length();
         }
@@ -329,14 +329,18 @@ namespace MapsetParser.objects
                 aTime > time && aTime < GetEndTime() ? "body" :
                                                        "head";
 
-            string hitObjectType =
-                this is Slider   ? "Slider"    :
-                this is Circle   ? "Circle"    :
-                this is Spinner  ? "Spinner"   :
+            return GetObjectType() + (!(this is Circle) ? (" " + edgeType) : "");
+        }
+
+        /// <summary> Returns the name of the object in general, for example "Slider", "Circle", "Hold note", etc. </summary>
+        public string GetObjectType() =>
+                this is Slider   ? "Slider" :
+                this is Circle   ? "Circle" :
+                this is Spinner  ? "Spinner" :
                 this is HoldNote ? "Hold note" :
                                    "Unknown object";
 
-            return hitObjectType + (!(this is Circle) ? (" " + edgeType) : "");
-        }
+        public override string ToString() =>
+            time + " ms: " + GetObjectType() + " at (" + Position.X + "; " + Position.Y + ")";
     }
 }
