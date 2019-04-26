@@ -221,7 +221,7 @@ namespace MapsetParser.objects
         /// the next hit object is returned instead. </summary>
         public HitObject GetHitObject(double aTime, HitObject.Type? aType = null)
         {
-            return hitObjects.LastOrDefault(anObject => anObject.GetEndTime() <= aTime &&
+            return hitObjects.LastOrDefault(anObject => (anObject.GetEndTime() <= aTime || anObject.time == aTime) &&
                 (aType != null ? anObject.HasType(aType.GetValueOrDefault()) : true)) ?? GetNextHitObject(aTime, aType);
         }
 
@@ -246,7 +246,7 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the current combo colour number, starts at 0. </summary>
-        public int GetComboNumber(double aTime)
+        public int GetComboColourIndex(double aTime)
         {
             int combo = 0;
             foreach (HitObject hitObject in hitObjects)
@@ -280,8 +280,19 @@ namespace MapsetParser.objects
             return combo;
         }
 
+        /// <summary> Same as <see cref="GetComboColourIndex"/>, except accounts for a bug which makes the last registered colour in
+        /// the code the first number in the editor. Basically use for display purposes.</summary>
+        public int GetDisplayedComboColourIndex(double aTime)
+        {
+            int colourIndex = GetComboColourIndex(aTime);
+            if (colourIndex == 0)
+                return colourSettings.combos.Count();
+            else
+                return colourIndex;
+        }
+
         /// <summary> Returns whether a difficulty-specific storyboard is present, does not care about .osb files. </summary>
-        public bool HasStoryboard()
+        public bool HasDifficultySpecificStoryboard()
         {
             if (sprites.Count > 0 || animations.Count > 0)
                 return true;
@@ -314,16 +325,6 @@ namespace MapsetParser.objects
                 case Difficulty.Expert: return "an Expert";
                 default:                return "an Extreme";
             }
-        }
-        
-        /// <summary> Same as GetCombo, except will account for a bug which makes the last registered colour in
-        /// the code the first number in the editor. Basically use for display purposes.</summary>
-        public int GetActualComboNumber(int aCombo)
-        {
-            if (aCombo == 0)
-                return colourSettings.combos.Count();
-            else
-                return aCombo;
         }
 
         /// <summary> Returns the complete drain time of the beatmap, accounting for breaks. </summary>
@@ -371,7 +372,7 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns how many ms into a beat the given time is. </summary>
-        public double GetBeatOffset(double aTime)
+        public double GetOffsetIntoBeat(double aTime)
         {
             UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
 
@@ -405,7 +406,7 @@ namespace MapsetParser.objects
         {
             UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
 
-            double beatOffset      = GetBeatOffset(aTime);
+            double beatOffset      = GetOffsetIntoBeat(aTime);
             double currentFraction = beatOffset / line.msPerBeat;
 
             // 1/16
@@ -429,9 +430,11 @@ namespace MapsetParser.objects
         {
             UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
             double theoreticalUnsnap = GetTheoreticalUnsnap(aTime, aSecondDivisor, aThirdDivisor);
-            
-            // the game apparently floors the desired time, rather than rounds it (which is ??? but whatever)
-            double desiredTime = (float)Math.Floor(aTime - theoreticalUnsnap);
+
+            // The game apparently casts to int the desired time value, rather than rounding or flooring, which would be more consistent.
+            // This is likely a contributor to rounding errors when copy pasting, along with reference times in the clipboard being in
+            // practical offsets rather than theoretical ones.
+            double desiredTime = (int)(aTime - theoreticalUnsnap);
             double practicalUnsnap = desiredTime - aTime;
 
             return practicalUnsnap;
