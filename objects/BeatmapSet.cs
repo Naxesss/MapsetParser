@@ -81,7 +81,7 @@ namespace MapsetParser.objects
             foreach (Beatmap beatmap in concurrentBeatmaps)
                 beatmaps.Add(beatmap);
 
-            string expectedOsbFileName = GetOsbFileName();
+            string expectedOsbFileName = GetOsbFileName()?.ToLower();
             for (int i = 0; i < filePaths.Length; ++i)
             {
                 string currentFileName = filePaths[i].Substring(songPath.Length + 1);
@@ -121,7 +121,7 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns whether or not a hit sound file is used based on its file name. </summary>
-        public bool IsHitsoundFileUsed(string aFileName)
+        public bool IsHitSoundFileUsed(string aFileName)
         {
             Regex hitsoundRegex = new Regex("(soft|normal|drum)-(slider(slide|whistle|tick)|hit(clap|finish|whistle|normal))(\\d+)?");
             if (hitsoundRegex.IsMatch(aFileName))
@@ -287,7 +287,7 @@ namespace MapsetParser.objects
             if (SkinStatic.IsUsed(fileName, this))
                 return true;
 
-            if (fileName == GetOsbFileName() && osb.IsUsed())
+            if (fileName == GetOsbFileName().ToLower() && osb.IsUsed())
                 return true;
 
             foreach (Beatmap beatmap in beatmaps)
@@ -317,7 +317,7 @@ namespace MapsetParser.objects
                 string fileSongPath = filePath.Substring(songPath.Length + 1);
                 string fileName = fileSongPath.Split(new char[] { '/', '\\' }).Last().ToLower();
 
-                if (IsHitsoundFileUsed(fileName))
+                if (IsHitSoundFileUsed(fileName))
                     yield return fileSongPath;
             }
         }
