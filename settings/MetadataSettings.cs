@@ -77,8 +77,7 @@ namespace MapsetParser.settings
                 .Replace("|", "")
                 .Replace("\"", "")
                 .Replace("<", "")
-                .Replace(">", "")
-                .ToLower();
+                .Replace(">", "");
         }
     }
 }
