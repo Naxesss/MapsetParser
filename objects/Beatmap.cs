@@ -217,18 +217,28 @@ namespace MapsetParser.objects
             return timingLines.FirstOrDefault(aLine => aLine.offset > aTime && (anUninherited ? aLine.uninherited : true));
         }
 
-        /// <summary> Returns the current or previous hit object, optionally only of a specific type. If none exists,
-        /// the next hit object is returned instead. </summary>
-        public HitObject GetHitObject(double aTime, HitObject.Type? aType = null)
+        /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
+        public HitObject GetHitObject(double aTime) => GetHitObject<HitObject>(aTime);
+        /// <summary> Same as <see cref="GetHitObject"/> except only considers objects of a given type. </summary>
+        public HitObject GetHitObject<T>(double aTime) where T : HitObject
         {
-            return hitObjects.LastOrDefault(anObject => (anObject.GetEndTime() <= aTime || anObject.time == aTime) &&
-                (aType != null ? anObject.HasType(aType.GetValueOrDefault()) : true)) ?? GetNextHitObject(aTime, aType);
+            return hitObjects.OfType<T>().LastOrDefault(anObject => (anObject.GetEndTime() <= aTime || anObject.time == aTime)) ?? GetNextHitObject<T>(aTime);
+        }
+        
+        /// <summary> Returns the previous hit object if any, otherwise the first. </summary>
+        public HitObject GetPrevHitObject(double aTime) => GetPrevHitObject<HitObject>(aTime);
+        /// <summary> Same as <see cref="GetPrevHitObject"/> except only considers objects of a given type. </summary>
+        public HitObject GetPrevHitObject<T>(double aTime) where T : HitObject
+        {
+            return hitObjects.OfType<T>().LastOrDefault(aHitObject => aHitObject.time < aTime) ?? hitObjects.OfType<T>().FirstOrDefault();
         }
 
-        /// <summary> Returns the next hit object after the current if any, optionally only of a specific type. </summary>
-        public HitObject GetNextHitObject(double aTime, HitObject.Type? aType = null)
+        /// <summary> Returns the next hit object after the current if any. </summary>
+        public HitObject GetNextHitObject(double aTime) => GetNextHitObject<HitObject>(aTime);
+        /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
+        public HitObject GetNextHitObject<T>(double aTime) where T : HitObject
         {
-            return hitObjects.FirstOrDefault(anObject => anObject.time > aTime && (aType != null ? anObject.HasType(aType.GetValueOrDefault()) : true));
+            return hitObjects.OfType<T>().FirstOrDefault(anObject => anObject.time > aTime);
         }
 
         /// <summary> Returns the unsnap in ms of notes unsnapped by 2 ms or more, otherwise null. </summary>
@@ -438,12 +448,6 @@ namespace MapsetParser.objects
             double practicalUnsnap = desiredTime - aTime;
 
             return practicalUnsnap;
-        }
-
-        /// <summary> Returns the previous hit object if any, otherwise the first. </summary>
-        public HitObject GetPrevHitObject(double aTime)
-        {
-            return hitObjects.LastOrDefault(aHitObject => aHitObject.time < aTime) ?? hitObjects.FirstOrDefault();
         }
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
