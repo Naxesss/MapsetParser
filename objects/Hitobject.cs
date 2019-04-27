@@ -251,7 +251,7 @@ namespace MapsetParser.objects
             return (this as Slider)?.GetEndSampleset(anAddition) ?? ((this is Spinner) ? (Beatmap.Sampleset?)GetSampleset(anAddition) : null);
         }
 
-        /// <summary> Returns the hit sound of the head of the object, if applicable, otherwise null. </summary>
+        /// <summary> Returns the hit sound(s) of the head of the object, if applicable, otherwise null. </summary>
         public HitSound? GetStartHitSound()
         {
             // spinners have no start
@@ -260,20 +260,20 @@ namespace MapsetParser.objects
                  : (HitSound?)hitSound);
         }
 
-        /// <summary> Returns the hit sound of the tail of the object, if it applicable, otherwise null. </summary>
+        /// <summary> Returns the hit sound(s) of the tail of the object, if it applicable, otherwise null. </summary>
         public HitSound? GetEndHitSound()
         {
             // circles and hold notes have no end
             return (this as Slider)?.endHitsound
-                ?? (HitSound?)(this as Spinner)?.hitSound
+                ?? (this as Spinner)?.hitSound
                 ?? null;
         }
 
-        /// <summary> Returns the hit sound of the slide of the object, if applicable, otherwise null. </summary>
+        /// <summary> Returns the hit sound(s) of the slide of the object, if applicable, otherwise null. </summary>
         public HitSound? GetSliderslide()
         {
             // circles, hold notes and spinners have no sliderslide
-            return (HitSound?)(this as Slider)?.hitSound
+            return (this as Slider)?.hitSound
                  ?? null;
         }
 
