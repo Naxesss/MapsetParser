@@ -265,17 +265,17 @@ namespace MapsetParser.objects
                     break;
 
                 // ignore spinners
-                if ((hitObject.type & 0x08) == 0)
+                if (!hitObject.type.HasFlag(HitObject.Type.Spinner))
                 {
                     int repeats = 0;
 
                     // has new combo
-                    if ((hitObject.type & 0x04) > 0)
+                    if (hitObject.type.HasFlag(HitObject.Type.NewCombo))
                         repeats += 1;
 
                     // accounts for the combo colour skips
                     for (int bit = 0x10; bit < 0x80; bit <<= 1)
-                        if ((hitObject.type & bit) > 0)
+                        if (((int)hitObject.type & bit) > 0)
                             repeats += (int)Math.Floor(bit / 16.0f);
 
                     // counts up and wraps around
@@ -460,8 +460,7 @@ namespace MapsetParser.objects
             while (true)
             {
                 // if either there are no more objects behind it or it's a new combo, break
-                if (lastHitObject == hitObjects.FirstOrDefault()
-                    || lastHitObject.HasType(HitObject.Type.NewCombo))
+                if (lastHitObject == hitObjects.FirstOrDefault() || lastHitObject.type.HasFlag(HitObject.Type.NewCombo))
                     break;
 
                 lastHitObject = GetPrevHitObject(lastHitObject.time);

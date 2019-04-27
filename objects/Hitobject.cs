@@ -25,8 +25,8 @@ namespace MapsetParser.objects
         public virtual Vector2 Position { get; private set; }
 
         public double   time;
-        public int      type;
-        public int      hitsound;
+        public Type     type;
+        public HitSound hitSound;
 
         // extras
         // not all file versions have these, so they need to be nullable
@@ -36,8 +36,9 @@ namespace MapsetParser.objects
         public int?                 volume;
         public string               filename       = null;
 
-        /// <summary> Determines which sounds will be played as feedback (can be combined, thus bitflags). </summary>
-        public enum Hitsound
+        /// <summary> Determines which sounds will be played as feedback (can be combined, bitflags). </summary>
+        [Flags]
+        public enum HitSound
         {
             None    = 0,
             Normal  = 1,
@@ -46,7 +47,8 @@ namespace MapsetParser.objects
             Clap    = 8
         }
 
-        /// <summary> Determines the properties of the hit object (can be combined, thus bitflags). </summary>
+        /// <summary> Determines the properties of the hit object (can be combined, bitflags). </summary>
+        [Flags]
         public enum Type
         {
             Circle          = 1,
@@ -68,7 +70,7 @@ namespace MapsetParser.objects
 
             time       = GetTime(aCode);
             type       = GetTypeFlags(aCode);
-            hitsound   = GetHitsound(aCode);
+            hitSound   = GetHitSound(aCode);
 
             // extras
             Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> extras = GetExtras(aCode);
@@ -81,12 +83,9 @@ namespace MapsetParser.objects
                 volume = extras.Item4 == 0 ? null : extras.Item4;
 
                 // hitsound filenames only apply to circles and hold notes
-                if(((type & (int)Type.Circle)           > 0 ||
-                    (type & (int)Type.ManiaHoldNote)    > 0) &&
-                    extras.Item5.Trim() != "")
-                {
-                    filename = PathStatic.ParsePath(extras.Item5);
-                }
+                string hitSoundFile = extras.Item5;
+                if (hitSoundFile.Trim() != "" && type.HasFlag(Type.Circle | Type.ManiaHoldNote))
+                    filename = PathStatic.ParsePath(hitSoundFile);
             }
         }
 
@@ -107,14 +106,14 @@ namespace MapsetParser.objects
             return double.Parse(aCode.Split(',')[2], CultureInfo.InvariantCulture);
         }
         
-        private int GetTypeFlags(string aCode)
+        private Type GetTypeFlags(string aCode)
         {
-            return int.Parse(aCode.Split(',')[3]);
+            return (Type)int.Parse(aCode.Split(',')[3]);
         }
         
-        private int GetHitsound(string aCode)
+        private HitSound GetHitSound(string aCode)
         {
-            return int.Parse(aCode.Split(',')[4]);
+            return (HitSound)int.Parse(aCode.Split(',')[4]);
         }
         
         private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int? ,int?, string> GetExtras(string aCode)
@@ -181,12 +180,6 @@ namespace MapsetParser.objects
          *  Utility
          */
 
-        /// <summary> Returns whether the hit object has the given type. </summary>
-        public bool HasType(Type aType)
-        {
-            return (type & (int)aType) != 0;
-        }
-
         /// <summary> Returns whether a hit object code has the given type. </summary>
         public static bool HasType(string aCode, Type aType)
         {
@@ -194,11 +187,11 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns whether the hit object has a hit sound, or optionally a certain type of hit sound. </summary>
-        public bool HasHitsound(Hitsound? aHitsound = null)
+        public bool HasHitsound(HitSound? aHitsound = null)
         {
             return aHitsound == null
-                ? hitsound > 0
-                : ((Hitsound)hitsound).HasFlag(aHitsound);
+                ? hitSound > 0
+                : ((HitSound)hitSound).HasFlag(aHitsound);
         }
 
         /// <summary> Returns the difference in time between the start of this object and the end of the previous object. </summary>
@@ -235,7 +228,7 @@ namespace MapsetParser.objects
                 yield return ((HoldNote)this).endTime;
         }
 
-        /// <summary> Returns the sampleset of the hit object, optionally prioritizing the addition. </summary>
+        /// <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
         public Beatmap.Sampleset GetSampleset(bool anAddition = false)
         {
             if (anAddition && addition != Beatmap.Sampleset.Auto)
@@ -246,69 +239,69 @@ namespace MapsetParser.objects
                 ? beatmap.GetTimingLine(time, false, true).sampleset : sampleset;
         }
 
+        /// <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
+        public Beatmap.Sampleset? GetStartSampleset(bool anAddition = false)
+        {
+            return (this as Slider)?.GetStartSampleset(anAddition) ?? ((this is Spinner) ? null : (Beatmap.Sampleset?)GetSampleset(anAddition));
+        }
+
+        /// <summary> Returns the effective sampleset of the tail of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
+        public virtual Beatmap.Sampleset? GetEndSampleset(bool anAddition = false)
+        {
+            return (this as Slider)?.GetEndSampleset(anAddition) ?? ((this is Spinner) ? (Beatmap.Sampleset?)GetSampleset(anAddition) : null);
+        }
+
         /// <summary> Returns the hit sound of the head of the object, if applicable, otherwise null. </summary>
-        public Hitsound? GetHitsoundStart()
+        public HitSound? GetStartHitSound()
         {
             // spinners have no start
             return (this as Slider)?.startHitsound
                 ?? ((this is Spinner) ? null
-                 : (Hitsound?)hitsound);
+                 : (HitSound?)hitSound);
         }
 
         /// <summary> Returns the hit sound of the tail of the object, if it applicable, otherwise null. </summary>
-        public Hitsound? GetHitsoundEnd()
+        public HitSound? GetEndHitSound()
         {
             // circles and hold notes have no end
             return (this as Slider)?.endHitsound
-                ?? (Hitsound?)(this as Spinner)?.hitsound
+                ?? (HitSound?)(this as Spinner)?.hitSound
                 ?? null;
         }
 
         /// <summary> Returns the hit sound of the slide of the object, if applicable, otherwise null. </summary>
-        public Hitsound? GetSliderslide()
+        public HitSound? GetSliderslide()
         {
             // circles, hold notes and spinners have no sliderslide
-            return (Hitsound?)(this as Slider)?.hitsound
+            return (HitSound?)(this as Slider)?.hitSound
                  ?? null;
         }
 
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
-        public IEnumerable<Tuple<int, Beatmap.Sampleset?, Hitsound?>> GetUsedHitsounds(bool anAddition = false)
+        public IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> GetUsedHitsounds(bool anAddition = false)
         {
-            yield return new Tuple<int, Beatmap.Sampleset?, Hitsound?>(
+            yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                 beatmap.GetTimingLine(time, false, true).customIndex,
-                GetSampleStart(anAddition), GetHitsoundStart());
+                GetStartSampleset(anAddition), GetStartHitSound());
 
-            yield return new Tuple<int, Beatmap.Sampleset?, Hitsound?>(
+            yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                 beatmap.GetTimingLine(GetEndTime(), false, true).customIndex,
-                GetSampleEnd(anAddition), GetHitsoundEnd());
+                GetEndSampleset(anAddition), GetEndHitSound());
 
             // only runs if it's a slider with repeats
             for (int i = 0; i < ((this as Slider)?.repeatHitsounds.Count() ?? 0); ++i)
             {
                 // functions as list pairs
-                Hitsound?           hitsound  = (this as Slider)?.repeatHitsounds.ElementAt(i);
+                HitSound?           hitsound  = (this as Slider)?.repeatHitsounds.ElementAt(i);
                 Beatmap.Sampleset?  sampleset = (this as Slider)?.GetRepeatSampleset(i);
                 Beatmap.Sampleset?  addition  = (this as Slider)?.repeatAdditions.Count() > 0 ?   // not a thing in file version 9
                                                 (this as Slider)?.repeatAdditions.ElementAt(i) :
                                                 Beatmap.Sampleset.Auto;
 
-                yield return new Tuple<int, Beatmap.Sampleset?, Hitsound?>(
+                yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                     beatmap.GetTimingLine((this as Slider).GetCurveDuration() * (i + 1), false, true).customIndex,
                     anAddition && addition != Beatmap.Sampleset.Auto ? addition : sampleset, hitsound);
             }
-        }
-
-        /// <summary> Returns the sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset? GetSampleStart(bool anAddition = false)
-        {
-            return (this as Slider)?.GetStartSampleset(anAddition) ?? ((this is Spinner) ? null : (Beatmap.Sampleset?)GetSampleset(anAddition));
-        }
-
-        /// <summary> Returns the sampleset of the tail of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset? GetSampleEnd(bool anAddition = false)
-        {
-            return (this as Slider)?.GetEndSampleset(anAddition) ?? ((this is Spinner) ? (Beatmap.Sampleset?)GetSampleset(anAddition) : null);
         }
 
         /// <summary> Returns the end time of the hit object, or the start time if no end time exists. </summary>

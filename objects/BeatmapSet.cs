@@ -135,17 +135,17 @@ namespace MapsetParser.objects
 
                 bool isTick = slide == "tick";
 
-                HitObject.Hitsound parsedHitsound =
-                    hitsound == "normal"    ? HitObject.Hitsound.Normal :
-                    hitsound == "whistle"   ? HitObject.Hitsound.Whistle :
-                    hitsound == "finish"    ? HitObject.Hitsound.Finish :
-                    hitsound == "clap"      ? HitObject.Hitsound.Clap :
-                                              HitObject.Hitsound.None;
+                HitObject.HitSound parsedHitsound =
+                    hitsound == "normal"    ? HitObject.HitSound.Normal :
+                    hitsound == "whistle"   ? HitObject.HitSound.Whistle :
+                    hitsound == "finish"    ? HitObject.HitSound.Finish :
+                    hitsound == "clap"      ? HitObject.HitSound.Clap :
+                                              HitObject.HitSound.None;
 
-                HitObject.Hitsound parsedSlide = 
-                    slide == "slide"    ? HitObject.Hitsound.Normal :
-                    slide == "whistle"  ? HitObject.Hitsound.Whistle :
-                                          HitObject.Hitsound.None;
+                HitObject.HitSound parsedSlide = 
+                    slide == "slide"    ? HitObject.HitSound.Normal :
+                    slide == "whistle"  ? HitObject.HitSound.Whistle :
+                                          HitObject.HitSound.None;
 
                 Beatmap.Sampleset parsedSample = 
                     sample == "normal"  ? Beatmap.Sampleset.Normal :
@@ -154,25 +154,25 @@ namespace MapsetParser.objects
                                           Beatmap.Sampleset.Auto;
 
                 // if neither slide nor hs is set, or sample isn't set, and it's not a slidertick, then the format is wrong and it's going to be unused
-                if (!((parsedHitsound == HitObject.Hitsound.None && parsedSlide == HitObject.Hitsound.None)
+                if (!((parsedHitsound == HitObject.HitSound.None && parsedSlide == HitObject.HitSound.None)
                     || parsedSample == Beatmap.Sampleset.Auto) || isTick)
                 {
                     foreach (Beatmap beatmap in beatmaps)
                     {
                         foreach (HitObject hitObject in beatmap.hitObjects)
                         {
-                            if (parsedHitsound == HitObject.Hitsound.Normal)
+                            if (parsedHitsound == HitObject.HitSound.Normal)
                             {
                                 // hitnormals trigger every time and are unaffected by additions
-                                IEnumerable<Tuple<int, Beatmap.Sampleset?, HitObject.Hitsound?>> usedHitnormals = hitObject.GetUsedHitsounds();
+                                IEnumerable<Tuple<int, Beatmap.Sampleset?, HitObject.HitSound?>> usedHitnormals = hitObject.GetUsedHitsounds();
                                 if (usedHitnormals.Any(aTuple => aTuple.Item1 == customIndex
                                                                 && aTuple.Item2 == parsedSample))
                                     return true;
                             }
-                            else if (parsedHitsound != HitObject.Hitsound.None)
+                            else if (parsedHitsound != HitObject.HitSound.None)
                             {
                                 // regular hitsounds, affected by additions which inherit samplesets
-                                IEnumerable<Tuple<int, Beatmap.Sampleset?, HitObject.Hitsound?>> usedHitsounds = hitObject.GetUsedHitsounds(true);
+                                IEnumerable<Tuple<int, Beatmap.Sampleset?, HitObject.HitSound?>> usedHitsounds = hitObject.GetUsedHitsounds(true);
                                 if (usedHitsounds.Any(aTuple => aTuple.Item1 == customIndex
                                                                 && aTuple.Item2 == parsedSample
                                                                 && aTuple.Item3.GetValueOrDefault().HasFlag(parsedHitsound)))
@@ -188,7 +188,7 @@ namespace MapsetParser.objects
                                     .Where(aLine => aLine.offset > slider.time && aLine.offset - 5 <= slider.endTime);
 
                                 // sliderwhistle needs a whistle hitsound on the slider, also check so it's not none since that's for slider ticks
-                                if (((HitObject.Hitsound)slider.hitsound).HasFlag(parsedSlide) || parsedSlide != HitObject.Hitsound.Whistle)
+                                if (((HitObject.HitSound)slider.hitSound).HasFlag(parsedSlide) || parsedSlide != HitObject.HitSound.Whistle)
                                 {
                                     // if any of them has the right custom then it's used
                                     // no need to do leniency on the first one since the lines already does that for us
