@@ -1,5 +1,6 @@
 using MapsetParser.objects;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -13,21 +14,30 @@ namespace MapsetParserTest
 
         private static BeatmapSet dorchadasSet         = new BeatmapSet(relativePath + @"\testcases\Rita - dorchadas");
         private static BeatmapSet realityDistortionSet = new BeatmapSet(relativePath + @"\testcases\Camellia Vs Akira Complex - Reality Distortion");
-        
+
         [Fact]
         public void LoadNonExistingTest() =>
             Assert.Throws<DirectoryNotFoundException>(() => new BeatmapSet(relativePath + @"\testcases\none"));
 
-        [Fact]
-        public void LoadedBeatmapTest() =>
-            Assert.Single(dorchadasSet.beatmaps);
+        public static IEnumerable<object[]> BeatmapSetData =>
+            new List<object[]>
+            {
+                new object[] { dorchadasSet },
+                new object[] { realityDistortionSet }
+            };
+
+        [Theory]
+        [MemberData(nameof(BeatmapSetData))]
+        public void LoadedBeatmapTest(BeatmapSet aBeatmapSet) =>
+            Assert.Single(aBeatmapSet.beatmaps);
+
+        [Theory]
+        [MemberData(nameof(BeatmapSetData))]
+        public void LoadedOsbTest(BeatmapSet aBeatmapSet) =>
+            Assert.NotNull(aBeatmapSet.osb);
 
         [Fact]
-        public void LoadedOsbTest() =>
-            Assert.NotNull(dorchadasSet.osb);
-
-        [Fact]
-        public void GetOsbFileNameTest() => 
+        public void GetOsbFileNameTest() =>
             Assert.Equal("Rita - dorchadas (Delis).osb", dorchadasSet.GetOsbFileName());
 
         [Fact]
@@ -39,32 +49,38 @@ namespace MapsetParserTest
             Assert.Single(dorchadasSet.hitsoundFiles);
 
         [Fact]
-        public void IsHitSoundFileUsedTest()
-        {
-            foreach(string hitSoundFile in dorchadasSet.hitsoundFiles)
-                Assert.True(dorchadasSet.IsHitSoundFileUsed(hitSoundFile));
+        public void UsedHitSoundLoadedCorrectlyTest() =>
+            Assert.Equal("soft-hitclap.wav", dorchadasSet.hitsoundFiles.FirstOrDefault());
 
-            Assert.True(dorchadasSet.IsHitSoundFileUsed("soft-hitclap.wav"));
-            Assert.False(dorchadasSet.IsHitSoundFileUsed("soft-hitclap99.wav"));
-        }
+        public static IEnumerable<object[]> IsHitSoundFileUsedData =>
+            dorchadasSet.hitsoundFiles.Select(aFile => new object[] { aFile, true });
+
+        [Theory]
+        [MemberData(nameof(IsHitSoundFileUsedData))]
+        [InlineData("soft-hitclap99.wav", false)]
+        public void IsHitSoundFileUsedTest(string aFileName, bool aUsed) =>
+            Assert.Equal(aUsed, dorchadasSet.IsHitSoundFileUsed(aFileName));
 
         [Fact]
         public void IsOsuUsedTest() =>
             Assert.True(dorchadasSet.IsFileUsed("Rita - dorchadas (Delis) [Mirash's Insane].osu"));
 
-        [Fact]
-        public void IsOsbUsedTest()
-        {
-            // The .osb is only used if it actually contains something.
-            Assert.False(dorchadasSet.IsFileUsed("Rita - dorchadas (Delis).osb"));
-            Assert.True(realityDistortionSet.IsFileUsed("Camellia Vs Akira Complex - Reality Distortion (rrtyui).osb"));
-        }
+        public static IEnumerable<object[]> IsOsbUsedData =>
+            new List<object[]>
+            {
+                new object[] { dorchadasSet, "Rita - dorchadas (Delis).osb", false },
+                new object[] { realityDistortionSet, "Camellia Vs Akira Complex - Reality Distortion (rrtyui).osb", true }
+            };
 
-        [Fact]
-        public void IsAnimationUsedTest()
-        {
-            Assert.True(realityDistortionSet.IsFileUsed(@"sb\element\realnoise\noise_3.png"));
-            Assert.False(realityDistortionSet.IsFileUsed(@"sb\element\realnoise\noise_4.png"));
-        }
+        [Theory]
+        [MemberData(nameof(IsOsbUsedData))]
+        public void IsOsbUsedTest(BeatmapSet aBeatmapSet, string aFileName, bool aUsed) =>
+            Assert.Equal(aUsed, aBeatmapSet.IsFileUsed(aFileName));
+
+        [Theory]
+        [InlineData(@"sb\element\realnoise\noise_3.png", true)]
+        [InlineData(@"sb\element\realnoise\noise_4.png", false)]
+        public void IsAnimationUsedTest(string aPath, bool aUsed) =>
+            Assert.Equal(aUsed, realityDistortionSet.IsFileUsed(aPath));
     }
 }
