@@ -30,15 +30,15 @@ namespace MapsetParser.objects.hitobjects
         public float                pixelLength;
 
         // hit sounding
-        public Hitsound             startHitsound;
+        public HitSound             startHitsound;
         public Beatmap.Sampleset    startSampleset;
         public Beatmap.Sampleset    startAddition;
 
-        public Hitsound             endHitsound;
+        public HitSound             endHitsound;
         public Beatmap.Sampleset    endSampleset;
         public Beatmap.Sampleset    endAddition;
 
-        public List<Hitsound>            repeatHitsounds;
+        public List<HitSound>            repeatHitsounds;
         public List<Beatmap.Sampleset>   repeatSamplesets;
         public List<Beatmap.Sampleset>   repeatAdditions;
         
@@ -134,11 +134,11 @@ namespace MapsetParser.objects.hitobjects
             return float.Parse(aCode.Split(',')[7], CultureInfo.InvariantCulture);
         }
         
-        private Tuple<Hitsound, Hitsound, IEnumerable<Hitsound>> GetEdgeHitsounds(string aCode)
+        private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitsounds(string aCode)
         {
-            Hitsound startHitsound = 0;
-            Hitsound endHitsound = 0;
-            IEnumerable<Hitsound> repeatHitsounds = new List<Hitsound>();
+            HitSound startHitsound = 0;
+            HitSound endHitsound = 0;
+            IEnumerable<HitSound> repeatHitsounds = new List<HitSound>();
 
             if (aCode.Split(',').Count() > 8)
             {
@@ -149,7 +149,7 @@ namespace MapsetParser.objects.hitobjects
                 {
                     for (int i = 0; i < edgeHitsounds.Split('|').Length; ++i)
                     {
-                        Hitsound hitsound = (Hitsound)int.Parse(edgeHitsounds.Split('|')[i]);
+                        HitSound hitsound = (HitSound)int.Parse(edgeHitsounds.Split('|')[i]);
 
                         // first is start
                         if (i == 0)
@@ -159,7 +159,7 @@ namespace MapsetParser.objects.hitobjects
                             endHitsound = hitsound;
                         // all the others are repeats
                         else
-                            repeatHitsounds = repeatHitsounds.Concat(new Hitsound[] { hitsound });
+                            repeatHitsounds = repeatHitsounds.Concat(new HitSound[] { hitsound });
                     }
                 }
             }
@@ -325,7 +325,7 @@ namespace MapsetParser.objects.hitobjects
         }
 
         /// <summary> Returns the sampleset on the head of the slider, optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset GetStartSampleset(bool anAddition = false)
+        public new Beatmap.Sampleset GetStartSampleset(bool anAddition = false)
         {
             if (anAddition && startAddition != Beatmap.Sampleset.Auto)
                 return startAddition;
@@ -350,7 +350,7 @@ namespace MapsetParser.objects.hitobjects
         }
 
         /// <summary> Returns the sampleset on the tail of the slider, optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset GetEndSampleset(bool anAddition = false)
+        public new Beatmap.Sampleset GetEndSampleset(bool anAddition = false)
         {
             if (anAddition && endAddition != Beatmap.Sampleset.Auto)
                 return endAddition;
