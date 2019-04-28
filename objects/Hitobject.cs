@@ -84,7 +84,7 @@ namespace MapsetParser.objects
 
                 // hitsound filenames only apply to circles and hold notes
                 string hitSoundFile = extras.Item5;
-                if (hitSoundFile.Trim() != "" && type.HasFlag(Type.Circle | Type.ManiaHoldNote))
+                if (hitSoundFile.Trim() != "" && (type.HasFlag(Type.Circle) || type.HasFlag(Type.ManiaHoldNote)))
                     filename = PathStatic.ParsePath(hitSoundFile);
             }
         }
@@ -255,30 +255,30 @@ namespace MapsetParser.objects
         public HitSound? GetStartHitSound()
         {
             // spinners have no start
-            return (this as Slider)?.startHitsound
-                ?? ((this is Spinner) ? null
-                 : (HitSound?)hitSound);
+            return
+                (this as Slider)?.startHitsound ??
+                ((this is Spinner) ? null : (HitSound?)hitSound);
         }
 
         /// <summary> Returns the hit sound(s) of the tail of the object, if it applicable, otherwise null. </summary>
         public HitSound? GetEndHitSound()
         {
             // circles and hold notes have no end
-            return (this as Slider)?.endHitsound
-                ?? (this as Spinner)?.hitSound
-                ?? null;
+            return
+                (this as Slider)?.endHitsound ??
+                (this as Spinner)?.hitSound ??
+                null;
         }
 
         /// <summary> Returns the hit sound(s) of the slide of the object, if applicable, otherwise null. </summary>
-        public HitSound? GetSliderslide()
+        public HitSound? GetSliderSlide()
         {
             // circles, hold notes and spinners have no sliderslide
-            return (this as Slider)?.hitSound
-                 ?? null;
+            return (this as Slider)?.hitSound ?? null;
         }
 
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
-        public IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> GetUsedHitsounds(bool anAddition = false)
+        private IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> GetUsedHitSounds(bool anAddition = false)
         {
             yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                 beatmap.GetTimingLine(time, false, true).customIndex,
@@ -287,11 +287,9 @@ namespace MapsetParser.objects
             yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                 beatmap.GetTimingLine(GetEndTime(), false, true).customIndex,
                 GetEndSampleset(anAddition), GetEndHitSound());
-
-            // only runs if it's a slider with repeats
+            
             for (int i = 0; i < ((this as Slider)?.repeatHitsounds.Count() ?? 0); ++i)
             {
-                // functions as list pairs
                 HitSound?           hitsound  = (this as Slider)?.repeatHitsounds.ElementAt(i);
                 Beatmap.Sampleset?  sampleset = (this as Slider)?.GetRepeatSampleset(i);
                 Beatmap.Sampleset?  addition  = (this as Slider)?.repeatAdditions.Count() > 0 ?   // not a thing in file version 9
@@ -304,14 +302,80 @@ namespace MapsetParser.objects
             }
         }
 
+        /// <summary> Returns all used hit sound file names for this object without extension. </summary>
+        public IEnumerable<string> GetUsedHitSoundFileNames()
+        {
+            IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> usedHitSounds = GetUsedHitSounds(true);
+            foreach (var usedHitSound in usedHitSounds)
+            {
+                foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
+                {
+                    // We only handle the actual hit sounds here, which are affected by additions.
+                    if (individualHitSound != HitSound.Normal && usedHitSound.Item3.GetValueOrDefault().HasFlag(individualHitSound))
+                    {
+                        string sampleset = usedHitSound.Item2.ToString().ToLower();
+                        string hitSound = usedHitSound.Item3.ToString().ToLower();
+                        string customIndex = usedHitSound.Item1 == 1 ? "" : usedHitSound.Item1.ToString();
+
+                        yield return $"{sampleset}-hit{hitSound}{customIndex}";
+                    }
+                }
+            }
+
+            IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> usedHitNormals = GetUsedHitSounds(false);
+            foreach (var usedHitNormal in usedHitNormals)
+            {
+                // Hit normals are not affected by additions, so we need to do this separately, since otherwise the samplesets would be incorrect.
+                if (usedHitNormal.Item3.GetValueOrDefault().HasFlag(HitSound.Normal))
+                {
+                    string sampleset = usedHitNormal.Item2.ToString().ToLower();
+                    string customIndex = usedHitNormal.Item1 == 1 ? "" : usedHitNormal.Item1.ToString();
+
+                    yield return $"{sampleset}-hitnormal{customIndex}";
+                }
+            }
+
+            if (this is Slider slider)
+            {
+                IEnumerable<TimingLine> lines =
+                    beatmap.timingLines.Where(aLine =>
+                        aLine.offset > slider.time &&
+                        aLine.offset <= slider.endTime);
+
+                string slide = hitSound.HasFlag(HitSound.Whistle) ? "whistle" : "slide";
+
+                TimingLine prevLine = beatmap.GetTimingLine(slider.time, false, true);
+                foreach (TimingLine line in lines)
+                {
+                    if (prevLine == line || prevLine.customIndex != line.customIndex)
+                    {
+                        string sampleset = line.sampleset.ToString();
+
+                        yield return $"{sampleset}-slider{slide}{line.customIndex}";
+                    }
+                    prevLine = line;
+                }
+
+                IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
+                foreach (double tickTime in tickTimes)
+                {
+                    TimingLine line = beatmap.GetTimingLine(tickTime);
+                    string sampleset = line.sampleset.ToString();
+
+                    yield return $"{sampleset}-slidertick{line.customIndex}";
+                }
+            }
+        }
+
         /// <summary> Returns the end time of the hit object, or the start time if no end time exists. </summary>
         public double GetEndTime()
         {
             // regardless of circle/slider/spinner/hold note, finds the end of the object
-            return (this as Slider)?.endTime
-                ?? (this as Spinner)?.endTime
-                ?? (this as HoldNote)?.endTime
-                ?? time;
+            return
+                (this as Slider)?.endTime ??
+                (this as Spinner)?.endTime ??
+                (this as HoldNote)?.endTime ??
+                time;
         }
 
         /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Circle" or "Spinner tail". </summary>
@@ -327,11 +391,11 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the name of the object in general, for example "Slider", "Circle", "Hold note", etc. </summary>
         public string GetObjectType() =>
-                this is Slider   ? "Slider" :
-                this is Circle   ? "Circle" :
-                this is Spinner  ? "Spinner" :
-                this is HoldNote ? "Hold note" :
-                                   "Unknown object";
+            this is Slider   ? "Slider" :
+            this is Circle   ? "Circle" :
+            this is Spinner  ? "Spinner" :
+            this is HoldNote ? "Hold note" :
+                               "Unknown object";
 
         public override string ToString() =>
             time + " ms: " + GetObjectType() + " at (" + Position.X + "; " + Position.Y + ")";

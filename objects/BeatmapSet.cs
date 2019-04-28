@@ -123,95 +123,11 @@ namespace MapsetParser.objects
         /// <summary> Returns whether or not a hit sound file is used based on its file name. </summary>
         public bool IsHitSoundFileUsed(string aFileName)
         {
-            Regex hitsoundRegex = new Regex("(soft|normal|drum)-(slider(slide|whistle|tick)|hit(clap|finish|whistle|normal))(\\d+)?");
-            if (hitsoundRegex.IsMatch(aFileName))
-            {
-                Match match = hitsoundRegex.Match(aFileName);
-
-                string sample = match.Groups[1].ToString();
-                string slide = match.Groups[3].ToString();
-                string hitsound = match.Groups[4].ToString();
-                int customIndex = match.Groups[5].ToString().Length > 0 ? int.Parse(match.Groups[5].ToString()) : 1;
-
-                bool isTick = slide == "tick";
-
-                HitObject.HitSound parsedHitsound =
-                    hitsound == "normal"    ? HitObject.HitSound.Normal :
-                    hitsound == "whistle"   ? HitObject.HitSound.Whistle :
-                    hitsound == "finish"    ? HitObject.HitSound.Finish :
-                    hitsound == "clap"      ? HitObject.HitSound.Clap :
-                                              HitObject.HitSound.None;
-
-                HitObject.HitSound parsedSlide = 
-                    slide == "slide"    ? HitObject.HitSound.Normal :
-                    slide == "whistle"  ? HitObject.HitSound.Whistle :
-                                          HitObject.HitSound.None;
-
-                Beatmap.Sampleset parsedSample = 
-                    sample == "normal"  ? Beatmap.Sampleset.Normal :
-                    sample == "soft"    ? Beatmap.Sampleset.Soft :
-                    sample == "drum"    ? Beatmap.Sampleset.Drum :
-                                          Beatmap.Sampleset.Auto;
-
-                // if neither slide nor hs is set, or sample isn't set, and it's not a slidertick, then the format is wrong and it's going to be unused
-                if (!((parsedHitsound == HitObject.HitSound.None && parsedSlide == HitObject.HitSound.None)
-                    || parsedSample == Beatmap.Sampleset.Auto) || isTick)
-                {
-                    foreach (Beatmap beatmap in beatmaps)
-                    {
-                        foreach (HitObject hitObject in beatmap.hitObjects)
-                        {
-                            if (parsedHitsound == HitObject.HitSound.Normal)
-                            {
-                                // hitnormals trigger every time and are unaffected by additions
-                                IEnumerable<Tuple<int, Beatmap.Sampleset?, HitObject.HitSound?>> usedHitnormals = hitObject.GetUsedHitsounds();
-                                if (usedHitnormals.Any(aTuple => aTuple.Item1 == customIndex
-                                                                && aTuple.Item2 == parsedSample))
-                                    return true;
-                            }
-                            else if (parsedHitsound != HitObject.HitSound.None)
-                            {
-                                // regular hitsounds, affected by additions which inherit samplesets
-                                IEnumerable<Tuple<int, Beatmap.Sampleset?, HitObject.HitSound?>> usedHitsounds = hitObject.GetUsedHitsounds(true);
-                                if (usedHitsounds.Any(aTuple => aTuple.Item1 == customIndex
-                                                                && aTuple.Item2 == parsedSample
-                                                                && aTuple.Item3.GetValueOrDefault().HasFlag(parsedHitsound)))
-                                    return true;
-                            }
-                            else if (hitObject is Slider)
-                            {
-                                Slider slider = hitObject as Slider;
-
-                                // get all the new timing lines while the slider is in effect
-                                // has a leniency of 5 ms behind the timingline, forward leniency doens't matter due to priority
-                                IEnumerable<TimingLine> lines = beatmap.timingLines
-                                    .Where(aLine => aLine.offset > slider.time && aLine.offset - 5 <= slider.endTime);
-
-                                // sliderwhistle needs a whistle hitsound on the slider, also check so it's not none since that's for slider ticks
-                                if (((HitObject.HitSound)slider.hitSound).HasFlag(parsedSlide) || parsedSlide != HitObject.HitSound.Whistle)
-                                {
-                                    // if any of them has the right custom then it's used
-                                    // no need to do leniency on the first one since the lines already does that for us
-                                    if (beatmap.GetTimingLine(slider.time).customIndex == customIndex
-                                        || lines.Any(aLine => aLine.customIndex == customIndex))
-                                        return true;
-                                }
-                                
-                                if (isTick)
-                                {
-                                    IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
-                                    foreach (double tickTime in tickTimes)
-                                    {
-                                        TimingLine line = beatmap.GetTimingLine(tickTime);
-                                        if (line.sampleset == parsedSample)
-                                            return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            foreach (Beatmap beatmap in beatmaps)
+                foreach (HitObject hitObject in beatmap.hitObjects)
+                    foreach (string fileName in hitObject.GetUsedHitSoundFileNames())
+                        if (aFileName == fileName)
+                            return true;
             return false;
         }
 
