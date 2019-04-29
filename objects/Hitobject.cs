@@ -287,7 +287,7 @@ namespace MapsetParser.objects
             yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                 beatmap.GetTimingLine(GetEndTime(), false, true).customIndex,
                 GetEndSampleset(anAddition), GetEndHitSound());
-            
+
             for (int i = 0; i < ((this as Slider)?.repeatHitsounds.Count() ?? 0); ++i)
             {
                 HitSound?           hitsound  = (this as Slider)?.repeatHitsounds.ElementAt(i);
@@ -305,19 +305,23 @@ namespace MapsetParser.objects
         /// <summary> Returns all used hit sound file names for this object without extension. </summary>
         public IEnumerable<string> GetUsedHitSoundFileNames()
         {
+            List<string> usedFiles = new List<string>();
+
             IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> usedHitSounds = GetUsedHitSounds(true);
             foreach (var usedHitSound in usedHitSounds)
             {
                 foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
                 {
                     // We only handle the actual hit sounds here, which are affected by additions.
-                    if (individualHitSound != HitSound.Normal && usedHitSound.Item3.GetValueOrDefault().HasFlag(individualHitSound))
+                    if (individualHitSound != HitSound.Normal &&
+                        individualHitSound != HitSound.None &&
+                        usedHitSound.Item3.GetValueOrDefault().HasFlag(individualHitSound))
                     {
                         string sampleset = usedHitSound.Item2.ToString().ToLower();
-                        string hitSound = usedHitSound.Item3.ToString().ToLower();
+                        string hitSound = individualHitSound.ToString().ToLower();
                         string customIndex = usedHitSound.Item1 == 1 ? "" : usedHitSound.Item1.ToString();
 
-                        yield return $"{sampleset}-hit{hitSound}{customIndex}";
+                        usedFiles.Add($"{sampleset}-hit{hitSound}{customIndex}");
                     }
                 }
             }
@@ -326,45 +330,46 @@ namespace MapsetParser.objects
             foreach (var usedHitNormal in usedHitNormals)
             {
                 // Hit normals are not affected by additions, so we need to do this separately, since otherwise the samplesets would be incorrect.
-                if (usedHitNormal.Item3.GetValueOrDefault().HasFlag(HitSound.Normal))
+                // Another reason we're doing this separately is because all places where hit sounds exist (or don't, but can), there is a hit normal.
+                // For example, where spinners start, there is no hit normal, since there can't be a hit sound there.
+                if (usedHitNormal.Item3 != null)
                 {
                     string sampleset = usedHitNormal.Item2.ToString().ToLower();
                     string customIndex = usedHitNormal.Item1 == 1 ? "" : usedHitNormal.Item1.ToString();
 
-                    yield return $"{sampleset}-hitnormal{customIndex}";
+                    usedFiles.Add($"{sampleset}-hitnormal{customIndex}");
                 }
             }
 
             if (this is Slider slider)
             {
-                IEnumerable<TimingLine> lines =
+                List<TimingLine> lines =
                     beatmap.timingLines.Where(aLine =>
                         aLine.offset > slider.time &&
-                        aLine.offset <= slider.endTime);
+                        aLine.offset <= slider.endTime).ToList();
+
+                lines.Add(beatmap.GetTimingLine(slider.time, false, true));
 
                 string slide = hitSound.HasFlag(HitSound.Whistle) ? "whistle" : "slide";
-
-                TimingLine prevLine = beatmap.GetTimingLine(slider.time, false, true);
+                
                 foreach (TimingLine line in lines)
                 {
-                    if (prevLine == line || prevLine.customIndex != line.customIndex)
-                    {
-                        string sampleset = line.sampleset.ToString();
+                    string sampleset = line.sampleset.ToString().ToLower();
 
-                        yield return $"{sampleset}-slider{slide}{line.customIndex}";
-                    }
-                    prevLine = line;
+                    usedFiles.Add($"{sampleset}-slider{slide}{line.customIndex}");
                 }
 
                 IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
                 foreach (double tickTime in tickTimes)
                 {
                     TimingLine line = beatmap.GetTimingLine(tickTime);
-                    string sampleset = line.sampleset.ToString();
+                    string sampleset = line.sampleset.ToString().ToLower();
 
-                    yield return $"{sampleset}-slidertick{line.customIndex}";
+                    usedFiles.Add($"{sampleset}-slidertick{line.customIndex}");
                 }
             }
+
+            return usedFiles.Distinct();
         }
 
         /// <summary> Returns the end time of the hit object, or the start time if no end time exists. </summary>
