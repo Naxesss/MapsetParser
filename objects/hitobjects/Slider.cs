@@ -222,9 +222,11 @@ namespace MapsetParser.objects.hitobjects
         
         private new double GetEndTime()
         {
-            double start = time;// - mBeatmap.GetTheoreticalUnsnap(mTime);
+            double start = time;
             double duration = GetCurveDuration();
-            return start + duration * edgeAmount;
+            double endTime = start + duration * edgeAmount;
+
+            return endTime + beatmap.GetPracticalUnsnap(endTime);
         }
 
         private IEnumerable<Vector2> GetRedAnchors()
