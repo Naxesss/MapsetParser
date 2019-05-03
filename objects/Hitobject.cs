@@ -355,8 +355,9 @@ namespace MapsetParser.objects
                 foreach (TimingLine line in lines)
                 {
                     string sampleset = line.sampleset.ToString().ToLower();
+                    string customIndex = line.customIndex == 1 ? "" : line.customIndex.ToString();
 
-                    usedFiles.Add($"{sampleset}-slider{slide}{line.customIndex}");
+                    usedFiles.Add($"{sampleset}-slider{slide}{customIndex}");
                 }
 
                 IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
@@ -364,8 +365,9 @@ namespace MapsetParser.objects
                 {
                     TimingLine line = beatmap.GetTimingLine(tickTime);
                     string sampleset = line.sampleset.ToString().ToLower();
+                    string customIndex = line.customIndex == 1 ? "" : line.customIndex.ToString();
 
-                    usedFiles.Add($"{sampleset}-slidertick{line.customIndex}");
+                    usedFiles.Add($"{sampleset}-slidertick{customIndex}");
                 }
             }
 
