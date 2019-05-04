@@ -20,7 +20,7 @@ namespace MapsetParser.objects
 
         public string               songPath;
         public List<string>         songFilePaths  = new List<string>();
-        public IEnumerable<string>  hitsoundFiles;
+        public IEnumerable<string>  hitSoundFiles;
 
         private struct BeatmapFile
         {
@@ -44,7 +44,7 @@ namespace MapsetParser.objects
 
             Initalize(aBeatmapSetPath);
             
-            hitsoundFiles = GetHitsoundFiles().ToList();
+            hitSoundFiles = GetHitSoundFiles().ToList();
             beatmaps = beatmaps.OrderBy(aBeatmap => aBeatmap.starRating).ToList();
 
             mapsetTrack.Complete();
@@ -161,7 +161,7 @@ namespace MapsetParser.objects
                 aBeatmap.videos         .Any(anElement => anElement.path.ToLower() == parsedPath) ||
                 aBeatmap.backgrounds    .Any(anElement => anElement.path.ToLower() == parsedPath) ||
                 aBeatmap.animations     .Any(anElement => anElement.path.ToLower() == parsedPath) ||
-                aBeatmap.storyHitsounds .Any(anElement => anElement.path.ToLower() == parsedPath)))
+                aBeatmap.storyHitSounds .Any(anElement => anElement.path.ToLower() == parsedPath)))
                 return true;
 
             // animations cannot be stripped of their extension
@@ -169,7 +169,7 @@ namespace MapsetParser.objects
                 aBeatmap.sprites         .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 aBeatmap.videos          .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 aBeatmap.backgrounds     .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
-                aBeatmap.storyHitsounds  .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))))
+                aBeatmap.storyHitSounds  .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))))
             {
                 if(parsedPath == lastStripped)
                     return true;
@@ -180,14 +180,14 @@ namespace MapsetParser.objects
                 osb.videos        .Any(anElement => anElement.path.ToLower() == parsedPath) ||
                 osb.backgrounds   .Any(anElement => anElement.path.ToLower() == parsedPath) ||
                 osb.animations    .Any(anElement => anElement.path.ToLower() == parsedPath) ||
-                osb.storyHitsounds.Any(anElement => anElement.path.ToLower() == parsedPath)))
+                osb.storyHitSounds.Any(anElement => anElement.path.ToLower() == parsedPath)))
                 return true;
 
             if (osb != null && (
                 osb.sprites       .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 osb.videos        .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 osb.backgrounds   .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
-                osb.storyHitsounds.Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))))
+                osb.storyHitSounds.Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))))
             {
                 if (parsedPath == lastStripped)
                     return true;
@@ -197,7 +197,7 @@ namespace MapsetParser.objects
                 (anObject.filename != null ? PathStatic.ParsePath(anObject.filename, true) : null) == strippedPath)))
                 return true;
 
-            if (hitsoundFiles.Any(aHitsoundPath => PathStatic.ParsePath(aHitsoundPath) == parsedPath))
+            if (hitSoundFiles.Any(aHitSoundPath => PathStatic.ParsePath(aHitSoundPath) == parsedPath))
                 return true;
 
             if (SkinStatic.IsUsed(fileName, this))
@@ -226,7 +226,7 @@ namespace MapsetParser.objects
             return false;
         }
 
-        private IEnumerable<string> GetHitsoundFiles()
+        private IEnumerable<string> GetHitSoundFiles()
         {
             foreach (string filePath in songFilePaths)
             {

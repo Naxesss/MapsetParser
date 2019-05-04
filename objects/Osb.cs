@@ -14,7 +14,7 @@ namespace MapsetParser.objects
         public List<Video>          videos;
         public List<Break>          breaks;
         public List<Sprite>         sprites;
-        public List<StoryHitsound>  storyHitsounds;
+        public List<StoryHitSound>  storyHitSounds;
         public List<Animation>      animations;
 
         public Osb(string aCode)
@@ -43,7 +43,7 @@ namespace MapsetParser.objects
             videos         = GetEvents(codeResult, new List<string>() { "Video",        "1" }, aLine => new Video(aLine));
             breaks         = GetEvents(codeResult, new List<string>() { "Break",        "2" }, aLine => new Break(aLine));
             sprites        = GetEvents(codeResult, new List<string>() { "Sprite",       "4" }, aLine => new Sprite(aLine));
-            storyHitsounds = GetEvents(codeResult, new List<string>() { "Sample",       "5" }, aLine => new StoryHitsound(aLine));
+            storyHitSounds = GetEvents(codeResult, new List<string>() { "Sample",       "5" }, aLine => new StoryHitSound(aLine));
             animations     = GetEvents(codeResult, new List<string>() { "Animation",    "6" }, aLine => new Animation(aLine));
         }
 
@@ -54,7 +54,7 @@ namespace MapsetParser.objects
                 || videos          .Count > 0
                 || breaks          .Count > 0
                 || sprites         .Count > 0
-                || storyHitsounds  .Count > 0
+                || storyHitSounds  .Count > 0
                 || animations      .Count > 0;
         }
 

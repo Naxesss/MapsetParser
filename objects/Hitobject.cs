@@ -187,11 +187,11 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns whether the hit object has a hit sound, or optionally a certain type of hit sound. </summary>
-        public bool HasHitsound(HitSound? aHitsound = null)
+        public bool HasHitSound(HitSound? aHitSound = null)
         {
-            return aHitsound == null
+            return aHitSound == null
                 ? hitSound > 0
-                : ((HitSound)hitSound).HasFlag(aHitsound);
+                : ((HitSound)hitSound).HasFlag(aHitSound);
         }
 
         /// <summary> Returns the difference in time between the start of this object and the end of the previous object. </summary>
@@ -256,7 +256,7 @@ namespace MapsetParser.objects
         {
             // spinners have no start
             return
-                (this as Slider)?.startHitsound ??
+                (this as Slider)?.startHitSound ??
                 ((this is Spinner) ? null : (HitSound?)hitSound);
         }
 
@@ -265,7 +265,7 @@ namespace MapsetParser.objects
         {
             // circles and hold notes have no end
             return
-                (this as Slider)?.endHitsound ??
+                (this as Slider)?.endHitSound ??
                 (this as Spinner)?.hitSound ??
                 null;
         }
@@ -288,9 +288,9 @@ namespace MapsetParser.objects
                 beatmap.GetTimingLine(GetEndTime(), false, true).customIndex,
                 GetEndSampleset(anAddition), GetEndHitSound());
 
-            for (int i = 0; i < ((this as Slider)?.repeatHitsounds.Count() ?? 0); ++i)
+            for (int i = 0; i < ((this as Slider)?.repeatHitSounds.Count() ?? 0); ++i)
             {
-                HitSound?           hitsound  = (this as Slider)?.repeatHitsounds.ElementAt(i);
+                HitSound?           hitSound  = (this as Slider)?.repeatHitSounds.ElementAt(i);
                 Beatmap.Sampleset?  sampleset = (this as Slider)?.GetRepeatSampleset(i);
                 Beatmap.Sampleset?  addition  = (this as Slider)?.repeatAdditions.Count() > 0 ?   // not a thing in file version 9
                                                 (this as Slider)?.repeatAdditions.ElementAt(i) :
@@ -298,7 +298,7 @@ namespace MapsetParser.objects
 
                 yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
                     beatmap.GetTimingLine((this as Slider).GetCurveDuration() * (i + 1), false, true).customIndex,
-                    anAddition && addition != Beatmap.Sampleset.Auto ? addition : sampleset, hitsound);
+                    anAddition && addition != Beatmap.Sampleset.Auto ? addition : sampleset, hitSound);
             }
         }
 

@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace MapsetParser.objects.events
 {
-    public class StoryHitsound
+    public class StoryHitSound
     {
         // Sample,15707,0,"drum-hitnormal.wav",60
         // type, time, layer, path, volume
@@ -27,7 +27,7 @@ namespace MapsetParser.objects.events
             Foreground = 3
         }
 
-        public StoryHitsound(string aCode)
+        public StoryHitSound(string aCode)
         {
             time   = GetTime(aCode);
             layer  = GetLayer(aCode);

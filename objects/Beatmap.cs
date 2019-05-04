@@ -32,7 +32,7 @@ namespace MapsetParser.objects
         public List<Video>          videos;
         public List<Break>          breaks;
         public List<Sprite>         sprites;
-        public List<StoryHitsound>  storyHitsounds;
+        public List<StoryHitSound>  storyHitSounds;
         public List<Animation>      animations;
 
         // objects
@@ -85,7 +85,7 @@ namespace MapsetParser.objects
             videos         = GetEvents(aCode, new List<string>() { "Video",        "1" }, aLine => new Video(aLine));
             breaks         = GetEvents(aCode, new List<string>() { "Break",        "2" }, aLine => new Break(aLine));
             sprites        = GetEvents(aCode, new List<string>() { "Sprite",       "4" }, aLine => new Sprite(aLine));
-            storyHitsounds = GetEvents(aCode, new List<string>() { "Sample",       "5" }, aLine => new StoryHitsound(aLine));
+            storyHitSounds = GetEvents(aCode, new List<string>() { "Sample",       "5" }, aLine => new StoryHitSound(aLine));
             animations     = GetEvents(aCode, new List<string>() { "Animation",    "6" }, aLine => new Animation(aLine));
 
             timingLines        = GetTimingLines(aCode);
@@ -187,7 +187,7 @@ namespace MapsetParser.objects
             return isNearInTime && isNearInSpace && wouldStackCorrectly && aSlider.time < aCircle.time;
         }
 
-        /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start time. </summary>
+        /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start Hitsoundtime. </summary>
         private bool MeetsStackTime(Stackable anObject, Stackable anOtherObject) =>
             anOtherObject.time - anObject.GetEndTime() <= StackTimeThreshold();
 
@@ -205,9 +205,9 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the timing line currently in effect at the given time, optionally uninherited line only
         /// or with a 5 ms backward leniency. </summary>
-        public TimingLine GetTimingLine(double aTime, bool anUninherited = false, bool aHitsoundLeniency = false)
+        public TimingLine GetTimingLine(double aTime, bool anUninherited = false, bool aHitSoundLeniency = false)
         {
-            return timingLines.LastOrDefault(aLine => aLine.offset <= aTime + (aHitsoundLeniency ? 5 : 0) && (anUninherited ? aLine.uninherited : true))
+            return timingLines.LastOrDefault(aLine => aLine.offset <= aTime + (aHitSoundLeniency ? 5 : 0) && (anUninherited ? aLine.uninherited : true))
                 ?? GetNextTimingLine(aTime, anUninherited);
         }
 

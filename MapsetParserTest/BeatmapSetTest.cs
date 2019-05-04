@@ -46,14 +46,14 @@ namespace MapsetParserTest
 
         [Fact]
         public void UsedHitSoundLoadedTest() =>
-            Assert.Single(dorchadasSet.hitsoundFiles);
+            Assert.Single(dorchadasSet.hitSoundFiles);
 
         [Fact]
         public void UsedHitSoundLoadedCorrectlyTest() =>
-            Assert.Equal("soft-hitclap.wav", dorchadasSet.hitsoundFiles.FirstOrDefault());
+            Assert.Equal("soft-hitclap.wav", dorchadasSet.hitSoundFiles.FirstOrDefault());
 
         public static IEnumerable<object[]> IsHitSoundFileUsedData =>
-            dorchadasSet.hitsoundFiles.Select(aFile => new object[] { aFile, true });
+            dorchadasSet.hitSoundFiles.Select(aFile => new object[] { aFile, true });
 
         [Theory]
         [MemberData(nameof(IsHitSoundFileUsedData))]

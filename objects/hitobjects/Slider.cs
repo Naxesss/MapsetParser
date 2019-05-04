@@ -30,15 +30,15 @@ namespace MapsetParser.objects.hitobjects
         public float                pixelLength;
 
         // hit sounding
-        public HitSound             startHitsound;
+        public HitSound             startHitSound;
         public Beatmap.Sampleset    startSampleset;
         public Beatmap.Sampleset    startAddition;
 
-        public HitSound             endHitsound;
+        public HitSound             endHitSound;
         public Beatmap.Sampleset    endSampleset;
         public Beatmap.Sampleset    endAddition;
 
-        public List<HitSound>            repeatHitsounds;
+        public List<HitSound>            repeatHitSounds;
         public List<Beatmap.Sampleset>   repeatSamplesets;
         public List<Beatmap.Sampleset>   repeatAdditions;
         
@@ -63,18 +63,18 @@ namespace MapsetParser.objects.hitobjects
             pixelLength        = GetPixelLength(aCode);
 
             // hit sounding
-            var edgeHitsounds = GetEdgeHitsounds(aCode);
+            var edgeHitSounds = GetEdgeHitSounds(aCode);
             var edgeAdditions = GetEdgeAdditions(aCode);
 
-            startHitsound      = edgeHitsounds.Item1;
+            startHitSound      = edgeHitSounds.Item1;
             startSampleset     = edgeAdditions.Item1;
             startAddition      = edgeAdditions.Item2;
 
-            endHitsound        = edgeHitsounds.Item2;
+            endHitSound        = edgeHitSounds.Item2;
             endSampleset       = edgeAdditions.Item3;
             endAddition        = edgeAdditions.Item4;
 
-            repeatHitsounds    = edgeHitsounds.Item3.ToList();
+            repeatHitSounds    = edgeHitSounds.Item3.ToList();
             repeatSamplesets   = edgeAdditions.Item5.ToList();
             repeatAdditions    = edgeAdditions.Item6.ToList();
 
@@ -134,37 +134,37 @@ namespace MapsetParser.objects.hitobjects
             return float.Parse(aCode.Split(',')[7], CultureInfo.InvariantCulture);
         }
         
-        private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitsounds(string aCode)
+        private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitSounds(string aCode)
         {
-            HitSound startHitsound = 0;
-            HitSound endHitsound = 0;
-            IEnumerable<HitSound> repeatHitsounds = new List<HitSound>();
+            HitSound startHitSound = 0;
+            HitSound endHitSound = 0;
+            IEnumerable<HitSound> repeatHitSounds = new List<HitSound>();
 
             if (aCode.Split(',').Count() > 8)
             {
-                string edgeHitsounds = aCode.Split(',')[8];
+                string edgeHitSounds = aCode.Split(',')[8];
 
                 // not set in some situations
-                if (edgeHitsounds.Contains("|"))
+                if (edgeHitSounds.Contains("|"))
                 {
-                    for (int i = 0; i < edgeHitsounds.Split('|').Length; ++i)
+                    for (int i = 0; i < edgeHitSounds.Split('|').Length; ++i)
                     {
-                        HitSound hitsound = (HitSound)int.Parse(edgeHitsounds.Split('|')[i]);
+                        HitSound hitSound = (HitSound)int.Parse(edgeHitSounds.Split('|')[i]);
 
                         // first is start
                         if (i == 0)
-                            startHitsound = hitsound;
+                            startHitSound = hitSound;
                         // last is end
-                        else if (i == edgeHitsounds.Split('|').Length - 1)
-                            endHitsound = hitsound;
+                        else if (i == edgeHitSounds.Split('|').Length - 1)
+                            endHitSound = hitSound;
                         // all the others are repeats
                         else
-                            repeatHitsounds = repeatHitsounds.Concat(new HitSound[] { hitsound });
+                            repeatHitSounds = repeatHitSounds.Concat(new HitSound[] { hitSound });
                     }
                 }
             }
 
-            return Tuple.Create(startHitsound, endHitsound, repeatHitsounds);
+            return Tuple.Create(startHitSound, endHitSound, repeatHitSounds);
         }
         
         private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset,
