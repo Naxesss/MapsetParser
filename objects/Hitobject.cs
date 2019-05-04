@@ -398,11 +398,12 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the name of the object in general, for example "Slider", "Circle", "Hold note", etc. </summary>
         public string GetObjectType() =>
-            this is Slider   ? "Slider" :
-            this is Circle   ? "Circle" :
-            this is Spinner  ? "Spinner" :
-            this is HoldNote ? "Hold note" :
-                               "Unknown object";
+            // Creating a hit object instance rather than circle, slider, etc will prevent polymorphism, so we check the type as well.
+            this is Slider   || type.HasFlag(Type.Slider)        ? "Slider" :
+            this is Circle   || type.HasFlag(Type.Circle)        ? "Circle" :
+            this is Spinner  || type.HasFlag(Type.Spinner)       ? "Spinner" :
+            this is HoldNote || type.HasFlag(Type.ManiaHoldNote) ? "Hold note" :
+            "Unknown object";
 
         public override string ToString() =>
             time + " ms: " + GetObjectType() + " at (" + Position.X + "; " + Position.Y + ")";

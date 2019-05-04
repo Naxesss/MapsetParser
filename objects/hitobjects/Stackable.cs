@@ -23,6 +23,6 @@ namespace MapsetParser.objects.hitobjects
             new Vector2(GetStackOffset(aPosition.X), GetStackOffset(aPosition.Y));
 
         private float GetStackOffset(float aValue) =>
-            aValue + stackIndex * beatmap.difficultySettings.GetCircleRadius() * -0.1f;
+            aValue + stackIndex * (beatmap?.difficultySettings.GetCircleRadius() ?? 0) * -0.1f;
     }
 }
