@@ -3,7 +3,3 @@
 /bin
 *.csproj
 *.sln
-MapsetParserTest/obj
-MapsetParserTest/MapsetParserTest.csproj
-MapsetParserTest/bin/Debug/netcoreapp2.0/*
-!MapsetParserTest/bin/Debug/netcoreapp2.0/testcases
