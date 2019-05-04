@@ -1,8 +1,8 @@
 ﻿.vs/
 /obj
 /bin
-MapsetParser.csproj
-MapsetParser.sln
+*.csproj
+*.sln
 MapsetParserTest/obj
 MapsetParserTest/MapsetParserTest.csproj
 MapsetParserTest/bin/Debug/netcoreapp2.0/*
