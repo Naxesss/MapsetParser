@@ -19,22 +19,22 @@ namespace MapsetParser.objects
         // x, y, time, typeFlags, hitsound, (sliderPath, edgeAmount, pixelLength, hitsoundEdges, additionEdges,) extras          slider
         // x, y, time, typeFlags, hitsound, (endTime,) extras                                                                    spinner
 
-        public Beatmap beatmap;
-        public string code;
-        
+        public readonly Beatmap beatmap;
+        public readonly string  code;
+
         public virtual Vector2 Position { get; private set; }
 
-        public double   time;
-        public Type     type;
-        public HitSound hitSound;
+        public readonly double   time;
+        public readonly Type     type;
+        public readonly HitSound hitSound;
 
         // extras
         // not all file versions have these, so they need to be nullable
-        public Beatmap.Sampleset    sampleset;
-        public Beatmap.Sampleset    addition;
-        public int?                 customIndex;
-        public int?                 volume;
-        public string               filename       = null;
+        public readonly Beatmap.Sampleset sampleset;
+        public readonly Beatmap.Sampleset addition;
+        public readonly int?              customIndex;
+        public readonly int?              volume;
+        public readonly string            filename = null;
 
         /// <summary> Determines which sounds will be played as feedback (can be combined, bitflags). </summary>
         [Flags]
@@ -51,36 +51,36 @@ namespace MapsetParser.objects
         [Flags]
         public enum Type
         {
-            Circle          = 1,
-            Slider          = 2,
-            NewCombo        = 4,
-            Spinner         = 8,
-            ComboSkip1      = 16,
-            ComboSkip2      = 32,
-            ComboSkip3      = 64,
-            ManiaHoldNote   = 128
+            Circle        = 1,
+            Slider        = 2,
+            NewCombo      = 4,
+            Spinner       = 8,
+            ComboSkip1    = 16,
+            ComboSkip2    = 32,
+            ComboSkip3    = 64,
+            ManiaHoldNote = 128
         }
 
         public HitObject(string aCode, Beatmap aBeatmap)
         {
             beatmap = aBeatmap;
-            code = aCode;
-            
+            code    = aCode;
+
             Position = GetPosition(aCode);
 
-            time       = GetTime(aCode);
-            type       = GetTypeFlags(aCode);
-            hitSound   = GetHitSound(aCode);
+            time     = GetTime(aCode);
+            type     = GetTypeFlags(aCode);
+            hitSound = GetHitSound(aCode);
 
             // extras
             Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> extras = GetExtras(aCode);
             if (extras != null)
             {
                 // custom index and volume are by default 0 if there are edge hitsounds or similar
-                sampleset = extras.Item1;
-                addition = extras.Item2;
+                sampleset   = extras.Item1;
+                addition    = extras.Item2;
                 customIndex = extras.Item3 == 0 ? null : extras.Item3;
-                volume = extras.Item4 == 0 ? null : extras.Item4;
+                volume      = extras.Item4 == 0 ? null : extras.Item4;
 
                 // hitsound filenames only apply to circles and hold notes
                 string hitSoundFile = extras.Item5;
