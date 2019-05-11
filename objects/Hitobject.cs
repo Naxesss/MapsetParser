@@ -277,28 +277,51 @@ namespace MapsetParser.objects
             return (this as Slider)?.hitSound ?? null;
         }
 
-        /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
-        private IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> GetUsedHitSounds(bool anAddition = false)
+        private struct HitSoundSample
         {
-            yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
-                beatmap.GetTimingLine(time, false, true).customIndex,
-                GetStartSampleset(anAddition), GetStartHitSound());
+            public readonly int customIndex;
+            public readonly Beatmap.Sampleset? sampleset;
+            public readonly HitSound? hitSound;
 
-            yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
-                beatmap.GetTimingLine(GetEndTime(), false, true).customIndex,
-                GetEndSampleset(anAddition), GetEndHitSound());
-
-            for (int i = 0; i < ((this as Slider)?.repeatHitSounds.Count() ?? 0); ++i)
+            public HitSoundSample(int aCustomIndex, Beatmap.Sampleset? aSampleset, HitSound? aHitSound)
             {
-                HitSound?           hitSound  = (this as Slider)?.repeatHitSounds.ElementAt(i);
-                Beatmap.Sampleset?  sampleset = (this as Slider)?.GetRepeatSampleset(i);
-                Beatmap.Sampleset?  addition  = (this as Slider)?.repeatAdditions.Count() > 0 ?   // not a thing in file version 9
-                                                (this as Slider)?.repeatAdditions.ElementAt(i) :
-                                                Beatmap.Sampleset.Auto;
+                customIndex = aCustomIndex;
+                sampleset = aSampleset;
+                hitSound = aHitSound;
+            }
+        }
 
-                yield return new Tuple<int, Beatmap.Sampleset?, HitSound?>(
-                    beatmap.GetTimingLine((this as Slider).GetCurveDuration() * (i + 1), false, true).customIndex,
-                    anAddition && addition != Beatmap.Sampleset.Auto ? addition : sampleset, hitSound);
+        /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
+        private IEnumerable<HitSoundSample> GetUsedHitSounds(bool anAddition = false)
+        {
+            yield return new HitSoundSample(
+                beatmap.GetTimingLine(time, true).customIndex,
+                GetStartSampleset(anAddition),
+                GetStartHitSound());
+
+            yield return new HitSoundSample(
+                beatmap.GetTimingLine(GetEndTime(), true).customIndex,
+                GetEndSampleset(anAddition),
+                GetEndHitSound());
+
+            if (this is Slider slider)
+            {
+                for (int i = 0; i < slider.repeatHitSounds.Count; ++i)
+                {
+                    HitSound?          repeatHitSound  = slider.repeatHitSounds.ElementAt(i);
+                    Beatmap.Sampleset? repeatSampleset = slider.GetRepeatSampleset(i);
+                    Beatmap.Sampleset? repeatAddition  =
+                        slider.repeatAdditions.Any() ?   // not a thing in file version 9
+                        slider.repeatAdditions.ElementAt(i) :
+                        Beatmap.Sampleset.Auto;
+
+                    double repeatTime = slider.GetCurveDuration() * (i + 1);
+
+                    yield return new HitSoundSample(
+                        beatmap.GetTimingLine(repeatTime, true).customIndex,
+                        anAddition && repeatAddition != Beatmap.Sampleset.Auto ? repeatAddition : repeatSampleset,
+                        repeatHitSound);
+                }
             }
         }
 
@@ -307,37 +330,37 @@ namespace MapsetParser.objects
         {
             List<string> usedFiles = new List<string>();
 
-            IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> usedHitSounds = GetUsedHitSounds(true);
-            foreach (var usedHitSound in usedHitSounds)
+            IEnumerable<HitSoundSample> usedHitSoundSamples = GetUsedHitSounds(true);
+            foreach (var usedHitSoundSample in usedHitSoundSamples)
             {
                 foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
                 {
                     // We only handle the actual hit sounds here, which are affected by additions.
                     if (individualHitSound != HitSound.Normal &&
                         individualHitSound != HitSound.None &&
-                        usedHitSound.Item3.GetValueOrDefault().HasFlag(individualHitSound))
+                        (usedHitSoundSample.hitSound?.HasFlag(individualHitSound) ?? false))
                     {
-                        string sampleset = usedHitSound.Item2.ToString().ToLower();
-                        string hitSound = individualHitSound.ToString().ToLower();
-                        string customIndex = usedHitSound.Item1 == 1 ? "" : usedHitSound.Item1.ToString();
+                        string samplesetString   = usedHitSoundSample.sampleset.ToString().ToLower();
+                        string hitSoundString    = individualHitSound.ToString().ToLower();
+                        string customIndexString = usedHitSoundSample.customIndex == 1 ? "" : usedHitSoundSample.customIndex.ToString();
 
-                        usedFiles.Add($"{sampleset}-hit{hitSound}{customIndex}");
+                        usedFiles.Add($"{samplesetString}-hit{hitSoundString}{customIndexString}");
                     }
                 }
             }
 
-            IEnumerable<Tuple<int, Beatmap.Sampleset?, HitSound?>> usedHitNormals = GetUsedHitSounds(false);
+            IEnumerable<HitSoundSample> usedHitNormals = GetUsedHitSounds(false);
             foreach (var usedHitNormal in usedHitNormals)
             {
                 // Hit normals are not affected by additions, so we need to do this separately, since otherwise the samplesets would be incorrect.
                 // Another reason we're doing this separately is because all places where hit sounds exist (or don't, but can), there is a hit normal.
                 // For example, where spinners start, there is no hit normal, since there can't be a hit sound there.
-                if (usedHitNormal.Item3 != null)
+                if (usedHitNormal.hitSound != null)
                 {
-                    string sampleset = usedHitNormal.Item2.ToString().ToLower();
-                    string customIndex = usedHitNormal.Item1 == 1 ? "" : usedHitNormal.Item1.ToString();
+                    string samplesetString   = usedHitNormal.sampleset.ToString().ToLower();
+                    string customIndexString = usedHitNormal.customIndex == 1 ? "" : usedHitNormal.customIndex.ToString();
 
-                    usedFiles.Add($"{sampleset}-hitnormal{customIndex}");
+                    usedFiles.Add($"{samplesetString}-hitnormal{customIndexString}");
                 }
             }
 
