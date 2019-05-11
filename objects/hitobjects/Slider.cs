@@ -308,7 +308,7 @@ namespace MapsetParser.objects.hitobjects
             // the game acts as if anything less is equal to this
             double minSVMult = 0.1;
 
-            double msPerBeat          = (beatmap.GetTimingLine(aTime, true) as UninheritedLine).msPerBeat;
+            double msPerBeat          = beatmap.GetTimingLine<UninheritedLine>(aTime).msPerBeat;
             double effectiveSVMult    = beatmap.GetTimingLine(time).svMult < minSVMult ? minSVMult : beatmap.GetTimingLine(time).svMult;
             double sliderSpeed        = 100 * effectiveSVMult * beatmap.difficultySettings.sliderMultiplier / msPerBeat;
 
@@ -389,7 +389,7 @@ namespace MapsetParser.objects.hitobjects
         public List<double> GetSliderTickTimes()
         {
             float tickRate = beatmap.difficultySettings.sliderTickRate;
-            double msPerBeat = (beatmap.GetTimingLine(time, true) as UninheritedLine).msPerBeat;
+            double msPerBeat = beatmap.GetTimingLine<UninheritedLine>(time).msPerBeat;
 
             double theoreticalTime = time - beatmap.GetTheoreticalUnsnap(time);
             

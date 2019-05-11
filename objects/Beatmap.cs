@@ -208,7 +208,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the timing line currently in effect at the given time, optionally with a 5 ms backward leniency. </summary>
         public TimingLine GetTimingLine(double aTime, bool aHitSoundLeniency = false) => GetTimingLine<TimingLine>(aTime, aHitSoundLeniency);
         /// <summary> Same as <see cref="GetTimingLine"/> except only considers objects of a given type. </summary>
-        public TimingLine GetTimingLine<T>(double aTime, bool aHitSoundLeniency = false) where T : TimingLine
+        public T GetTimingLine<T>(double aTime, bool aHitSoundLeniency = false) where T : TimingLine
         {
             return
                 timingLines.OfType<T>().LastOrDefault( aLine =>
@@ -219,7 +219,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the next timing line after the current if any. </summary>
         public TimingLine GetNextTimingLine(double aTime) => GetNextTimingLine<TimingLine>(aTime);
         /// <summary> Same as <see cref="GetNextTimingLine"/> except only considers objects of a given type. </summary>
-        public TimingLine GetNextTimingLine<T>(double aTime) where T : TimingLine
+        public T GetNextTimingLine<T>(double aTime) where T : TimingLine
         {
             return
                 timingLines.OfType<T>().FirstOrDefault(aLine =>
@@ -229,7 +229,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
         public HitObject GetHitObject(double aTime) => GetHitObject<HitObject>(aTime);
         /// <summary> Same as <see cref="GetHitObject"/> except only considers objects of a given type. </summary>
-        public HitObject GetHitObject<T>(double aTime) where T : HitObject
+        public T GetHitObject<T>(double aTime) where T : HitObject
         {
             return
                 hitObjects.OfType<T>().LastOrDefault(anObject =>
@@ -240,7 +240,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the previous hit object if any, otherwise the first. </summary>
         public HitObject GetPrevHitObject(double aTime) => GetPrevHitObject<HitObject>(aTime);
         /// <summary> Same as <see cref="GetPrevHitObject"/> except only considers objects of a given type. </summary>
-        public HitObject GetPrevHitObject<T>(double aTime) where T : HitObject
+        public T GetPrevHitObject<T>(double aTime) where T : HitObject
         {
             return
                 hitObjects.OfType<T>().LastOrDefault(aHitObject =>
@@ -251,7 +251,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the next hit object after the current if any. </summary>
         public HitObject GetNextHitObject(double aTime) => GetNextHitObject<HitObject>(aTime);
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
-        public HitObject GetNextHitObject<T>(double aTime) where T : HitObject
+        public T GetNextHitObject<T>(double aTime) where T : HitObject
         {
             return
                 hitObjects.OfType<T>().FirstOrDefault(anObject =>
@@ -378,7 +378,7 @@ namespace MapsetParser.objects
         public double GetCountdownStartBeat()
         {
             // always 6 beats before the first, but the first beat can be cut by having the first beat 5 ms after 0.
-            UninheritedLine line = (UninheritedLine)GetTimingLine(0, true);
+            UninheritedLine line = GetTimingLine<UninheritedLine>(0);
 
             double firstBeatTime = line.offset;
             while (firstBeatTime - line.msPerBeat > 0)
@@ -400,7 +400,7 @@ namespace MapsetParser.objects
         /// <summary> Returns how many ms into a beat the given time is. </summary>
         public double GetOffsetIntoBeat(double aTime)
         {
-            UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
+            UninheritedLine line = GetTimingLine<UninheritedLine>(aTime);
 
             // gets how many miliseconds into a beat we are
             double time        = aTime - line.offset;
@@ -428,7 +428,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. </summary>
         public double GetTheoreticalUnsnap(double aTime, int aSecondDivisor = 16, int aThirdDivisor = 12)
         {
-            UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
+            UninheritedLine line = GetTimingLine<UninheritedLine>(aTime);
 
             double beatOffset      = GetOffsetIntoBeat(aTime);
             double currentFraction = beatOffset / line.msPerBeat;
