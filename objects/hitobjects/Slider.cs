@@ -24,33 +24,34 @@ namespace MapsetParser.objects.hitobjects
             Unknown
         }
 
-        public CurveType            curveType;
-        public List<Vector2>        nodePositions;
-        public int                  edgeAmount;
-        public float                pixelLength;
+        public readonly CurveType     curveType;
+        public readonly List<Vector2> nodePositions;
+        public readonly int           edgeAmount;
+        public readonly float         pixelLength;
 
         // hit sounding
-        public HitSound             startHitSound;
-        public Beatmap.Sampleset    startSampleset;
-        public Beatmap.Sampleset    startAddition;
+        public readonly HitSound          startHitSound;
+        public readonly Beatmap.Sampleset startSampleset;
+        public readonly Beatmap.Sampleset startAddition;
 
-        public HitSound             endHitSound;
-        public Beatmap.Sampleset    endSampleset;
-        public Beatmap.Sampleset    endAddition;
+        public readonly HitSound          endHitSound;
+        public readonly Beatmap.Sampleset endSampleset;
+        public readonly Beatmap.Sampleset endAddition;
 
-        public List<HitSound>            repeatHitSounds;
-        public List<Beatmap.Sampleset>   repeatSamplesets;
-        public List<Beatmap.Sampleset>   repeatAdditions;
+        public readonly List<HitSound>          repeatHitSounds;
+        public readonly List<Beatmap.Sampleset> repeatSamplesets;
+        public readonly List<Beatmap.Sampleset> repeatAdditions;
         
         // non-explicit
-        List<Vector2> bezierPoints;
-        public List<Vector2> pathPxPositions;
-        public List<Vector2> redAnchorPositions;
+        private List<Vector2> bezierPoints;
+        private double? duration;
 
-        private double?      duration;
-        public  double       endTime;
-        public  List<double> sliderTickTimes;
-        
+        public readonly List<Vector2> pathPxPositions;
+        public readonly List<Vector2> redAnchorPositions;
+
+        public readonly double       endTime;
+        public readonly List<double> sliderTickTimes;
+
         public Vector2 UnstackedEndPosition { get; private set; }
         public Vector2 EndPosition { get; private set; }
 

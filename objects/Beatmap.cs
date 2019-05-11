@@ -14,7 +14,7 @@ namespace MapsetParser.objects
 {
     public class Beatmap
     {
-        public string code;
+        public readonly string code;
         public string songPath;
         public string mapPath;
 
@@ -395,7 +395,7 @@ namespace MapsetParser.objects
             return beatOffset;
         }
 
-        private int[] divisors = new int[] { 1, 2, 3, 4, 6, 8, 12, 16 };
+        private readonly int[] divisors = new int[] { 1, 2, 3, 4, 6, 8, 12, 16 };
         /// <summary> Returns the lowest possible beat snap divisor to get to the given time with less than 2 ms of unsnap, 0 if unsnapped. </summary>
         public int GetLowestDivisor(double aTime)
         {

@@ -12,13 +12,14 @@ namespace MapsetParser.objects
 
         public string code;
 
-        public double               offset;
-        public int                  meter;         // this exists for both green and red lines but only red uses it
-        public Beatmap.Sampleset    sampleset;
-        public int                  customIndex;
-        public float                volume;
-        public bool                 uninherited;
-        public bool                 kiai;
+        public readonly double  offset;
+        public readonly int     meter;         // this exists for both green and red lines but only red uses it
+        public readonly bool    uninherited;
+        public readonly bool    kiai;
+
+        public readonly Beatmap.Sampleset sampleset;
+        public readonly int               customIndex;
+        public readonly float             volume;
 
         // might not be explicit (depending on inherited or not)
         public float svMult;

@@ -18,17 +18,17 @@ namespace MapsetParser.objects.events
             LoopOnce
         }
 
-        public int      layer;
-        public int      origin;
-        public string   path;
-        public Vector2  offset;
+        public readonly int      layer;
+        public readonly int      origin;
+        public readonly string   path;
+        public readonly Vector2  offset;
 
         // animation-specific
-        public int      frameCount;
-        public double   frameDelay;
-        public LoopType loopType;
+        public readonly int      frameCount;
+        public readonly double   frameDelay;
+        public readonly LoopType loopType;
 
-        public List<string> framePaths;
+        public readonly List<string> framePaths;
 
         public Animation(string aCode)
         {

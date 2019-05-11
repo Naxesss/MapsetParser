@@ -16,8 +16,8 @@ namespace MapsetParser.objects.events
          *  - Abnormal break times do not show up in the editor, but do in gameplay.
         */
 
-        public double time;
-        public double endTime;
+        public readonly double time;
+        public readonly double endTime;
 
         public Break(string aCode)
         {

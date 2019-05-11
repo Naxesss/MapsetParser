@@ -4,7 +4,7 @@ namespace MapsetParser.objects.hitobjects
 {
     public class Spinner : HitObject
     {
-        public double endTime;
+        public readonly double endTime;
 
         public Spinner(string aCode, Beatmap aBeatmap)
             : base(aCode, aBeatmap)

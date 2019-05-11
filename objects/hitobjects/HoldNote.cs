@@ -7,7 +7,7 @@ namespace MapsetParser.objects.hitobjects
         // 448,192,243437,128,2,247861:0:0:0:0:
         // x, y, time, typeFlags, hitsound, endTime:extras
         
-        public double endTime;
+        public readonly double endTime;
 
         public HoldNote(string aCode, Beatmap aBeatmap)
             : base(aCode, aBeatmap)

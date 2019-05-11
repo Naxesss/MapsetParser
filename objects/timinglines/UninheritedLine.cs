@@ -4,8 +4,8 @@ namespace MapsetParser.objects.timinglines
 {
     public class UninheritedLine : TimingLine
     {
-        public double msPerBeat;
-        public double bpm;
+        public readonly double msPerBeat;
+        public readonly double bpm;
 
         // red lines
         public UninheritedLine(string aCode)

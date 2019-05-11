@@ -10,12 +10,12 @@ namespace MapsetParser.objects
     {
         public string code;
 
-        public List<Background>     backgrounds;
-        public List<Video>          videos;
-        public List<Break>          breaks;
-        public List<Sprite>         sprites;
-        public List<StoryHitSound>  storyHitSounds;
-        public List<Animation>      animations;
+        public readonly List<Background>     backgrounds;
+        public readonly List<Video>          videos;
+        public readonly List<Break>          breaks;
+        public readonly List<Sprite>         sprites;
+        public readonly List<StoryHitSound>  storyHitSounds;
+        public readonly List<Animation>      animations;
 
         public Osb(string aCode)
         {

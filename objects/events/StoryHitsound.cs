@@ -10,13 +10,13 @@ namespace MapsetParser.objects.events
         // Sample,15707,0,"drum-hitnormal.wav",60
         // type, time, layer, path, volume
 
-        public double   time;
-        public Layer    layer;
-        public string   path;
-        public float    volume;
+        public readonly double time;
+        public readonly Layer  layer;
+        public readonly string path;
+        public readonly float  volume;
 
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
-        public string strippedPath;
+        public readonly string strippedPath;
 
         /// <summary> The layer the hit sound is audible on, for example only when passing a section if "Pass". </summary>
         public enum Layer

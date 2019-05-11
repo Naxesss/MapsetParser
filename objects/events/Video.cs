@@ -7,11 +7,11 @@ namespace MapsetParser.objects.events
         // Video,-320,"aragoto.avi"
         // Video, offset, filename
 
-        public int      offset;
-        public string   path;
+        public readonly int    offset;
+        public readonly string path;
 
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
-        public string strippedPath;
+        public readonly string strippedPath;
 
         public Video(string aCode)
         {

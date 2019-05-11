@@ -9,12 +9,12 @@ namespace MapsetParser.objects.events
         // 0,0,"apple is oral.jpg",0,0
         // Background, layer, filename, x offset, y offset
 
-        public int          layer;
-        public string       path;
-        public Vector2?     offset;
+        public readonly int      layer;
+        public readonly string   path;
+        public readonly Vector2? offset;
 
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
-        public string strippedPath;
+        public readonly string strippedPath;
 
         public Background(string aCode)
         {

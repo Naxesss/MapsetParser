@@ -9,13 +9,13 @@ namespace MapsetParser.objects.events
         // Sprite,Foreground,Centre,"SB\whitenamebar.png",320,240
         // Sprite, layer, origin, filename, x offset, y offset
 
-        public int      layer;
-        public int      origin;
-        public string   path;
-        public Vector2  offset;
+        public readonly int     layer;
+        public readonly int     origin;
+        public readonly string  path;
+        public readonly Vector2 offset;
 
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
-        public string strippedPath;
+        public readonly string strippedPath;
 
         public Sprite(string aCode)
         {

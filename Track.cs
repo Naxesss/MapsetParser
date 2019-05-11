@@ -7,7 +7,7 @@ namespace MapsetParser
 {
     internal class Track
     {
-        private string message;
+        private readonly string message;
 
         public Track(string aMessage)
         {
