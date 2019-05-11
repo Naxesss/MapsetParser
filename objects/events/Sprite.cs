@@ -38,6 +38,9 @@ namespace MapsetParser.objects.events
                 argument == "Foreground"    ? 3 :
                 -1;
 
+            // Throws an exception if not a number.
+            if (id == -1)
+                return int.Parse(argument);
 
             return id;
         }
@@ -60,7 +63,7 @@ namespace MapsetParser.objects.events
                 -1;
 
             if (id == -1)
-                try { return int.Parse(aCode.Split(',')[2]); } catch { }
+                return int.Parse(argument);
 
             return id;
         }
