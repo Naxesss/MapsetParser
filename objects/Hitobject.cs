@@ -408,13 +408,19 @@ namespace MapsetParser.objects
                 time;
         }
 
-        /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Circle" or "Spinner tail". </summary>
+        /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Slider repeat", "Circle" or "Spinner tail". </summary>
         public string GetPartName(double aTime)
         {
+            // Checks within 1 ms leniency in case of decimals and precision errors.
+            bool isClose(double anEdgeTime, double anOtherTime) =>
+                anEdgeTime <= anOtherTime + 1 &&
+                anEdgeTime >= anOtherTime - 1;
+
             string edgeType =
-                GetEndTime() == aTime                ? "tail" :
-                aTime > time && aTime < GetEndTime() ? "body" :
-                                                       "head";
+                isClose(GetEndTime(), aTime)                                 ? "tail" :
+                GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime)) ? "repeat" :
+                aTime > time && aTime < GetEndTime()                         ? "body" :
+                "head";
 
             return GetObjectType() + (!(this is Circle) ? (" " + edgeType) : "");
         }
