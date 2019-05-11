@@ -92,7 +92,7 @@ namespace MapsetParser.objects
         /*
          *  Parsing
          */
-        
+
         private Vector2 GetPosition(string aCode)
         {
             float x = float.Parse(aCode.Split(',')[0], CultureInfo.InvariantCulture);
@@ -100,23 +100,23 @@ namespace MapsetParser.objects
 
             return new Vector2(x, y);
         }
-        
+
         private double GetTime(string aCode)
         {
             return double.Parse(aCode.Split(',')[2], CultureInfo.InvariantCulture);
         }
-        
+
         private Type GetTypeFlags(string aCode)
         {
             return (Type)int.Parse(aCode.Split(',')[3]);
         }
-        
+
         private HitSound GetHitSound(string aCode)
         {
             return (HitSound)int.Parse(aCode.Split(',')[4]);
         }
-        
-        private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int? ,int?, string> GetExtras(string aCode)
+
+        private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> GetExtras(string aCode)
         {
             string extras = aCode.Split(',').Last();
 
