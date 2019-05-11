@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MapsetParser.starrating.standard
 {
-    abstract class Skill
+    public abstract class Skill
     {
         protected abstract double SkillMultiplier  { get; }    // how much this skill is weighed
         protected abstract double StrainDecay      { get; }    // how quickly strain decays for this skill

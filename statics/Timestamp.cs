@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MapsetParser.statics
 {
-    public class Timestamp
+    public static class Timestamp
     {
         public static string Get<T>(params T[] anObject)
         {

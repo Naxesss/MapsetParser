@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MapsetParser.starrating.standard
 {
-    class StandardDifficultyCalculator
+    public static class StandardDifficultyCalculator
     {
         private const int       sectionLength          = 400;
         private const double    difficultyMultiplier   = 0.0675;

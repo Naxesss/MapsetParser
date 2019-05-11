@@ -7,7 +7,7 @@ using System.Text;
 
 namespace MapsetParser.statics
 {
-    internal class SkinStatic
+    internal static class SkinStatic
     {
         private static bool isInitialized = false;
         

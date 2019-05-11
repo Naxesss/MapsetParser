@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MapsetParser.statics
 {
-    public class PathStatic
+    public static class PathStatic
     {
         /// <summary> Returns the file path in its base form as seen by the game, optionally allowing
         /// extensions to be stripped or maintaining case. </summary>

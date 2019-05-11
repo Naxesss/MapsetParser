@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MapsetParser.starrating.standard
 {
-    class Speed : Skill
+    public class Speed : Skill
     {
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecay      => 0.3;
