@@ -3,3 +3,4 @@
 /bin
 *.csproj
 *.sln
+GlobalSuppressions.cs
