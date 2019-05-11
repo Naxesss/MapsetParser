@@ -387,11 +387,14 @@ namespace MapsetParser.objects
             double firstObjectTime = GetNextHitObject(0).time;
             int firstObjectBeat = (int)Math.Floor((firstObjectTime - firstBeatTime) / line.msPerBeat);
 
+            // Apparently double does not result in the countdown needing half as much time, but rather closer to 0.45 times as much.
+            double countdownMultiplier =
+                generalSettings.countdown == GeneralSettings.Countdown.None ? 1 :
+                generalSettings.countdown == GeneralSettings.Countdown.Half ? 2 :
+                0.45;
+
             return firstObjectBeat -
-                ((firstBeatTime > 5 ? 5 : 6) + generalSettings.countdownBeatOffset) * (
-                generalSettings.countdown == GeneralSettings.Countdown.None  ? 1 :
-                generalSettings.countdown == GeneralSettings.Countdown.Half  ? 2 :
-                                                                               0.45);
+                ((firstBeatTime > 5 ? 5 : 6) + generalSettings.countdownBeatOffset) * countdownMultiplier;
         }
 
         /// <summary> Returns how many ms into a beat the given time is. </summary>
