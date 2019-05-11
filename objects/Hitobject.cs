@@ -236,7 +236,7 @@ namespace MapsetParser.objects
 
             // inherits from timing line if auto
             return sampleset == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(time, false, true).sampleset : sampleset;
+                ? beatmap.GetTimingLine(time, true).sampleset : sampleset;
         }
 
         /// <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
@@ -348,7 +348,7 @@ namespace MapsetParser.objects
                         aLine.offset > slider.time &&
                         aLine.offset <= slider.endTime).ToList();
 
-                lines.Add(beatmap.GetTimingLine(slider.time, false, true));
+                lines.Add(beatmap.GetTimingLine(slider.time, true));
 
                 string slide = hitSound.HasFlag(HitSound.Whistle) ? "whistle" : "slide";
                 

@@ -336,7 +336,7 @@ namespace MapsetParser.objects.hitobjects
 
             // inherits from timing line if auto
             return startSampleset == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(time, false, true).sampleset : startSampleset;
+                ? beatmap.GetTimingLine(time, true).sampleset : startSampleset;
         }
 
         /// <summary> Returns the sampleset at a given repeat (starting from 0), optionally prioritizing the addition. </summary>
@@ -349,8 +349,8 @@ namespace MapsetParser.objects.hitobjects
                 return repeatAdditions.ElementAt(aRepeatIndex);
 
             // doesn't exist in file version 9
-            return repeatSamplesets.Count() == 0 || repeatSamplesets.ElementAt(aRepeatIndex) == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(time, false, true).sampleset : repeatSamplesets.ElementAt(aRepeatIndex);
+            return repeatSamplesets.Count == 0 || repeatSamplesets.ElementAt(aRepeatIndex) == Beatmap.Sampleset.Auto
+                ? beatmap.GetTimingLine(time, true).sampleset : repeatSamplesets.ElementAt(aRepeatIndex);
         }
 
         /// <summary> Returns the sampleset on the tail of the slider, optionally prioritizing the addition. </summary>
@@ -360,7 +360,7 @@ namespace MapsetParser.objects.hitobjects
                 return endAddition;
 
             return endSampleset == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(endTime, false, true).sampleset : endSampleset;
+                ? beatmap.GetTimingLine(endTime, true).sampleset : endSampleset;
         }
 
         /// <summary> Returns how far along the curve a given point of time is (from 0 to 1), accounting for repeats. </summary>

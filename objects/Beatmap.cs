@@ -204,18 +204,26 @@ namespace MapsetParser.objects
          *  Helper Methods 
         */
 
-        /// <summary> Returns the timing line currently in effect at the given time, optionally uninherited line only
-        /// or with a 5 ms backward leniency. </summary>
-        public TimingLine GetTimingLine(double aTime, bool anUninherited = false, bool aHitSoundLeniency = false)
+
+        /// <summary> Returns the timing line currently in effect at the given time, optionally with a 5 ms backward leniency. </summary>
+        public TimingLine GetTimingLine(double aTime, bool aHitSoundLeniency = false) => GetTimingLine<TimingLine>(aTime, aHitSoundLeniency);
+        /// <summary> Same as <see cref="GetTimingLine"/> except only considers objects of a given type. </summary>
+        public TimingLine GetTimingLine<T>(double aTime, bool aHitSoundLeniency = false) where T : TimingLine
         {
-            return timingLines.LastOrDefault(aLine => aLine.offset <= aTime + (aHitSoundLeniency ? 5 : 0) && (anUninherited ? aLine.uninherited : true))
-                ?? GetNextTimingLine(aTime, anUninherited);
+            return
+                timingLines.OfType<T>().LastOrDefault( aLine =>
+                    aLine.offset <= aTime + (aHitSoundLeniency ? 5 : 0)) ??
+                GetNextTimingLine<T>(aTime);
         }
 
-        /// <summary> Returns the next timing line after the current if any, optionally only next uninherited. </summary>
-        public TimingLine GetNextTimingLine(double aTime, bool anUninherited = false)
+        /// <summary> Returns the next timing line after the current if any. </summary>
+        public TimingLine GetNextTimingLine(double aTime) => GetNextTimingLine<TimingLine>(aTime);
+        /// <summary> Same as <see cref="GetNextTimingLine"/> except only considers objects of a given type. </summary>
+        public TimingLine GetNextTimingLine<T>(double aTime) where T : TimingLine
         {
-            return timingLines.FirstOrDefault(aLine => aLine.offset > aTime && (anUninherited ? aLine.uninherited : true));
+            return
+                timingLines.OfType<T>().FirstOrDefault(aLine =>
+                    aLine.offset > aTime);
         }
 
         /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
@@ -223,7 +231,10 @@ namespace MapsetParser.objects
         /// <summary> Same as <see cref="GetHitObject"/> except only considers objects of a given type. </summary>
         public HitObject GetHitObject<T>(double aTime) where T : HitObject
         {
-            return hitObjects.OfType<T>().LastOrDefault(anObject => (anObject.GetEndTime() <= aTime || anObject.time == aTime)) ?? GetNextHitObject<T>(aTime);
+            return
+                hitObjects.OfType<T>().LastOrDefault(anObject =>
+                    (anObject.GetEndTime() <= aTime || anObject.time == aTime)) ??
+                GetNextHitObject<T>(aTime);
         }
         
         /// <summary> Returns the previous hit object if any, otherwise the first. </summary>
@@ -350,11 +361,7 @@ namespace MapsetParser.objects
             {
                 // account for spinner/slider/holdnote ends
                 double startTime = hitObjects.First().time;
-                double endTime =
-                        hitObjects.Last() is Slider    ? ((Slider)hitObjects.Last()).endTime
-                    :   hitObjects.Last() is Spinner   ? ((Spinner)hitObjects.Last()).endTime
-                    :   hitObjects.Last() is HoldNote  ? ((HoldNote)hitObjects.Last()).endTime
-                    :   hitObjects.Last().time;
+                double endTime = hitObjects.Last().GetEndTime();
 
                 // remove breaks
                 double breakReduction = 0;
