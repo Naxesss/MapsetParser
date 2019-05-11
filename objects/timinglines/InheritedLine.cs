@@ -2,8 +2,7 @@
 {
     public class InheritedLine : TimingLine
     {
-        // green lines
-        // legit the exact same as the regular timing line object
+        // This is the same as the base class, just a different name.
         public InheritedLine(string aCode)
             : base(aCode)
         {

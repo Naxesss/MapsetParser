@@ -40,7 +40,10 @@ namespace MapsetParser.statics
 
             string minuteString = minutes >= 10 ? minutes.ToString() : "0" + minutes;
             string secondString = seconds >= 10 ? seconds.ToString() : "0" + seconds;
-            string milisecondsString = time >= 100 ? time.ToString() : time >= 10 ? "0" + time : "00" + time;
+            string milisecondsString =
+                time >= 100 ? time.ToString() :
+                time >= 10 ? "0" + time :
+                "00" + time;
 
             return minuteString + ":" + secondString + ":" + milisecondsString + " - ";
         }

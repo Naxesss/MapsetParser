@@ -260,9 +260,6 @@ namespace MapsetParser.statics
             AddElements(skinGeneral);
             AddElements(skinStandard, aBeatmapSet => aBeatmapSet.beatmaps.Any(
                 aBeatmap => aBeatmap.generalSettings.mode == Beatmap.Mode.Standard));
-            /*AddElements(mSkinTaiko, aBeatmapSet => aBeatmapSet.mBeatmaps.Any(
-                aBeatmap => aBeatmap.mGeneralSettings.mMode == Beatmap.Mode.Taiko
-                         || aBeatmap.mGeneralSettings.mMode == Beatmap.Mode.Standard));*/ // todo will implement non-std stuff later
             AddElements(skinCatch, aBeatmapSet => aBeatmapSet.beatmaps.Any(
                 aBeatmap => aBeatmap.generalSettings.mode == Beatmap.Mode.Catch
                          || aBeatmap.generalSettings.mode == Beatmap.Mode.Standard));
@@ -271,6 +268,11 @@ namespace MapsetParser.statics
                          || aBeatmap.generalSettings.mode == Beatmap.Mode.Standard));
             AddElements(skinNotMania, aBeatmapSet => aBeatmapSet.beatmaps.Any(
                 aBeatmap => aBeatmap.generalSettings.mode != Beatmap.Mode.Mania));
+
+            // TODO: Taiko skin conversion, see issue #6
+            /*AddElements(mSkinTaiko, aBeatmapSet => aBeatmapSet.mBeatmaps.Any(
+                aBeatmap => aBeatmap.mGeneralSettings.mMode == Beatmap.Mode.Taiko
+                         || aBeatmap.mGeneralSettings.mMode == Beatmap.Mode.Standard));*/
 
             // only used in specific cases
             AddElements(skinCountdown, aBeatmapSet => aBeatmapSet.beatmaps.Any(

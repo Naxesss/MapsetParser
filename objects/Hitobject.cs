@@ -121,7 +121,7 @@ namespace MapsetParser.objects
             string extras = aCode.Split(',').Last();
 
             // hold notes have "endTime:extras" as format
-            int index = ((Type)type).HasFlag(Type.ManiaHoldNote) ? 1 : 0;
+            int index = type.HasFlag(Type.ManiaHoldNote) ? 1 : 0;
             if (extras.Contains(":"))
             {
                 Beatmap.Sampleset sampleset   = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index]);
@@ -191,7 +191,7 @@ namespace MapsetParser.objects
         {
             return aHitSound == null
                 ? hitSound > 0
-                : ((HitSound)hitSound).HasFlag(aHitSound);
+                : hitSound.HasFlag(aHitSound);
         }
 
         /// <summary> Returns the difference in time between the start of this object and the end of the previous object. </summary>
@@ -206,8 +206,8 @@ namespace MapsetParser.objects
             HitObject prevObject = beatmap.GetPrevHitObject(time);
 
             Vector2 prevPosition = prevObject.Position;
-            if (prevObject is Slider)
-                prevPosition = ((Slider)prevObject).EndPosition;
+            if (prevObject is Slider slider)
+                prevPosition = slider.EndPosition;
 
             return (Position - prevPosition).Length();
         }
@@ -217,15 +217,15 @@ namespace MapsetParser.objects
         {
             yield return time;
 
-            if (this is Slider)
-                for(int i = 0; i <  ((Slider)this).edgeAmount; ++i)
-                    yield return time + ((Slider)this).GetCurveDuration() * (i + 1);
+            if (this is Slider slider)
+                for (int i = 0; i < slider.edgeAmount; ++i)
+                    yield return time + slider.GetCurveDuration() * (i + 1);
 
-            if (this is Spinner)
-                yield return ((Spinner)this).endTime;
+            if (this is Spinner spinner)
+                yield return spinner.endTime;
 
-            if (this is HoldNote)
-                yield return ((HoldNote)this).endTime;
+            if (this is HoldNote holdNote)
+                yield return holdNote.endTime;
         }
 
         /// <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>

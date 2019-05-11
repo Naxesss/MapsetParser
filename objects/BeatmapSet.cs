@@ -169,10 +169,10 @@ namespace MapsetParser.objects
                 aBeatmap.sprites         .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 aBeatmap.videos          .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 aBeatmap.backgrounds     .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
-                aBeatmap.storyHitSounds  .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))))
+                aBeatmap.storyHitSounds  .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))) &&
+                parsedPath == lastStripped)
             {
-                if(parsedPath == lastStripped)
-                    return true;
+                return true;
             }
 
             if (osb != null && (
@@ -187,10 +187,10 @@ namespace MapsetParser.objects
                 osb.sprites       .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 osb.videos        .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
                 osb.backgrounds   .Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path)) ||
-                osb.storyHitSounds.Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))))
+                osb.storyHitSounds.Any(anElement => anElement.strippedPath == strippedPath && lastStripped.StartsWith(anElement.path))) &&
+                parsedPath == lastStripped)
             {
-                if (parsedPath == lastStripped)
-                    return true;
+                return true;
             }
 
             if (beatmaps.Any(aBeatmap => aBeatmap.hitObjects.Any(anObject =>

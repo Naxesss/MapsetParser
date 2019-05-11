@@ -23,7 +23,7 @@ namespace MapsetParser.settings
         // Combo# : r,g,b
         
         /// <summary> Starts at index 0, so combo colour 1 is the 0th element in the list. </summary>
-        public List<Vector3> combos = new List<Vector3>();
+        public List<Vector3> combos;
         
         // optional
         public Vector3? sliderTrackOverride;    // The body of the slider

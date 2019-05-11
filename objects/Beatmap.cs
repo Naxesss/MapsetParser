@@ -179,7 +179,7 @@ namespace MapsetParser.objects
                     aCircle.UnstackedPosition,
                     aSlider.edgeAmount % 2 == 0 ?
                         aSlider.UnstackedPosition :
-                        aSlider.UnstackedEndPosition); // todo UnstackedEndPosition
+                        aSlider.UnstackedEndPosition);
             
             bool isNearInTime = MeetsStackTime(aSlider, aCircle);
             bool isNearInSpace = distanceSq < 3 * 3;
@@ -231,7 +231,10 @@ namespace MapsetParser.objects
         /// <summary> Same as <see cref="GetPrevHitObject"/> except only considers objects of a given type. </summary>
         public HitObject GetPrevHitObject<T>(double aTime) where T : HitObject
         {
-            return hitObjects.OfType<T>().LastOrDefault(aHitObject => aHitObject.time < aTime) ?? hitObjects.OfType<T>().FirstOrDefault();
+            return
+                hitObjects.OfType<T>().LastOrDefault(aHitObject =>
+                    aHitObject.time < aTime) ??
+                hitObjects.OfType<T>().FirstOrDefault();
         }
 
         /// <summary> Returns the next hit object after the current if any. </summary>
@@ -239,7 +242,9 @@ namespace MapsetParser.objects
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
         public HitObject GetNextHitObject<T>(double aTime) where T : HitObject
         {
-            return hitObjects.OfType<T>().FirstOrDefault(anObject => anObject.time > aTime);
+            return
+                hitObjects.OfType<T>().FirstOrDefault(anObject =>
+                    anObject.time > aTime);
         }
 
         /// <summary> Returns the unsnap in ms of notes unsnapped by 2 ms or more, otherwise null. </summary>
@@ -283,7 +288,7 @@ namespace MapsetParser.objects
                     for (int l = 0; l < repeats; l++)
                     {
                         combo += 1;
-                        if (combo >= colourSettings.combos.Count())
+                        if (combo >= colourSettings.combos.Count)
                             combo = 0;
                     }
                 }
@@ -297,7 +302,7 @@ namespace MapsetParser.objects
         {
             int colourIndex = GetComboColourIndex(aTime);
             if (colourIndex == 0)
-                return colourSettings.combos.Count();
+                return colourSettings.combos.Count;
             else
                 return colourIndex;
         }
@@ -400,8 +405,6 @@ namespace MapsetParser.objects
         /// <summary> Returns the lowest possible beat snap divisor to get to the given time with less than 2 ms of unsnap, 0 if unsnapped. </summary>
         public int GetLowestDivisor(double aTime)
         {
-            UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
-
             foreach (int divisor in divisors)
             {
                 double unsnap = Math.Abs(GetPracticalUnsnap(aTime, divisor, 1));
@@ -439,7 +442,6 @@ namespace MapsetParser.objects
         /// The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
         public double GetPracticalUnsnap(double aTime, int aSecondDivisor = 16, int aThirdDivisor = 12)
         {
-            UninheritedLine line = (UninheritedLine)GetTimingLine(aTime, true);
             double theoreticalUnsnap = GetTheoreticalUnsnap(aTime, aSecondDivisor, aThirdDivisor);
 
             // The game apparently casts to int the desired time value, rather than rounding or flooring, which would be more consistent.

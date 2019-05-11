@@ -1,4 +1,5 @@
 ﻿using MapsetParser.statics;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -48,12 +49,13 @@ namespace MapsetParser.objects.events
         // layer
         private int GetLayer(string aCode)
         {
-            string arg = aCode.Split(',')[1];
-            int id = arg == "Background" ? 0
-                     : arg == "Fail" ? 1
-                     : arg == "Pass" ? 2
-                     : arg == "Foreground" ? 3
-                                                : -1;
+            string argument = aCode.Split(',')[1];
+            int id =
+                argument == "Background" ? 0 :
+                argument == "Fail"       ? 1 :
+                argument == "Pass"       ? 2 :
+                argument == "Foreground" ? 3 :
+                -1;
 
             if (id == -1)
                 try { return int.Parse(arg); } catch { }
@@ -64,17 +66,19 @@ namespace MapsetParser.objects.events
         // origin
         private int GetOrigin(string aCode)
         {
-            int id = aCode.Split(',')[2] == "TopLeft" ? 0
-                     : aCode.Split(',')[2] == "Centre" ? 1
-                     : aCode.Split(',')[2] == "CentreLeft" ? 2
-                     : aCode.Split(',')[2] == "TopRight" ? 3
-                     : aCode.Split(',')[2] == "BottomCentre" ? 4
-                     : aCode.Split(',')[2] == "TopCentre" ? 5
-                     : aCode.Split(',')[2] == "Custom" ? 6
-                     : aCode.Split(',')[2] == "CentreRight" ? 7
-                     : aCode.Split(',')[2] == "BottomLeft" ? 8
-                     : aCode.Split(',')[2] == "BottomRight" ? 9
-                                                                : -1;
+            string argument = aCode.Split(',')[2];
+            int id =
+                argument == "TopLeft"      ? 0 :
+                argument == "Centre"       ? 1 :
+                argument == "CentreLeft"   ? 2 :
+                argument == "TopRight"     ? 3 :
+                argument == "BottomCentre" ? 4 :
+                argument == "TopCentre"    ? 5 :
+                argument == "Custom"       ? 6 :
+                argument == "CentreRight"  ? 7 :
+                argument == "BottomLeft"   ? 8 :
+                argument == "BottomRight"  ? 9 :
+                -1;
 
             if (id == -1)
                 try { return int.Parse(aCode.Split(',')[2]); } catch { }

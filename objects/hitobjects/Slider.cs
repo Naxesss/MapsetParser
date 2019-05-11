@@ -99,11 +99,12 @@ namespace MapsetParser.objects.hitobjects
         private CurveType GetSliderType(string aCode)
         {
             string type = aCode.Split(',')[5].Split('|')[0];
-            return type == "L" ? CurveType.Linear
-                 : type == "P" ? CurveType.Passthrough
-                 : type == "B" ? CurveType.Bezier
-                 : type == "C" ? CurveType.Catmull
-                                 : CurveType.Unknown;
+            return
+                type == "L" ? CurveType.Linear :
+                type == "P" ? CurveType.Passthrough :
+                type == "B" ? CurveType.Bezier :
+                type == "C" ? CurveType.Catmull :
+                CurveType.Unknown;
         }
         
         private IEnumerable<Vector2> GetNodes(string aCode)
@@ -457,12 +458,12 @@ namespace MapsetParser.objects.hitobjects
             
             List<double> pathLengths = new List<double>();
             Vector2 previousPosition = Position;
-            for(int i = 0; i < nodePositions.Count(); ++i)
+            for(int i = 0; i < nodePositions.Count; ++i)
             {
                 // since every node is interpreted as an anchor, we only need to worry about the last node
                 // rest will be perfectly followed by just going straight to the node
                 double distance = 0;
-                if (i < nodePositions.Count() - 1)
+                if (i < nodePositions.Count - 1)
                 {
                     distance          = GetDistance(nodePositions.ElementAt(i), previousPosition);
                     previousPosition  = nodePositions.ElementAt(i);
@@ -500,11 +501,11 @@ namespace MapsetParser.objects.hitobjects
         private Vector2 GetPassthroughPathPosition(double aTime)
         {
             // less than 3 interprets as linear
-            if (nodePositions.Count() < 3)
+            if (nodePositions.Count < 3)
                 return GetLinearPathPosition(aTime);
 
             // more than 3 interprets as bezier
-            if (nodePositions.Count() > 3)
+            if (nodePositions.Count > 3)
                 return GetBezierPathPosition(aTime);
             
             Vector2 secondPoint   = nodePositions.ElementAt(1);
@@ -558,12 +559,12 @@ namespace MapsetParser.objects.hitobjects
             double totalLength = 0;
             double fullLength = GetCurveDuration() * pixelsPerMs;
             
-            while (tteration < sliderPoints.Count())
+            while (tteration < sliderPoints.Count)
             {
                 // get all the nodes from one anchor/start point to the next
                 List<Vector2> points = new List<Vector2>();
                 int currentIteration = tteration;
-                for (int i = currentIteration; i < sliderPoints.Count(); ++i)
+                for (int i = currentIteration; i < sliderPoints.Count; ++i)
                 {
                     if (i > currentIteration && sliderPoints.ElementAt(i - 1) == sliderPoints.ElementAt(i))
                         break;
@@ -593,7 +594,7 @@ namespace MapsetParser.objects.hitobjects
 
                 // as long as we haven't reached the last path between anchors, keep track of the length of the path
                 // ensures that we can switch from one anchor path to another
-                if (tteration <= sliderPoints.Count())
+                if (tteration <= sliderPoints.Count)
                     totalLength += curvePixelLength;
                 else
                     bezierPoints.Add(currentPoint);
@@ -620,7 +621,7 @@ namespace MapsetParser.objects.hitobjects
         private Vector2 GetCatmullPathPosition(double aTime)
         {
             // any less than 3 points might as well be linear
-            if (nodePositions.Count() < 3)
+            if (nodePositions.Count < 3)
                 GetLinearPathPosition(aTime);
 
             double fraction = GetCurveFraction(aTime);
