@@ -385,7 +385,7 @@ namespace MapsetParser.objects
                 firstBeatTime -= line.msPerBeat;
 
             double firstObjectTime = GetNextHitObject(0).time;
-            int firstObjectBeat = (int)Math.Floor((firstObjectTime - firstBeatTime) / line.msPerBeat);
+            int firstObjectBeat = Timestamp.Round((firstObjectTime - firstBeatTime) / line.msPerBeat);
 
             // Apparently double does not result in the countdown needing half as much time, but rather closer to 0.45 times as much.
             double countdownMultiplier =
@@ -453,11 +453,8 @@ namespace MapsetParser.objects
         public double GetPracticalUnsnap(double aTime, int aSecondDivisor = 16, int aThirdDivisor = 12)
         {
             double theoreticalUnsnap = GetTheoreticalUnsnap(aTime, aSecondDivisor, aThirdDivisor);
-
-            // The game apparently casts to int the desired time value, rather than rounding or flooring, which would be more consistent.
-            // This is likely a contributor to rounding errors when copy pasting, along with reference times in the clipboard being in
-            // practical offsets rather than theoretical ones.
-            double desiredTime = (int)(aTime - theoreticalUnsnap);
+            
+            double desiredTime = Timestamp.Round(aTime - theoreticalUnsnap);
             double practicalUnsnap = desiredTime - aTime;
 
             return practicalUnsnap;

@@ -7,19 +7,25 @@ namespace MapsetParser.statics
 {
     public static class Timestamp
     {
-        public static string Get<T>(params T[] anObject)
-        {
-            if (anObject is HitObject[])
-                return GetTimestamp((anObject as HitObject[])[0].beatmap, anObject as HitObject[]);
-            else if (anObject is double[])
-                return GetTimestamp(Math.Round(Convert.ToDouble((anObject as double[])[0])));
-            else
-                return "";
-        }
+        /// <summary> Returns the given time as an integer in the way the game rounds time values. </summary>
+        /// <remarks>
+        ///     Interestingly, the game currently does not round, but rather cast to integer. This may
+        ///     change in future versions of the game to fix issues such as 1 ms rounding errors when
+        ///     copying objects, however.
+        /// </remarks>
+        public static int Round(double aTime) => (int)aTime;
+
+        /// <summary> Returns the timestamp of a given time. If decimal, is rounded in the same way the game rounds. </summary>
+        public static string Get(double aTime) =>
+            GetTimestamp(aTime);
+
+        /// <summary> Returns the timestamp of given hit objects, so the timestamp includes the object(s). </summary>
+        public static string Get(params HitObject[] anObjects) =>
+            GetTimestamp(anObjects[0].beatmap, anObjects);
 
         private static string GetTimestamp(double aTime)
         {
-            double time = Math.Floor(aTime);
+            double time = Round(aTime);
 
             if (time < 0)
                 return time.ToString();

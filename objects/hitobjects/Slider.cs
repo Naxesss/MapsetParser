@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Linq;
 using MapsetParser.objects.timinglines;
+using MapsetParser.statics;
 
 namespace MapsetParser.objects.hitobjects
 {
@@ -343,7 +344,7 @@ namespace MapsetParser.objects.hitobjects
         public Beatmap.Sampleset GetRepeatSampleset(int aRepeatIndex, bool anAddition = false)
         {
             double theoreticalStart = base.time - beatmap.GetTheoreticalUnsnap(base.time);
-            double time = Math.Floor(theoreticalStart + GetCurveDuration() * (aRepeatIndex + 1));
+            double time = Timestamp.Round(theoreticalStart + GetCurveDuration() * (aRepeatIndex + 1));
 
             if (anAddition && repeatAdditions.ElementAt(aRepeatIndex) != Beatmap.Sampleset.Auto)
                 return repeatAdditions.ElementAt(aRepeatIndex);
