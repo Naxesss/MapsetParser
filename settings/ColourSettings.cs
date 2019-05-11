@@ -32,17 +32,16 @@ namespace MapsetParser.settings
         public ColourSettings(string aCode)
         {
             combos = ParseColours(GetCombos(aCode)).ToList();
-
-            // optional
-            string sliderTrackOverride    = GetValue(aCode, "SliderTrackOverride");
-            string sliderBorder           = GetValue(aCode, "SliderBorder");
+            
+            string sliderTrackOverrideValue    = GetValue(aCode, "SliderTrackOverride");
+            string sliderBorderValue           = GetValue(aCode, "SliderBorder");
             // there is also a "SliderBody" property documented, but it seemingly does nothing
 
-            if (sliderTrackOverride != null)
-                this.sliderTrackOverride = ParseColour(sliderTrackOverride);
+            if (sliderTrackOverrideValue != null)
+                sliderTrackOverride = ParseColour(sliderTrackOverrideValue);
 
-            if (sliderBorder != null)
-                this.sliderBorder = ParseColour(sliderBorder);
+            if (sliderBorderValue != null)
+                sliderBorder = ParseColour(sliderBorderValue);
         }
 
         private IEnumerable<string> GetCombos(string aCode)

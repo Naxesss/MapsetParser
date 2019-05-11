@@ -124,20 +124,20 @@ namespace MapsetParser.objects
             int index = type.HasFlag(Type.ManiaHoldNote) ? 1 : 0;
             if (extras.Contains(":"))
             {
-                Beatmap.Sampleset sampleset   = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index]);
-                Beatmap.Sampleset additions   = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index + 1]);
-                int? customIndex              = int.Parse(extras.Split(':')[index + 2]);
+                Beatmap.Sampleset samplesetValue = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index]);
+                Beatmap.Sampleset additionsValue = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index + 1]);
+                int? customIndexValue = int.Parse(extras.Split(':')[index + 2]);
 
                 // does not exist in file v11
-                int? volume = null;
+                int? volumeValue = null;
                 if (extras.Split(':').Count() > index + 3)
-                    volume = int.Parse(extras.Split(':')[index + 3]);
+                    volumeValue = int.Parse(extras.Split(':')[index + 3]);
 
-                string filename = "";
+                string filenameValue = "";
                 if (extras.Split(':').Count() > index + 4)
-                    filename = extras.Split(':')[index + 4];
+                    filenameValue = extras.Split(':')[index + 4];
 
-                return Tuple.Create(sampleset, additions, customIndex, volume, filename);
+                return Tuple.Create(samplesetValue, additionsValue, customIndexValue, volumeValue, filenameValue);
             }
             return null;
         }
@@ -354,20 +354,20 @@ namespace MapsetParser.objects
                 
                 foreach (TimingLine line in lines)
                 {
-                    string sampleset = line.sampleset.ToString().ToLower();
-                    string customIndex = line.customIndex == 1 ? "" : line.customIndex.ToString();
+                    string samplesetString   = line.sampleset.ToString().ToLower();
+                    string customIndexString = line.customIndex == 1 ? "" : line.customIndex.ToString();
 
-                    usedFiles.Add($"{sampleset}-slider{slide}{customIndex}");
+                    usedFiles.Add($"{samplesetString}-slider{slide}{customIndexString}");
                 }
 
                 IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
                 foreach (double tickTime in tickTimes)
                 {
                     TimingLine line = beatmap.GetTimingLine(tickTime);
-                    string sampleset = line.sampleset.ToString().ToLower();
-                    string customIndex = line.customIndex == 1 ? "" : line.customIndex.ToString();
+                    string samplesetString   = line.sampleset.ToString().ToLower();
+                    string customIndexString = line.customIndex == 1 ? "" : line.customIndex.ToString();
 
-                    usedFiles.Add($"{sampleset}-slidertick{customIndex}");
+                    usedFiles.Add($"{samplesetString}-slidertick{customIndexString}");
                 }
             }
 

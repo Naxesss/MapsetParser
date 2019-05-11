@@ -138,9 +138,9 @@ namespace MapsetParser.objects.hitobjects
         
         private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitSounds(string aCode)
         {
-            HitSound startHitSound = 0;
-            HitSound endHitSound = 0;
-            IEnumerable<HitSound> repeatHitSounds = new List<HitSound>();
+            HitSound edgeStartHitSound = 0;
+            HitSound edgeEndHitSound = 0;
+            IEnumerable<HitSound> edgeRepeatHitSounds = new List<HitSound>();
 
             if (aCode.Split(',').Count() > 8)
             {
@@ -155,31 +155,31 @@ namespace MapsetParser.objects.hitobjects
 
                         // first is start
                         if (i == 0)
-                            startHitSound = hitSound;
+                            edgeStartHitSound = hitSound;
                         // last is end
                         else if (i == edgeHitSounds.Split('|').Length - 1)
-                            endHitSound = hitSound;
+                            edgeEndHitSound = hitSound;
                         // all the others are repeats
                         else
-                            repeatHitSounds = repeatHitSounds.Concat(new HitSound[] { hitSound });
+                            edgeRepeatHitSounds = edgeRepeatHitSounds.Concat(new HitSound[] { hitSound });
                     }
                 }
             }
 
-            return Tuple.Create(startHitSound, endHitSound, repeatHitSounds);
+            return Tuple.Create(edgeStartHitSound, edgeEndHitSound, edgeRepeatHitSounds);
         }
         
         private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset,
             IEnumerable<Beatmap.Sampleset>, IEnumerable<Beatmap.Sampleset>> GetEdgeAdditions(string aCode)
         {
-            Beatmap.Sampleset startSampleset = 0;
-            Beatmap.Sampleset startAddition  = 0;
+            Beatmap.Sampleset edgeStartSampleset = 0;
+            Beatmap.Sampleset edgeStartAddition  = 0;
 
-            Beatmap.Sampleset endSampleset = 0;
-            Beatmap.Sampleset endAddition  = 0;
+            Beatmap.Sampleset edgeEndSampleset = 0;
+            Beatmap.Sampleset edgeEndAddition  = 0;
 
-            IEnumerable<Beatmap.Sampleset> repeatSamplesets = new List<Beatmap.Sampleset>();
-            IEnumerable<Beatmap.Sampleset> repeatAdditions  = new List<Beatmap.Sampleset>();
+            IEnumerable<Beatmap.Sampleset> edgeRepeatSamplesets = new List<Beatmap.Sampleset>();
+            IEnumerable<Beatmap.Sampleset> edgeRepeatAdditions  = new List<Beatmap.Sampleset>();
 
             if (aCode.Split(',').Count() > 9)
             {
@@ -196,26 +196,26 @@ namespace MapsetParser.objects.hitobjects
                         // first is start
                         if (i == 0)
                         {
-                            startSampleset = sampleset;
-                            startAddition  = addition;
+                            edgeStartSampleset = sampleset;
+                            edgeStartAddition  = addition;
                         }
                         // last is end
                         else if (i == edgeAdditions.Split('|').Length - 1)
                         {
-                            endSampleset = sampleset;
-                            endAddition  = addition;
+                            edgeEndSampleset = sampleset;
+                            edgeEndAddition  = addition;
                         }
                         // all the others are repeats
                         else
                         {
-                            repeatSamplesets = repeatSamplesets.Concat(new Beatmap.Sampleset[] { sampleset });
-                            repeatAdditions  = repeatAdditions .Concat(new Beatmap.Sampleset[] { sampleset });
+                            edgeRepeatSamplesets = edgeRepeatSamplesets.Concat(new Beatmap.Sampleset[] { sampleset });
+                            edgeRepeatAdditions  = edgeRepeatAdditions .Concat(new Beatmap.Sampleset[] { sampleset });
                         }
                     }
                 }
             }
 
-            return Tuple.Create(startSampleset, startAddition, endSampleset, endAddition, repeatSamplesets, repeatAdditions);
+            return Tuple.Create(edgeStartSampleset, edgeStartAddition, edgeEndSampleset, edgeEndAddition, edgeRepeatSamplesets, edgeRepeatAdditions);
         }
 
         /*
@@ -225,10 +225,10 @@ namespace MapsetParser.objects.hitobjects
         private new double GetEndTime()
         {
             double start = time;
-            double duration = GetCurveDuration();
-            double endTime = start + duration * edgeAmount;
+            double curveDuration = GetCurveDuration();
+            double exactEndTime = start + curveDuration * edgeAmount;
 
-            return endTime + beatmap.GetPracticalUnsnap(endTime);
+            return exactEndTime + beatmap.GetPracticalUnsnap(exactEndTime);
         }
 
         private IEnumerable<Vector2> GetRedAnchors()
@@ -550,7 +550,7 @@ namespace MapsetParser.objects.hitobjects
             List<Vector2> sliderPoints = nodePositions.ToList();
 
             Vector2 currentPoint = Position;
-            List<Vector2> bezierPoints = new List<Vector2>() { currentPoint };
+            List<Vector2> tempBezierPoints = new List<Vector2>() { currentPoint };
 
             // for each anchor, calculate the curve, until we find where we need to be
             int tteration = 0;
@@ -587,7 +587,7 @@ namespace MapsetParser.objects.hitobjects
                         {
                             totalLength += curvePixelLength;
                             curvePixelLength = 0;
-                            bezierPoints.Add(currentPoint);
+                            tempBezierPoints.Add(currentPoint);
                         }
                     }
                 }
@@ -597,10 +597,10 @@ namespace MapsetParser.objects.hitobjects
                 if (tteration <= sliderPoints.Count)
                     totalLength += curvePixelLength;
                 else
-                    bezierPoints.Add(currentPoint);
+                    tempBezierPoints.Add(currentPoint);
             }
 
-            return bezierPoints;
+            return tempBezierPoints;
         }
 
         private Vector2 GetBezierPathPosition(double aTime)
