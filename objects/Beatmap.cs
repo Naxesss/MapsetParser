@@ -9,6 +9,7 @@ using MapsetParser.objects.hitobjects;
 using MapsetParser.objects.timinglines;
 using MapsetParser.starrating.standard;
 using System.Numerics;
+using MapsetParser.statics;
 
 namespace MapsetParser.objects
 {
@@ -74,10 +75,10 @@ namespace MapsetParser.objects
             songPath   = aSongPath;
             mapPath    = aMapPath;
 
-            generalSettings    = GetSettings(aCode, "General",     aSectionCode => new GeneralSettings(aSectionCode));
-            metadataSettings   = GetSettings(aCode, "Metadata",    aSectionCode => new MetadataSettings(aSectionCode));
-            difficultySettings = GetSettings(aCode, "Difficulty",  aSectionCode => new DifficultySettings(aSectionCode));
-            colourSettings     = GetSettings(aCode, "Colours",     aSectionCode => new ColourSettings(aSectionCode));
+            generalSettings    = ParserStatic.GetSettings(aCode, "General",     aSectionCode => new GeneralSettings(aSectionCode));
+            metadataSettings   = ParserStatic.GetSettings(aCode, "Metadata",    aSectionCode => new MetadataSettings(aSectionCode));
+            difficultySettings = ParserStatic.GetSettings(aCode, "Difficulty",  aSectionCode => new DifficultySettings(aSectionCode));
+            colourSettings     = ParserStatic.GetSettings(aCode, "Colours",     aSectionCode => new ColourSettings(aSectionCode));
 
             // event type 3 seems to be "background colour transformation" https://i.imgur.com/Tqlz3s5.png
             
@@ -502,23 +503,12 @@ namespace MapsetParser.objects
         /*
          *  Parser Methods
         */
-
-        private T GetSettings<T>(string aCode, string aSection, Func<string, T> aFunc)
-        {
-            StringBuilder stringBuilder = new StringBuilder("");
-            
-            IEnumerable<string> lines = ParseSection(aCode, aSection, aLine => aLine);
-            foreach (string line in lines)
-                stringBuilder.Append((stringBuilder.Length > 0 ? "\n" : "") + line);
-
-            return aFunc(stringBuilder.ToString());
-        }
-
+        
         private List<T> GetEvents<T>(string aCode, List<string> aTypes, Func<string, T> aFunc)
         {
             // find all lines starting with any of aTypes in the event section
             List<T> types = new List<T>();
-            GetSettings(aCode, "Events", aSection =>
+            ParserStatic.GetSettings(aCode, "Events", aSection =>
             {
                 foreach (string line in aSection.Split(new string[] { "\n" }, StringSplitOptions.None))
                     if (aTypes.Any(aType => line.StartsWith(aType + ",")))
@@ -531,7 +521,7 @@ namespace MapsetParser.objects
         private List<TimingLine> GetTimingLines(string aCode)
         {
             // find the [TimingPoints] section and parse each timing line
-            return ParseSection(aCode, "TimingPoints", aLine =>
+            return ParserStatic.ParseSection(aCode, "TimingPoints", aLine =>
             {
                 return TimingLine.IsUninherited(aLine) ? new UninheritedLine(aLine) : (TimingLine)new InheritedLine(aLine);
             }).ToList();
@@ -540,33 +530,14 @@ namespace MapsetParser.objects
         private List<HitObject> GetHitobjects(string aCode)
         {
             // find the [Hitobjects] section and parse each hitobject until empty line or end of file
-            return ParseSection(aCode, "HitObjects", aLine =>
+            return ParserStatic.ParseSection(aCode, "HitObjects", aLine =>
             {
-                return  HitObject.HasType(aLine, HitObject.Type.Circle)          ? new Circle(aLine, this)
-                    :   HitObject.HasType(aLine, HitObject.Type.Slider)          ? new Slider(aLine, this)
-                    :   HitObject.HasType(aLine, HitObject.Type.ManiaHoldNote)   ? new HoldNote(aLine, this)
-                    : (HitObject)new Spinner(aLine, this);
+                return 
+                    HitObject.HasType(aLine, HitObject.Type.Circle)        ? new Circle(aLine, this) :
+                    HitObject.HasType(aLine, HitObject.Type.Slider)        ? new Slider(aLine, this) :
+                    HitObject.HasType(aLine, HitObject.Type.ManiaHoldNote) ? new HoldNote(aLine, this) :
+                    (HitObject)new Spinner(aLine, this);
             }).ToList();
-        }
-
-        private IEnumerable<T> ParseSection<T>(string aCode, string aSectionName, Func<string, T> aFunc)
-        {
-            // find the section, always from a line starting with [ and ending with ]
-            // then ending on either end of file or an empty line
-            IEnumerable<string> lines = aCode.Split(new string[] { "\n" }, StringSplitOptions.None);
-
-            bool read = false;
-            foreach(string line in lines)
-            {
-                if (line.Trim().Length == 0)
-                    read = false;
-
-                if (read)
-                    yield return aFunc(line);
-
-                if (line.StartsWith("[" + aSectionName + "]"))
-                    read = true;
-            }
         }
 
         /// <summary> Returns the beatmap as a string in the format "[Insane]", if the difficulty is called "Insane", for example. </summary>
