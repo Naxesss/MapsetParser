@@ -541,7 +541,7 @@ namespace MapsetParser.objects
             // find the [Hitobjects] section and parse each hitobject until empty line or end of file
             return ParserStatic.ParseSection(aCode, "HitObjects", aLine =>
             {
-                return 
+                return
                     HitObject.HasType(aLine, HitObject.Type.Circle)        ? new Circle(aLine, this) :
                     HitObject.HasType(aLine, HitObject.Type.Slider)        ? new Slider(aLine, this) :
                     HitObject.HasType(aLine, HitObject.Type.ManiaHoldNote) ? new HoldNote(aLine, this) :

@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MapsetParser.objects
 {
@@ -277,35 +278,35 @@ namespace MapsetParser.objects
             return (this as Slider)?.hitSound ?? null;
         }
 
-        private struct HitSoundSample
+        private HitSample GetEdgeSample(double aTime, Beatmap.Sampleset? aSampleset, HitSound? aHitSound)
         {
-            public readonly int customIndex;
-            public readonly Beatmap.Sampleset? sampleset;
-            public readonly HitSound? hitSound;
-
-            public HitSoundSample(int aCustomIndex, Beatmap.Sampleset? aSampleset, HitSound? aHitSound)
-            {
-                customIndex = aCustomIndex;
-                sampleset = aSampleset;
-                hitSound = aHitSound;
-            }
+            return
+                new HitSample(
+                    beatmap.GetTimingLine(aTime, true).customIndex,
+                    aSampleset,
+                    aHitSound,
+                    HitSample.HitSource.Edge,
+                    aTime);
         }
 
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
-        private IEnumerable<HitSoundSample> GetUsedHitSounds(bool anAddition = false)
+        public IEnumerable<HitSample> GetUsedHitSamples()
         {
-            yield return new HitSoundSample(
-                beatmap.GetTimingLine(time, true).customIndex,
-                GetStartSampleset(anAddition),
-                GetStartHitSound());
+            // Head
+            yield return GetEdgeSample(time, GetStartSampleset(true), GetStartHitSound());
+            yield return GetEdgeSample(time, GetStartSampleset(false), HitSound.Normal);
 
-            yield return new HitSoundSample(
-                beatmap.GetTimingLine(GetEndTime(), true).customIndex,
-                GetEndSampleset(anAddition),
-                GetEndHitSound());
-
+            // Hold notes can not have a hit sounds on their tails.
+            if (!(this is HoldNote))
+            {
+                // Tail
+                yield return GetEdgeSample(GetEndTime(), GetEndSampleset(true), GetEndHitSound());
+                yield return GetEdgeSample(GetEndTime(), GetEndSampleset(false), HitSound.Normal);
+            }
+            
             if (this is Slider slider)
             {
+                // Repeat
                 for (int i = 0; i < slider.repeatHitSounds.Count; ++i)
                 {
                     HitSound?          repeatHitSound  = slider.repeatHitSounds.ElementAt(i);
@@ -313,88 +314,42 @@ namespace MapsetParser.objects
                     Beatmap.Sampleset? repeatAddition  =
                         slider.repeatAdditions.Any() ?   // not a thing in file version 9
                         slider.repeatAdditions.ElementAt(i) :
-                        Beatmap.Sampleset.Auto;
+                        (Beatmap.Sampleset?)null;
 
                     double repeatTime = slider.GetCurveDuration() * (i + 1);
+                    
+                    yield return GetEdgeSample(repeatTime, repeatAddition ?? repeatSampleset, repeatHitSound);
+                    yield return GetEdgeSample(repeatTime, repeatSampleset, HitSound.Normal);
+                }
 
-                    yield return new HitSoundSample(
-                        beatmap.GetTimingLine(repeatTime, true).customIndex,
-                        anAddition && repeatAddition != Beatmap.Sampleset.Auto ? repeatAddition : repeatSampleset,
-                        repeatHitSound);
+                List<TimingLine> lines =
+                    beatmap.timingLines.Where(aLine =>
+                        aLine.offset > slider.time &&
+                        aLine.offset <= slider.endTime).ToList();
+                lines.Add(beatmap.GetTimingLine(slider.time, true));
+                
+                // Body
+                foreach (TimingLine line in lines)
+                    yield return new HitSample(line.customIndex, line.sampleset, hitSound, HitSample.HitSource.Body, line.offset);
+
+                // Tick
+                IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
+                foreach (double tickTime in tickTimes)
+                {
+                    TimingLine line = beatmap.GetTimingLine(tickTime);
+                    yield return new HitSample(line.customIndex, line.sampleset, null, HitSample.HitSource.Tick, tickTime);
                 }
             }
         }
 
         /// <summary> Returns all used hit sound file names for this object without extension. </summary>
-        public IEnumerable<string> GetUsedHitSoundFileNames()
+        public IEnumerable<string> GetUsedHitSoundFiles()
         {
-            List<string> usedFiles = new List<string>();
-
-            IEnumerable<HitSoundSample> usedHitSoundSamples = GetUsedHitSounds(true);
-            foreach (var usedHitSoundSample in usedHitSoundSamples)
-            {
-                foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
-                {
-                    // We only handle the actual hit sounds here, which are affected by additions.
-                    if (individualHitSound != HitSound.Normal &&
-                        individualHitSound != HitSound.None &&
-                        (usedHitSoundSample.hitSound?.HasFlag(individualHitSound) ?? false))
-                    {
-                        string samplesetString   = usedHitSoundSample.sampleset.ToString().ToLower();
-                        string hitSoundString    = individualHitSound.ToString().ToLower();
-                        string customIndexString = usedHitSoundSample.customIndex == 1 ? "" : usedHitSoundSample.customIndex.ToString();
-
-                        usedFiles.Add($"{samplesetString}-hit{hitSoundString}{customIndexString}");
-                    }
-                }
-            }
-
-            IEnumerable<HitSoundSample> usedHitNormals = GetUsedHitSounds(false);
-            foreach (var usedHitNormal in usedHitNormals)
-            {
-                // Hit normals are not affected by additions, so we need to do this separately, since otherwise the samplesets would be incorrect.
-                // Another reason we're doing this separately is because all places where hit sounds exist (or don't, but can), there is a hit normal.
-                // For example, where spinners start, there is no hit normal, since there can't be a hit sound there.
-                if (usedHitNormal.hitSound != null)
-                {
-                    string samplesetString   = usedHitNormal.sampleset.ToString().ToLower();
-                    string customIndexString = usedHitNormal.customIndex == 1 ? "" : usedHitNormal.customIndex.ToString();
-
-                    usedFiles.Add($"{samplesetString}-hitnormal{customIndexString}");
-                }
-            }
-
-            if (this is Slider slider)
-            {
-                List<TimingLine> lines =
-                    beatmap.timingLines.Where(aLine =>
-                        aLine.offset > slider.time &&
-                        aLine.offset <= slider.endTime).ToList();
-
-                lines.Add(beatmap.GetTimingLine(slider.time, true));
-
-                string slide = hitSound.HasFlag(HitSound.Whistle) ? "whistle" : "slide";
-                
-                foreach (TimingLine line in lines)
-                {
-                    string samplesetString   = line.sampleset.ToString().ToLower();
-                    string customIndexString = line.customIndex == 1 ? "" : line.customIndex.ToString();
-
-                    usedFiles.Add($"{samplesetString}-slider{slide}{customIndexString}");
-                }
-
-                IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
-                foreach (double tickTime in tickTimes)
-                {
-                    TimingLine line = beatmap.GetTimingLine(tickTime);
-                    string samplesetString   = line.sampleset.ToString().ToLower();
-                    string customIndexString = line.customIndex == 1 ? "" : line.customIndex.ToString();
-
-                    usedFiles.Add($"{samplesetString}-slidertick{customIndexString}");
-                }
-            }
-
-            return usedFiles.Distinct();
+            return
+                GetUsedHitSamples()
+                    .Select(aSample => aSample.GetFileName())
+                    .Where(aName => aName != null)
+                    .Distinct();
         }
 
         /// <summary> Returns the end time of the hit object, or the start time if no end time exists. </summary>
