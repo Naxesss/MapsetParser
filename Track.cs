@@ -12,12 +12,12 @@ namespace MapsetParser
         public Track(string aMessage)
         {
             message = aMessage;
-            EventStatic.onLoadStart(message);
+            EventStatic.OnLoadStart(message);
         }
 
         public void Complete()
         {
-            EventStatic.onLoadComplete(message);
+            EventStatic.OnLoadComplete(message);
         }
     }
 }
