@@ -213,7 +213,7 @@ namespace MapsetParser.objects
             return (Position - prevPosition).Length();
         }
 
-        /// <summary> Returns the points in time where heads, tails or repeats exist (i.e. the start, end or reverses of any object). </summary>
+        /// <summary> Returns the points in time where heads, tails or reverses exist (i.e. the start, end or reverses of any object). </summary>
         public IEnumerable<double> GetEdgeTimes()
         {
             yield return time;
@@ -306,20 +306,20 @@ namespace MapsetParser.objects
             
             if (this is Slider slider)
             {
-                // Repeat
-                for (int i = 0; i < slider.repeatHitSounds.Count; ++i)
+                // Reverse
+                for (int i = 0; i < slider.reverseHitSounds.Count; ++i)
                 {
-                    HitSound?          repeatHitSound  = slider.repeatHitSounds.ElementAt(i);
-                    Beatmap.Sampleset? repeatSampleset = slider.GetRepeatSampleset(i);
-                    Beatmap.Sampleset? repeatAddition  =
-                        slider.repeatAdditions.Any() ?   // not a thing in file version 9
-                        slider.repeatAdditions.ElementAt(i) :
+                    HitSound?          reverseHitSound  = slider.reverseHitSounds.ElementAt(i);
+                    Beatmap.Sampleset? reverseSampleset = slider.GetReverseSampleset(i);
+                    Beatmap.Sampleset? reverseAddition  =
+                        slider.reverseAdditions.Any() ?   // not a thing in file version 9
+                        slider.reverseAdditions.ElementAt(i) :
                         (Beatmap.Sampleset?)null;
 
-                    double repeatTime = slider.GetCurveDuration() * (i + 1);
+                    double reverseTime = slider.GetCurveDuration() * (i + 1);
                     
-                    yield return GetEdgeSample(repeatTime, repeatAddition ?? repeatSampleset, repeatHitSound);
-                    yield return GetEdgeSample(repeatTime, repeatSampleset, HitSound.Normal);
+                    yield return GetEdgeSample(reverseTime, reverseAddition ?? reverseSampleset, reverseHitSound);
+                    yield return GetEdgeSample(reverseTime, reverseSampleset, HitSound.Normal);
                 }
 
                 List<TimingLine> lines =
@@ -363,7 +363,7 @@ namespace MapsetParser.objects
                 time;
         }
 
-        /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Slider repeat", "Circle" or "Spinner tail". </summary>
+        /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Slider reverse", "Circle" or "Spinner tail". </summary>
         public string GetPartName(double aTime)
         {
             // Checks within 1 ms leniency in case of decimals and precision errors.
@@ -373,7 +373,7 @@ namespace MapsetParser.objects
 
             string edgeType =
                 isClose(GetEndTime(), aTime)                                 ? "tail" :
-                GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime)) ? "repeat" :
+                GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime)) ? "reverse" :
                 aTime > time && aTime < GetEndTime()                         ? "body" :
                 "head";
 

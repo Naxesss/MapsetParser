@@ -39,9 +39,9 @@ namespace MapsetParser.objects.hitobjects
         public readonly Beatmap.Sampleset endSampleset;
         public readonly Beatmap.Sampleset endAddition;
 
-        public readonly List<HitSound>          repeatHitSounds;
-        public readonly List<Beatmap.Sampleset> repeatSamplesets;
-        public readonly List<Beatmap.Sampleset> repeatAdditions;
+        public readonly List<HitSound>          reverseHitSounds;
+        public readonly List<Beatmap.Sampleset> reverseSamplesets;
+        public readonly List<Beatmap.Sampleset> reverseAdditions;
         
         // non-explicit
         private List<Vector2> bezierPoints;
@@ -76,9 +76,9 @@ namespace MapsetParser.objects.hitobjects
             endSampleset       = edgeAdditions.Item3;
             endAddition        = edgeAdditions.Item4;
 
-            repeatHitSounds    = edgeHitSounds.Item3.ToList();
-            repeatSamplesets   = edgeAdditions.Item5.ToList();
-            repeatAdditions    = edgeAdditions.Item6.ToList();
+            reverseHitSounds    = edgeHitSounds.Item3.ToList();
+            reverseSamplesets   = edgeAdditions.Item5.ToList();
+            reverseAdditions    = edgeAdditions.Item6.ToList();
 
             // non-explicit
             if (beatmap != null)
@@ -141,7 +141,7 @@ namespace MapsetParser.objects.hitobjects
         {
             HitSound edgeStartHitSound = 0;
             HitSound edgeEndHitSound = 0;
-            IEnumerable<HitSound> edgeRepeatHitSounds = new List<HitSound>();
+            IEnumerable<HitSound> edgeReverseHitSounds = new List<HitSound>();
 
             if (aCode.Split(',').Count() > 8)
             {
@@ -160,14 +160,14 @@ namespace MapsetParser.objects.hitobjects
                         // last is end
                         else if (i == edgeHitSounds.Split('|').Length - 1)
                             edgeEndHitSound = hitSound;
-                        // all the others are repeats
+                        // all the others are reverses
                         else
-                            edgeRepeatHitSounds = edgeRepeatHitSounds.Concat(new HitSound[] { hitSound });
+                            edgeReverseHitSounds = edgeReverseHitSounds.Concat(new HitSound[] { hitSound });
                     }
                 }
             }
 
-            return Tuple.Create(edgeStartHitSound, edgeEndHitSound, edgeRepeatHitSounds);
+            return Tuple.Create(edgeStartHitSound, edgeEndHitSound, edgeReverseHitSounds);
         }
         
         private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset,
@@ -179,8 +179,8 @@ namespace MapsetParser.objects.hitobjects
             Beatmap.Sampleset edgeEndSampleset = 0;
             Beatmap.Sampleset edgeEndAddition  = 0;
 
-            IEnumerable<Beatmap.Sampleset> edgeRepeatSamplesets = new List<Beatmap.Sampleset>();
-            IEnumerable<Beatmap.Sampleset> edgeRepeatAdditions  = new List<Beatmap.Sampleset>();
+            IEnumerable<Beatmap.Sampleset> edgeReverseSamplesets = new List<Beatmap.Sampleset>();
+            IEnumerable<Beatmap.Sampleset> edgeReverseAdditions  = new List<Beatmap.Sampleset>();
 
             if (aCode.Split(',').Count() > 9)
             {
@@ -193,30 +193,27 @@ namespace MapsetParser.objects.hitobjects
                     {
                         Beatmap.Sampleset sampleset = (Beatmap.Sampleset)int.Parse(edgeAdditions.Split('|')[i].Split(':')[0]);
                         Beatmap.Sampleset addition  = (Beatmap.Sampleset)int.Parse(edgeAdditions.Split('|')[i].Split(':')[1]);
-
-                        // first is start
+                        
                         if (i == 0)
                         {
                             edgeStartSampleset = sampleset;
                             edgeStartAddition  = addition;
                         }
-                        // last is end
                         else if (i == edgeAdditions.Split('|').Length - 1)
                         {
                             edgeEndSampleset = sampleset;
                             edgeEndAddition  = addition;
                         }
-                        // all the others are repeats
                         else
                         {
-                            edgeRepeatSamplesets = edgeRepeatSamplesets.Concat(new Beatmap.Sampleset[] { sampleset });
-                            edgeRepeatAdditions  = edgeRepeatAdditions .Concat(new Beatmap.Sampleset[] { sampleset });
+                            edgeReverseSamplesets = edgeReverseSamplesets.Concat(new Beatmap.Sampleset[] { sampleset });
+                            edgeReverseAdditions  = edgeReverseAdditions .Concat(new Beatmap.Sampleset[] { sampleset });
                         }
                     }
                 }
             }
 
-            return Tuple.Create(edgeStartSampleset, edgeStartAddition, edgeEndSampleset, edgeEndAddition, edgeRepeatSamplesets, edgeRepeatAdditions);
+            return Tuple.Create(edgeStartSampleset, edgeStartAddition, edgeEndSampleset, edgeEndAddition, edgeReverseSamplesets, edgeReverseAdditions);
         }
 
         /*
@@ -316,7 +313,7 @@ namespace MapsetParser.objects.hitobjects
             return sliderSpeed;
         }
 
-        /// <summary> Returns the duration of the curve (i.e. from edge to edge), ignoring repeats. </summary>
+        /// <summary> Returns the duration of the curve (i.e. from edge to edge), ignoring reverses. </summary>
         public double GetCurveDuration()
         {
             if (duration != null)
@@ -340,18 +337,18 @@ namespace MapsetParser.objects.hitobjects
                 ? beatmap.GetTimingLine(time, true).sampleset : startSampleset;
         }
 
-        /// <summary> Returns the sampleset at a given repeat (starting from 0), optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset GetRepeatSampleset(int aRepeatIndex, bool anAddition = false)
+        /// <summary> Returns the sampleset at a given reverse (starting from 0), optionally prioritizing the addition. </summary>
+        public Beatmap.Sampleset GetReverseSampleset(int aReverseIndex, bool anAddition = false)
         {
             double theoreticalStart = base.time - beatmap.GetTheoreticalUnsnap(base.time);
-            double time = Timestamp.Round(theoreticalStart + GetCurveDuration() * (aRepeatIndex + 1));
+            double time = Timestamp.Round(theoreticalStart + GetCurveDuration() * (aReverseIndex + 1));
 
-            if (anAddition && repeatAdditions.ElementAt(aRepeatIndex) != Beatmap.Sampleset.Auto)
-                return repeatAdditions.ElementAt(aRepeatIndex);
+            if (anAddition && reverseAdditions.ElementAt(aReverseIndex) != Beatmap.Sampleset.Auto)
+                return reverseAdditions.ElementAt(aReverseIndex);
 
             // doesn't exist in file version 9
-            return repeatSamplesets.Count == 0 || repeatSamplesets.ElementAt(aRepeatIndex) == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(time, true).sampleset : repeatSamplesets.ElementAt(aRepeatIndex);
+            return reverseSamplesets.Count == 0 || reverseSamplesets.ElementAt(aReverseIndex) == Beatmap.Sampleset.Auto
+                ? beatmap.GetTimingLine(time, true).sampleset : reverseSamplesets.ElementAt(aReverseIndex);
         }
 
         /// <summary> Returns the sampleset on the tail of the slider, optionally prioritizing the addition. </summary>

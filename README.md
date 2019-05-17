@@ -1,10 +1,10 @@
 # MapsetParser
 MapsetParser is a parser library for beatmapsets from the rhythm game osu! made in C# .NET Core. This parser not only makes the data in .osu files more easily accessible, but also keeps track of the entire song folder of a given mapset, including the path to files inside sub-folders.
 
-Figuring out seemingly basic properties like which files are used or what the slider velocity the current object is in, to more advanced ones like how many frames each storyboard animation has, what hit sound the 5th repeat of a slider is using, or where halfway through a catmull slider is on the playfield, are all possible with this parser!
+Figuring out seemingly basic properties like which files are used or what the slider velocity the current object is in, to more advanced ones like how many frames each storyboard animation has, what hit sound the 5th reverse of a slider is using, or where halfway through a catmull slider is on the playfield, are all possible with this parser!
 
 # Examples
-## Finding sliders with multiple repeats
+## Finding sliders with multiple reverses
 ```csharp
 BeatmapSet beatmapSet = new BeatmapSet(@"C:\...\osu\Songs\580215 Rita - dorchadas");
 
@@ -13,11 +13,11 @@ Beatmap beatmap = beatmapSet.beatmaps.First(aBeatmap =>
 
 foreach (Slider slider in beatmap.hitObjects.OfType<Slider>())
     if (slider.edgeAmount > 2)
-        Console.WriteLine($"Slider at {slider.time} ms has {(slider.edgeAmount - 1)} repeats.");
+        Console.WriteLine($"Slider at {slider.time} ms has {(slider.edgeAmount - 1)} reverses.");
 ```
 ```
-Slider at 107808 ms has 2 repeats.
-Slider at 108308 ms has 2 repeats.
+Slider at 107808 ms has 2 reverses.
+Slider at 108308 ms has 2 reverses.
 ```
 
 ## Seeing which files are used

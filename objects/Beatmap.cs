@@ -284,19 +284,19 @@ namespace MapsetParser.objects
                 // ignore spinners
                 if (!hitObject.type.HasFlag(HitObject.Type.Spinner))
                 {
-                    int repeats = 0;
+                    int reverses = 0;
 
                     // has new combo
                     if (hitObject.type.HasFlag(HitObject.Type.NewCombo))
-                        repeats += 1;
+                        reverses += 1;
 
                     // accounts for the combo colour skips
                     for (int bit = 0x10; bit < 0x80; bit <<= 1)
                         if (((int)hitObject.type & bit) > 0)
-                            repeats += (int)Math.Floor(bit / 16.0f);
+                            reverses += (int)Math.Floor(bit / 16.0f);
 
                     // counts up and wraps around
-                    for (int l = 0; l < repeats; l++)
+                    for (int l = 0; l < reverses; l++)
                     {
                         combo += 1;
                         if (combo >= colourSettings.combos.Count)
