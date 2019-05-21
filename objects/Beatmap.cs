@@ -120,13 +120,6 @@ namespace MapsetParser.objects
                     {
                         if (!MeetsStackTime(hitObject, otherHitObject))
                             break;
-                        
-                        // Circles on tails do nothing.
-                        if (hitObject is Circle && otherHitObject is Slider &&
-                            ShouldStackTail(otherHitObject as Slider, hitObject as Circle))
-                        {
-                            break;
-                        }
 
                         if ((hitObject is Circle || otherHitObject is Circle) &&
                             ShouldStack(hitObject, otherHitObject))
@@ -198,12 +191,11 @@ namespace MapsetParser.objects
 
         /// <summary> Returns how far apart in time two objects can be and still be able to stack. </summary>
         private double StackTimeThreshold() =>
-            difficultySettings.GetPreemptTime() * generalSettings.stackLeniency * 0.1;
+            difficultySettings.GetFadeInTime() * generalSettings.stackLeniency * 0.1;
 
         /*
          *  Helper Methods 
         */
-
 
         /// <summary> Returns the timing line currently in effect at the given time, optionally with a 5 ms backward leniency. </summary>
         public TimingLine GetTimingLine(double aTime, bool aHitSoundLeniency = false) => GetTimingLine<TimingLine>(aTime, aHitSoundLeniency);
