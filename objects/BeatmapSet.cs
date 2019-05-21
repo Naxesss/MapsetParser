@@ -43,8 +43,11 @@ namespace MapsetParser.objects
             songPath   = aBeatmapSetPath;
 
             Initalize(aBeatmapSetPath);
-            
-            hitSoundFiles = GetHitSoundFiles().ToList();
+
+            Track hsTrack = new Track("Finding hit sound files...");
+            hitSoundFiles = GetUsedHitSoundFiles().ToList();
+            hsTrack.Complete();
+
             beatmaps = beatmaps.OrderBy(aBeatmap => aBeatmap.starRating).ToList();
 
             mapsetTrack.Complete();
@@ -120,15 +123,19 @@ namespace MapsetParser.objects
             return beatmaps.FirstOrDefault(aBeatmap => aBeatmap != null)?.generalSettings.audioFileName ?? null;
         }
 
-        /// <summary> Returns whether or not a hit sound file is used based on its file name. </summary>
-        public bool IsHitSoundFileUsed(string aFileName)
+        /// <summary> Returns whichever of the given file names are unused. </summary>
+        public List<string> GetUsedHitSoundFilesOf(IEnumerable<string> aFileNames)
         {
+            List<string> usedFilesNames = new List<string>();
+
             foreach (Beatmap beatmap in beatmaps)
                 foreach (HitObject hitObject in beatmap.hitObjects)
-                    foreach (string fileName in hitObject.GetUsedHitSoundFiles())
-                        if (aFileName.StartsWith(fileName + "."))
-                            return true;
-            return false;
+                    foreach (string usedFileName in hitObject.GetUsedHitSoundFiles())
+                        foreach (string fileName in aFileNames)
+                            if (fileName.StartsWith(usedFileName + ".") && !usedFilesNames.Contains(fileName))
+                                usedFilesNames.Add(fileName);
+
+            return usedFilesNames;
         }
 
         /// <summary> Returns whether the given full file path is used by the beatmapset. </summary>
@@ -226,16 +233,17 @@ namespace MapsetParser.objects
             return false;
         }
 
-        private IEnumerable<string> GetHitSoundFiles()
+        /// <summary> Returns all used hit sound files in the folder. </summary>
+        private IEnumerable<string> GetUsedHitSoundFiles()
         {
-            foreach (string filePath in songFilePaths)
-            {
-                string fileSongPath = filePath.Substring(songPath.Length + 1);
-                string fileName = fileSongPath.Split(new char[] { '/', '\\' }).Last().ToLower();
+            IEnumerable<string> hitSoundFilePaths =
+                songFilePaths.Select(aPath => aPath.Substring(songPath.Length + 1));
 
-                if (IsHitSoundFileUsed(fileName))
-                    yield return fileSongPath;
-            }
+            IEnumerable<string> usedHitSoundFiles =
+                GetUsedHitSoundFilesOf(hitSoundFilePaths.Select(aPath =>
+                    aPath.Split(new char[] { '/', '\\' }).Last().ToLower()));
+
+            return usedHitSoundFiles;
         }
 
         /// <summary> Returns the beatmapset as a string in the format "Artist - Title (Creator)". </summary>

@@ -46,15 +46,16 @@ namespace MapsetParser.objects
                 {
                     if (hitSound.GetValueOrDefault().HasFlag(individualHitSound))
                     {
-                        if (hitSource == HitSource.Edge)
+                        if (hitSource == HitSource.Edge && individualHitSound != HitSound.None)
                             hitSoundString = "hit" + individualHitSound.ToString().ToLower();
                         else if (hitSource == HitSource.Body)
                             hitSoundString = "slider" + (individualHitSound == HitSound.Whistle ? "whistle" : "slide");
                     }
-                    if (hitSource == HitSource.Tick)
-                        hitSoundString = "slidertick";
                 }
             }
+
+            if (hitSource == HitSource.Tick)
+                hitSoundString = "slidertick";
 
             string customIndexString = customIndex == 1 ? "" : customIndex.ToString();
 

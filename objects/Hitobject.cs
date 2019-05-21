@@ -278,6 +278,15 @@ namespace MapsetParser.objects
             return (this as Slider)?.hitSound ?? null;
         }
 
+        /// <summary> Returns all individual hit sounds used by a specific hit sound instnace,
+        /// excluding <see cref="HitSound.None"/>. </summary>
+        private IEnumerable<HitSound> SplitHitSound(HitSound aHitSound)
+        {
+            foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
+                if (aHitSound.HasFlag(individualHitSound) && individualHitSound != HitSound.None)
+                    yield return individualHitSound;
+        }
+
         private HitSample GetEdgeSample(double aTime, Beatmap.Sampleset? aSampleset, HitSound? aHitSound)
         {
             return
@@ -293,14 +302,16 @@ namespace MapsetParser.objects
         public IEnumerable<HitSample> GetUsedHitSamples()
         {
             // Head
-            yield return GetEdgeSample(time, GetStartSampleset(true), GetStartHitSound());
+            foreach(HitSound splitStartHitSound in SplitHitSound(GetStartHitSound().GetValueOrDefault()))
+                yield return GetEdgeSample(time, GetStartSampleset(true), splitStartHitSound);
             yield return GetEdgeSample(time, GetStartSampleset(false), HitSound.Normal);
 
             // Hold notes can not have a hit sounds on their tails.
             if (!(this is HoldNote))
             {
                 // Tail
-                yield return GetEdgeSample(GetEndTime(), GetEndSampleset(true), GetEndHitSound());
+                foreach (HitSound splitEndHitSound in SplitHitSound(GetEndHitSound().GetValueOrDefault()))
+                    yield return GetEdgeSample(GetEndTime(), GetEndSampleset(true), splitEndHitSound);
                 yield return GetEdgeSample(GetEndTime(), GetEndSampleset(false), HitSound.Normal);
             }
             
@@ -317,8 +328,9 @@ namespace MapsetParser.objects
                         (Beatmap.Sampleset?)null;
 
                     double reverseTime = slider.GetCurveDuration() * (i + 1);
-                    
-                    yield return GetEdgeSample(reverseTime, reverseAddition ?? reverseSampleset, reverseHitSound);
+
+                    foreach (HitSound splitReverseHitSound in SplitHitSound(reverseHitSound.GetValueOrDefault()))
+                        yield return GetEdgeSample(reverseTime, reverseAddition ?? reverseSampleset, splitReverseHitSound);
                     yield return GetEdgeSample(reverseTime, reverseSampleset, HitSound.Normal);
                 }
 
@@ -342,7 +354,8 @@ namespace MapsetParser.objects
             }
         }
 
-        /// <summary> Returns all used hit sound file names for this object without extension. </summary>
+        /// <summary> Returns all potentially used hit sound file names (should they be
+        /// in the song folder) for this object without extension. </summary>
         public IEnumerable<string> GetUsedHitSoundFiles()
         {
             return
