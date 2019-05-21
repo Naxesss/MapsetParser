@@ -347,11 +347,10 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the complete drain time of the beatmap, accounting for breaks. </summary>
-        public double GetDraintime()
+        public double GetDrainTime()
         {
             if (hitObjects.Count > 0)
             {
-                // account for spinner/slider/holdnote ends
                 double startTime = hitObjects.First().time;
                 double endTime = hitObjects.Last().GetEndTime();
 
@@ -364,7 +363,20 @@ namespace MapsetParser.objects
             }
             return 0;
         }
-        
+
+        /// <summary> Returns the play time of the beatmap, starting from the first object and ending at the end of the last object. </summary>
+        public double GetPlayTime()
+        {
+            if (hitObjects.Count > 0)
+            {
+                double startTime = hitObjects.First().time;
+                double endTime = hitObjects.Last().GetEndTime();
+
+                return endTime - startTime;
+            }
+            return 0;
+        }
+
         /// <summary> Returns the beat number from offset 0 at which the countdown would start, accounting for
         /// countdown offset and speed. No countdown if less than 0. </summary>
         public double GetCountdownStartBeat()
