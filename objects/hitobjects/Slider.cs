@@ -361,7 +361,7 @@ namespace MapsetParser.objects.hitobjects
                 ? beatmap.GetTimingLine(endTime, true).sampleset : endSampleset;
         }
 
-        /// <summary> Returns how far along the curve a given point of time is (from 0 to 1), accounting for repeats. </summary>
+        /// <summary> Returns how far along the curve a given point of time is (from 0 to 1), accounting for reverses. </summary>
         public double GetCurveFraction(double aTime)
         {
             double division = (aTime - time) / GetCurveDuration();
