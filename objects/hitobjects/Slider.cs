@@ -21,8 +21,7 @@ namespace MapsetParser.objects.hitobjects
             Linear,
             Passthrough,
             Bezier,
-            Catmull,
-            Unknown
+            Catmull
         }
 
         public readonly CurveType     curveType;
@@ -104,8 +103,7 @@ namespace MapsetParser.objects.hitobjects
                 type == "L" ? CurveType.Linear :
                 type == "P" ? CurveType.Passthrough :
                 type == "B" ? CurveType.Bezier :
-                type == "C" ? CurveType.Catmull :
-                CurveType.Unknown;
+                CurveType.Catmull;  // Catmull is the default curve type.
         }
         
         private IEnumerable<Vector2> GetNodes(string aCode)
