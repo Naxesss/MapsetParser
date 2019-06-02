@@ -1,7 +1,7 @@
 # MapsetParser
 MapsetParser is a parser library for beatmapsets from the rhythm game osu! made in C# .NET Core. This parser not only makes the data in .osu files more easily accessible, but also keeps track of the entire song folder of a given mapset, including the path to files inside sub-folders.
 
-Figuring out seemingly basic properties like which files are used or what the slider velocity the current object is in, to more advanced ones like how many frames each storyboard animation has, what hit sound the 5th reverse of a slider is using, or where halfway through a catmull slider is on the playfield, are all possible with this parser!
+Figuring out seemingly basic properties like which files are used or what the slider velocity the current object is in, to more advanced ones like how many frames each storyboard animation has, what hit sound the 5th reverse of a slider is using, or where halfway through a catmull slider is on the playfield, are all possible with this parser.
 
 # Examples
 ## Finding sliders with multiple reverses
@@ -71,7 +71,7 @@ foreach (Beatmap beatmap in beatmapSet.beatmaps)
         {
             string partName = hitObject.GetPartName(edgeTime);
 
-            // Object needs to be moved forwards by this much to be snapped.
+            // Object needs to be moved forward by this much to be snapped.
             double unsnap = beatmap.GetPracticalUnsnap(edgeTime);
             if (Math.Abs(unsnap) >= 1)
                 Console.WriteLine($"{partName} at {edgeTime} ms is unsnapped by {unsnap} ms.");
