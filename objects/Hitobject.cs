@@ -385,10 +385,10 @@ namespace MapsetParser.objects
                 anEdgeTime >= anOtherTime - 1;
 
             string edgeType =
+                isClose(time, aTime)                                         ? "head" :
                 isClose(GetEndTime(), aTime)                                 ? "tail" :
                 GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime)) ? "reverse" :
-                aTime > time && aTime < GetEndTime()                         ? "body" :
-                "head";
+                "body";
 
             return GetObjectType() + (!(this is Circle) ? (" " + edgeType) : "");
         }
