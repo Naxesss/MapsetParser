@@ -94,6 +94,7 @@ namespace MapsetParser.objects
 
             if (generalSettings.mode == Mode.Standard)
             {
+                // Stacking is standard-only.
                 ApplyStacking();
 
                 starRating = aStarRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
