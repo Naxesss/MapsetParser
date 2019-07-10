@@ -88,15 +88,16 @@ namespace MapsetParser.objects
             sprites        = GetEvents(aCode, new List<string>() { "Sprite",       "4" }, aLine => new Sprite(aLine));
             storyHitSounds = GetEvents(aCode, new List<string>() { "Sample",       "5" }, aLine => new StoryHitSound(aLine));
             animations     = GetEvents(aCode, new List<string>() { "Animation",    "6" }, aLine => new Animation(aLine));
-
+            
             timingLines        = GetTimingLines(aCode);
             hitObjects         = GetHitobjects(aCode);
 
-            ApplyStacking();
+            if (generalSettings.mode == Mode.Standard)
+            {
+                ApplyStacking();
 
-            // would do a mode check on this but while non-std modes aren't supported this is
-            // the closest we have to sorting things by difficulty for those
-            starRating = aStarRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
+                starRating = aStarRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
+            }
         }
 
         /*
