@@ -383,6 +383,10 @@ namespace MapsetParser.objects
         /// countdown offset and speed. No countdown if less than 0. </summary>
         public double GetCountdownStartBeat()
         {
+            // If there are no objects, this does not apply.
+            if (GetHitObject(0) == null)
+                return 0;
+
             // always 6 beats before the first, but the first beat can be cut by having the first beat 5 ms after 0.
             UninheritedLine line = GetTimingLine<UninheritedLine>(0);
 
@@ -390,7 +394,7 @@ namespace MapsetParser.objects
             while (firstBeatTime - line.msPerBeat > 0)
                 firstBeatTime -= line.msPerBeat;
 
-            double firstObjectTime = GetNextHitObject(0).time;
+            double firstObjectTime = GetHitObject(0).time;
             int firstObjectBeat = Timestamp.Round((firstObjectTime - firstBeatTime) / line.msPerBeat);
 
             // Apparently double does not result in the countdown needing half as much time, but rather closer to 0.45 times as much.
