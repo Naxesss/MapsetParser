@@ -349,7 +349,12 @@ namespace MapsetParser.objects
                 foreach (double tickTime in tickTimes)
                 {
                     TimingLine line = beatmap.GetTimingLine(tickTime);
-                    yield return new HitSample(line.customIndex, line.sampleset, null, HitSample.HitSource.Tick, tickTime);
+
+                    // If no line exists, we use the default settings.
+                    int               customIndex = line?.customIndex ?? 1;
+                    Beatmap.Sampleset sampleset   = line?.sampleset   ?? Beatmap.Sampleset.Normal;
+
+                    yield return new HitSample(customIndex, sampleset, null, HitSample.HitSource.Tick, tickTime);
                 }
             }
         }
