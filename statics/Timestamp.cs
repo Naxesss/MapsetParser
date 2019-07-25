@@ -61,7 +61,24 @@ namespace MapsetParser.statics
 
             string objects = "";
             foreach (HitObject hitObject in aHitObjects)
-                objects += (objects.Length > 0 ? "," : "") + aMap.GetCombo(hitObject);
+            {
+                string objectRef;
+                if (aMap.generalSettings.mode == Beatmap.Mode.Mania)
+                {
+                    int row =
+                        hitObject.Position.X == 64 ? 0 :
+                        hitObject.Position.X == 192 ? 1 :
+                        hitObject.Position.X == 320 ? 2 :
+                        hitObject.Position.X == 448 ? 3 :
+                        -1;
+
+                    objectRef = hitObject.time + "|" + row;
+                }
+                else
+                    objectRef = aMap.GetCombo(hitObject).ToString();
+
+                objects += (objects.Length > 0 ? "," : "") + objectRef;
+            }
             
             return timestamp + " (" + objects + ") - ";
         }
