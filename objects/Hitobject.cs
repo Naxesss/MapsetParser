@@ -343,10 +343,9 @@ namespace MapsetParser.objects
                 // Body
                 foreach (TimingLine line in lines)
                     yield return new HitSample(line.customIndex, line.sampleset, hitSound, HitSample.HitSource.Body, line.offset);
-
+                
                 // Tick
-                IEnumerable<double> tickTimes = slider.GetSliderTickTimes();
-                foreach (double tickTime in tickTimes)
+                foreach (double tickTime in slider.sliderTickTimes)
                 {
                     TimingLine line = beatmap.GetTimingLine(tickTime);
 
