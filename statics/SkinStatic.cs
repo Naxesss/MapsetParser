@@ -22,8 +22,6 @@ namespace MapsetParser.statics
             "play-skip.png",
             "play-unranked.png",
             "multi-skipped.png",
-            "section-fail.png",
-            "section-pass.png",
             // pause screen
             "pause-overlay.png",    "pause-overlay.jpg",    // according to the wiki page these are the only two which have jpg alternatives
             "fail-background.png",  "fail-background.jpg",
@@ -95,8 +93,6 @@ namespace MapsetParser.statics
             "comboburst.wav",
             "combobreak.wav",
             "failsound.wav",
-            "sectionpass.wav",
-            "sectionfail.wav",
             // sounds in the pause screen
             "pause-loop.wav"
         };
@@ -245,6 +241,15 @@ namespace MapsetParser.statics
             "sliderb-spec.png"
         };
 
+        private static string[] skinBreak = new string[]
+        {
+            "section-fail.png",
+            "section-pass.png",
+            // sounds
+            "sectionpass.wav", "sectionpass.mp3",
+            "sectionfail.wav", "sectionfail.mp3"
+        };
+
         // here we do skin elements that aren't necessarily used but can be, given a specific condition
         private static List<Tuple<string[], Func<BeatmapSet, bool>>> conditionalTuples = new List<Tuple<string[], Func<BeatmapSet, bool>>>();
 
@@ -283,6 +288,8 @@ namespace MapsetParser.statics
                 aBeatmap => aBeatmap.hitObjects.Any(anObject => (anObject as Slider)?.edgeAmount > 1)));
             AddElements(skinStandardSpinner, aBeatmapSet => aBeatmapSet.beatmaps.Any(
                 aBeatmap => aBeatmap.hitObjects.Any(anObject => anObject is Spinner)));
+            AddElements(skinBreak, aBeatmapSet => aBeatmapSet.beatmaps.Any(
+                aBeatmap => aBeatmap.breaks.Any()));
 
             // depending on other skin elements
             AddElements(skinNotScorebarMarker, aBeatmapSet => aBeatmapSet.songFilePaths.Any(
