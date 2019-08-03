@@ -88,7 +88,7 @@ namespace MapsetParser.objects.hitobjects
                 sliderTickTimes    = GetSliderTickTimes();
 
                 UnstackedEndPosition = edgeAmount % 2 == 1 ? pathPxPositions.Last() : UnstackedPosition;
-                EndPosition          = GetStackOffset(UnstackedEndPosition);
+                EndPosition          = UnstackedEndPosition + Position - UnstackedPosition;
             }
         }
 
