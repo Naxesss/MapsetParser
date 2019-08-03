@@ -385,13 +385,13 @@ namespace MapsetParser.objects
         {
             // Checks within 1 ms leniency in case of decimals and precision errors.
             bool isClose(double anEdgeTime, double anOtherTime) =>
-                anEdgeTime <= anOtherTime + 1 &&
-                anEdgeTime >= anOtherTime - 1;
+                anEdgeTime <= anOtherTime + 2 &&
+                anEdgeTime >= anOtherTime - 2;
 
             string edgeType =
-                isClose(time, aTime)                                         ? "head" :
-                isClose(GetEndTime(), aTime)                                 ? "tail" :
-                GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime)) ? "reverse" :
+                isClose(time, aTime)                                                    ? "head" :
+                isClose(GetEndTime(), aTime) || isClose(GetEdgeTimes().Last(), aTime)   ? "tail" :
+                GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime))            ? "reverse" :
                 "body";
 
             return GetObjectType() + (!(this is Circle) ? (" " + edgeType) : "");
