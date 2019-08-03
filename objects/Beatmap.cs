@@ -141,10 +141,14 @@ namespace MapsetParser.objects
                             }
                         }
                         
-                        if (hitObject is Slider && otherHitObject is Circle &&
-                            ShouldStackTail(hitObject as Slider, otherHitObject as Circle))
+                        if (hitObject is Slider && ShouldStackTail(hitObject as Slider, otherHitObject))
                         {
-                            --otherHitObject.stackIndex;
+                            // Slider tail on circle means the circle moves down,
+                            // whereas slider tail on slider head means the first slider moves up.
+                            if (otherHitObject is Circle)
+                                --otherHitObject.stackIndex;
+                            else
+                                ++hitObject.stackIndex;
                             wasChanged = true;
                             break;
                         }
@@ -166,21 +170,22 @@ namespace MapsetParser.objects
             return isNearInTime && isNearInSpace && wouldStackCorrectly;
         }
 
-        /// <summary> Returns whether a circle following a slider should be stacked under the slider tail, but currently is not. </summary>
-        private bool ShouldStackTail(Slider aSlider, Circle aCircle)
+        /// <summary> Returns whether a stackable following a slider should be stacked under the slider tail 
+        /// (or slider over the head in case of slider and slider), but currently is not. </summary>
+        private bool ShouldStackTail(Slider aSlider, Stackable anOtherObject)
         {
             double distanceSq =
                 Vector2.DistanceSquared(
-                    aCircle.UnstackedPosition,
+                    anOtherObject.UnstackedPosition,
                     aSlider.edgeAmount % 2 == 0 ?
                         aSlider.UnstackedPosition :
                         aSlider.UnstackedEndPosition);
             
-            bool isNearInTime = MeetsStackTime(aSlider, aCircle);
+            bool isNearInTime = MeetsStackTime(aSlider, anOtherObject);
             bool isNearInSpace = distanceSq < 3 * 3;
-            bool wouldStackCorrectly = aSlider.stackIndex == aCircle.stackIndex;
+            bool wouldStackCorrectly = aSlider.stackIndex == anOtherObject.stackIndex;
 
-            return isNearInTime && isNearInSpace && wouldStackCorrectly && aSlider.time < aCircle.time;
+            return isNearInTime && isNearInSpace && wouldStackCorrectly && aSlider.time < anOtherObject.time;
         }
 
         /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start Hitsoundtime. </summary>
