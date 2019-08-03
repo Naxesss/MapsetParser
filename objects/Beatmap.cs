@@ -325,11 +325,11 @@ namespace MapsetParser.objects
         /// (may be inaccurate since recent sr reworks were done). </summary>
         public Difficulty GetDifficulty()
         {
-            if (starRating <= 1.5f)        return Difficulty.Easy;
-            else if (starRating <= 2.25f)  return Difficulty.Normal;
-            else if (starRating <= 3.75f)  return Difficulty.Hard;
-            else if (starRating <= 5.25f)  return Difficulty.Insane;
-            else if (starRating <= 6.75f)  return Difficulty.Expert;
+            if (starRating < 2.0f)        return Difficulty.Easy;
+            else if (starRating < 2.7f)  return Difficulty.Normal;
+            else if (starRating < 4.0f)  return Difficulty.Hard;
+            else if (starRating < 5.3f)  return Difficulty.Insane;
+            else if (starRating < 6.5f)  return Difficulty.Expert;
             else                            return Difficulty.Ultra;
         }
 
