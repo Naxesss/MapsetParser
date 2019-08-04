@@ -53,7 +53,7 @@ namespace MapsetParser.objects.hitobjects
         public readonly List<double> sliderTickTimes;
 
         public Vector2 UnstackedEndPosition { get; private set; }
-        public Vector2 EndPosition { get; private set; }
+        public Vector2 EndPosition => UnstackedEndPosition + Position - UnstackedPosition;
 
         public Slider(string aCode, Beatmap aBeatmap)
             : base(aCode, aBeatmap)
@@ -88,7 +88,6 @@ namespace MapsetParser.objects.hitobjects
                 sliderTickTimes    = GetSliderTickTimes();
 
                 UnstackedEndPosition = edgeAmount % 2 == 1 ? pathPxPositions.Last() : UnstackedPosition;
-                EndPosition          = UnstackedEndPosition + Position - UnstackedPosition;
             }
         }
 
