@@ -327,15 +327,49 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the interpreted difficulty level based on the star rating of the beatmap
-        /// (may be inaccurate since recent sr reworks were done). </summary>
-        public Difficulty GetDifficulty()
+        /// (may be inaccurate since recent sr reworks were done), can optionally consider diff names. </summary>
+        public Difficulty GetDifficulty(bool aConsiderDiffName = false)
         {
-            if (starRating < 2.0f)        return Difficulty.Easy;
-            else if (starRating < 2.7f)  return Difficulty.Normal;
-            else if (starRating < 4.0f)  return Difficulty.Hard;
-            else if (starRating < 5.3f)  return Difficulty.Insane;
-            else if (starRating < 6.5f)  return Difficulty.Expert;
-            else                            return Difficulty.Ultra;
+            Difficulty difficulty;
+
+            if (starRating < 2.0f)      difficulty =  Difficulty.Easy;
+            else if (starRating < 2.7f) difficulty = Difficulty.Normal;
+            else if (starRating < 4.0f) difficulty = Difficulty.Hard;
+            else if (starRating < 5.3f) difficulty = Difficulty.Insane;
+            else if (starRating < 6.5f) difficulty = Difficulty.Expert;
+            else                        difficulty = Difficulty.Ultra;
+
+            if(!aConsiderDiffName)
+                return difficulty;
+
+            return GetDifficultyFromName() ?? difficulty;
+        }
+
+        /// <summary> A list of aliases for difficulty levels. Can't be ambigious with named top diffs, so something
+        /// like "Lunatic", "Another", or "Special" which could be either Insane or top diff is no good.</summary>
+        private readonly Dictionary<Difficulty, IEnumerable<string>> nameDiffPairs = new Dictionary<Difficulty, IEnumerable<string>>()
+        {
+            { Difficulty.Easy,   new List<string>(){ "Easy", "Beginner", "Basic", "Kantan", "Cup", "EZ" } },
+            { Difficulty.Normal, new List<string>(){ "Normal", "Intermediate", "Medium", "Futsuu", "Salad", "NM" } },
+            { Difficulty.Hard,   new List<string>(){ "Hard", "Advanced", "Muzukashii", "Platter", "HD" } },
+            { Difficulty.Insane, new List<string>(){ "Insane", "Hyper", "Oni", "Rain", "MX" } },
+            { Difficulty.Expert, new List<string>(){ "Expert", "Extra", "Extreme", "Inner Oni", "Ura Oni", "Overdose", "SC" } }
+        };
+
+        public Difficulty? GetDifficultyFromName()
+        {
+            string name = metadataSettings.version;
+
+            foreach (var pair in nameDiffPairs)
+                if (pair.Value.Any(
+                    aValue =>
+                        name.ToLower() == aValue.ToLower() ||
+                        name.ToLower().StartsWith(aValue.ToLower() + " ") ||
+                        name.ToLower().EndsWith(" " + aValue.ToLower()) ||
+                        name.ToLower().Contains(" " + aValue.ToLower() + " ")))
+                    return pair.Key;
+
+            return null;
         }
 
         /// <summary> Returns the name of the difficulty in a gramatically correct way, for example "an Easy" and "a Normal".
