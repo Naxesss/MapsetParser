@@ -383,7 +383,7 @@ namespace MapsetParser.objects
                 case Difficulty.Hard:   return "a Hard";
                 case Difficulty.Insane: return "an Insane";
                 case Difficulty.Expert: return "an Expert";
-                default:                return "an Extreme";
+                default:                return "an Ultra";
             }
         }
 
