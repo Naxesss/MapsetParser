@@ -619,7 +619,7 @@ namespace MapsetParser.objects.hitobjects
         {
             // any less than 3 points might as well be linear
             if (nodePositions.Count < 3)
-                GetLinearPathPosition(aTime);
+                return GetLinearPathPosition(aTime);
 
             double fraction = GetCurveFraction(aTime);
 
