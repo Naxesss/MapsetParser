@@ -89,12 +89,12 @@ namespace MapsetParser.statics
             "selection-mod-perfect.png",
             "selection-mod-suddendeath.png",
             // sounds in gameplay
-            "applause.wav",
-            "comboburst.wav",
-            "combobreak.wav",
-            "failsound.wav",
+            "applause.wav", "applause.mp3",
+            "comboburst.wav", "comboburst.mp3",
+            "combobreak.wav", "combobreak.mp3",
+            "failsound.wav", "failsound.mp3",
             // sounds in the pause screen
-            "pause-loop.wav"
+            "pause-loop.wav", "pause-loop.mp3"
         };
 
         private static string[] skinStandard = new string[]
@@ -178,11 +178,11 @@ namespace MapsetParser.statics
             "go.png",
             "ready.png",
             // sounds
-            "count1s.wav",
-            "count2s.wav",
-            "count3s.wav",
-            "gos.wav",
-            "readys.wav"
+            "count1s.wav", "count1s.mp3",
+            "count2s.wav", "count2s.mp3",
+            "count3s.wav", "count3s.mp3",
+            "gos.wav", "gos.mp3",
+            "readys.wav", "readys.mp3"
         };
 
         private static string[] skinStandardSlider = new string[]
@@ -223,8 +223,8 @@ namespace MapsetParser.statics
             "spinner-metre.png",
             "spinner-osu.png",
             // sounds
-            "spinnerspin.wav",
-            "spinnerbonus.wav"
+            "spinnerspin.wav", "spinnerspin.mp3",
+            "spinnerbonus.wav", "spinnerbonus.mp3"
         };
 
         private static string[] skinNotScorebarMarker = new string[]
