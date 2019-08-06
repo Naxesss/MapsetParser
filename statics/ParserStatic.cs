@@ -20,7 +20,7 @@ namespace MapsetParser.statics
                     read = false;
 
                 if (read)
-                    yield return aFunc(line);
+                    yield return aFunc(line.Replace("\r", ""));
 
                 if (line.StartsWith("[" + aSectionName + "]"))
                     read = true;
