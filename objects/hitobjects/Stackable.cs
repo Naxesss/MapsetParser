@@ -8,6 +8,7 @@ namespace MapsetParser.objects.hitobjects
     public class Stackable : HitObject
     {
         public int stackIndex;
+        public bool isOnSlider;
 
         public Vector2 UnstackedPosition { get => base.Position; }
         public override Vector2 Position { get => GetStackOffset(base.Position); }
