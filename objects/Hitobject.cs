@@ -230,14 +230,14 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset GetSampleset(bool anAddition = false)
+        public Beatmap.Sampleset GetSampleset(bool anAddition = false, double? aSpecificTime = null)
         {
             if (anAddition && addition != Beatmap.Sampleset.Auto)
                 return addition;
 
             // inherits from timing line if auto
             return sampleset == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(time, true).sampleset : sampleset;
+                ? beatmap.GetTimingLine(aSpecificTime ?? time, true).sampleset : sampleset;
         }
 
         /// <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
@@ -351,7 +351,11 @@ namespace MapsetParser.objects
 
                     // If no line exists, we use the default settings.
                     int               customIndex = line?.customIndex ?? 1;
-                    Beatmap.Sampleset sampleset   = line?.sampleset   ?? Beatmap.Sampleset.Normal;
+                    Beatmap.Sampleset sampleset   = GetSampleset(true, tickTime);
+
+                    // Defaults to normal if none is set (before any timing line).
+                    if (sampleset == Beatmap.Sampleset.Auto)
+                        sampleset = Beatmap.Sampleset.Normal;
 
                     yield return new HitSample(customIndex, sampleset, null, HitSample.HitSource.Tick, tickTime);
                 }
