@@ -123,34 +123,52 @@ namespace MapsetParser.objects
                         if (!MeetsStackTime(hitObject, otherHitObject))
                             break;
 
-                        if ((hitObject is Circle || otherHitObject is Circle) &&
-                            ShouldStack(hitObject, otherHitObject))
+                        if (hitObject is Circle || otherHitObject is Circle)
                         {
-                            if (hitObject.stackIndex < 0)
+                            if (ShouldStack(hitObject, otherHitObject))
                             {
-                                // Objects stacked under slider tails will continue to stack downwards.
-                                --otherHitObject.stackIndex;
-                                wasChanged = true;
-                                break;
+                                if (otherHitObject is Slider || otherHitObject.isOnSlider)
+                                    hitObject.isOnSlider = true;
+
+                                // Sliders are never less than 0 stack index.
+                                // Circles go below 0 when stacked under slider tails.
+                                if (hitObject.stackIndex < 0 && !hitObject.isOnSlider)
+                                {
+                                    // Objects stacked under slider tails will continue to stack downwards.
+                                    otherHitObject.stackIndex = hitObject.stackIndex - 1;
+                                    wasChanged = true;
+                                    break;
+                                }
+                                else
+                                {
+                                    hitObject.stackIndex = otherHitObject.stackIndex + 1;
+                                    wasChanged = true;
+                                    break;
+                                }
                             }
-                            else
-                            {
-                                ++hitObject.stackIndex;
-                                wasChanged = true;
+                            else if (IsStacked(hitObject, otherHitObject))
                                 break;
-                            }
                         }
                         
-                        if (hitObject is Slider && ShouldStackTail(hitObject as Slider, otherHitObject))
+                        if (hitObject is Slider)
                         {
-                            // Slider tail on circle means the circle moves down,
-                            // whereas slider tail on slider head means the first slider moves up.
-                            if (otherHitObject is Circle)
-                                --otherHitObject.stackIndex;
-                            else
-                                ++hitObject.stackIndex;
-                            wasChanged = true;
-                            break;
+                            if (ShouldStackTail(hitObject as Slider, otherHitObject))
+                            {
+                                // Slider tail on circle means the circle moves down,
+                                // whereas slider tail on slider head means the first slider moves up.
+                                // Only sliders later in time can move sliders earlier in time.
+                                if (otherHitObject is Slider || otherHitObject.isOnSlider)
+                                {
+                                    hitObject.isOnSlider = true;
+                                    hitObject.stackIndex = otherHitObject.stackIndex + 1;
+                                }
+                                else
+                                    otherHitObject.stackIndex = hitObject.stackIndex - 1;
+                                wasChanged = true;
+                                break;
+                            }
+                            else if (IsStackedTail(hitObject as Slider, otherHitObject))
+                                break;
                         }
                     }
                 }
@@ -158,21 +176,32 @@ namespace MapsetParser.objects
             while (wasChanged);
         }
 
-        /// <summary> Returns whether two stackable objects should be stacked, but currently are not. </summary>
-        private bool ShouldStack(Stackable anObject, Stackable anOtherObject)
+        /// <summary> Returns whether two stackable objects could be stacked. </summary>
+        private bool CanStack(Stackable anObject, Stackable anOtherObject)
         {
             bool isNearInTime = MeetsStackTime(anObject, anOtherObject);
             bool isNearInSpace = MeetsStackDistance(anObject, anOtherObject);
-            bool wouldStackCorrectly =
-                anObject.stackIndex == anOtherObject.stackIndex ||
-                anObject.stackIndex < 0 && anObject.stackIndex < anOtherObject.stackIndex; // Allows negative stacks to line up.
-            
-            return isNearInTime && isNearInSpace && wouldStackCorrectly;
+
+            return isNearInTime && isNearInSpace;
         }
 
-        /// <summary> Returns whether a stackable following a slider should be stacked under the slider tail 
-        /// (or slider over the head in case of slider and slider), but currently is not. </summary>
-        private bool ShouldStackTail(Slider aSlider, Stackable anOtherObject)
+        /// <summary> Returns whether two stackable objects are currently stacked. </summary>
+        private bool IsStacked(Stackable anObject, Stackable anOtherObject)
+        {
+            bool isAlreadyStacked = anObject.stackIndex == anOtherObject.stackIndex + 1;
+
+            return CanStack(anObject, anOtherObject) && isAlreadyStacked;
+        }
+
+        /// <summary> Returns whether two stackable objects should be stacked, but currently are not. </summary>
+        private bool ShouldStack(Stackable anObject, Stackable anOtherObject)
+        {
+            return CanStack(anObject, anOtherObject) && !IsStacked(anObject, anOtherObject);
+        }
+
+        /// <summary> Returns whether a stackable following a slider could be stacked under the tail
+        /// (or over in case of slider and slider). </summary>
+        private bool CanStackTail(Slider aSlider, Stackable anOtherObject)
         {
             double distanceSq =
                 Vector2.DistanceSquared(
@@ -180,12 +209,27 @@ namespace MapsetParser.objects
                     aSlider.edgeAmount % 2 == 0 ?
                         aSlider.UnstackedPosition :
                         aSlider.UnstackedEndPosition);
-            
+
             bool isNearInTime = MeetsStackTime(aSlider, anOtherObject);
             bool isNearInSpace = distanceSq < 3 * 3;
-            bool wouldStackCorrectly = aSlider.stackIndex == anOtherObject.stackIndex;
 
-            return isNearInTime && isNearInSpace && wouldStackCorrectly && aSlider.time < anOtherObject.time;
+            return isNearInTime && isNearInSpace && aSlider.time < anOtherObject.time;
+        }
+
+        /// <summary> Returns whether a stackable following a slider is stacked under the tail
+        /// (or over in case of slider and slider). </summary>
+        private bool IsStackedTail(Slider aSlider, Stackable anOtherObject)
+        {
+            bool isAlreadyStacked = aSlider.stackIndex == anOtherObject.stackIndex + 1;
+
+            return CanStackTail(aSlider, anOtherObject) && isAlreadyStacked;
+        }
+
+        /// <summary> Returns whether a stackable following a slider should be stacked under the slider tail 
+        /// (or slider over the head in case of slider and slider), but currently is not. </summary>
+        private bool ShouldStackTail(Slider aSlider, Stackable anOtherObject)
+        {
+            return CanStackTail(aSlider, anOtherObject) && !IsStackedTail(aSlider, anOtherObject);
         }
 
         /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start Hitsoundtime. </summary>
