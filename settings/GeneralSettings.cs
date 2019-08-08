@@ -62,8 +62,8 @@ namespace MapsetParser.settings
             // optional
             countdownBeatOffset    = GetValue(aLines, "CountdownOffset") != null ?
                                         int.Parse(GetValue(aLines, "CountdownOffset")) : 0;
-            skinPreference         = GetValue(aLines, "SkinPreference");
-
+            skinPreference         = GetValue(aLines, "SkinPreference") == "" ?
+                                        null : GetValue(aLines, "SkinPreference");
             storyInFrontOfFire     = GetValue(aLines, "StoryFireInFront") != null
                                         && GetValue(aLines, "StoryFireInFront") == "1";
             specialN1Style         = GetValue(aLines, "SpecialStyle") != null
