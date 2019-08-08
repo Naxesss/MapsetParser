@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -30,6 +31,6 @@ namespace MapsetParser.statics
 
         /// <summary> Returns the file path relative to another path, usually song path in this context. </summary>
         public static string RelativePath(string aFilePath, string aSongPath) =>
-            aFilePath.Replace(aSongPath + "\\", "");
+            aFilePath.Replace(aSongPath + "\\", "").Replace(aSongPath + "/", "");
     }
 }

@@ -583,7 +583,7 @@ namespace MapsetParser.objects
             {
                 // read the mp3 file tags, if an audio file is specified
                 string audioFileName = generalSettings.audioFileName;
-                string mp3Path = songPath + "\\" + audioFileName;
+                string mp3Path = songPath + Path.DirectorySeparatorChar + audioFileName;
 
                 if (audioFileName.Length > 0 && File.Exists(mp3Path))
                     return mp3Path;
