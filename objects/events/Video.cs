@@ -13,25 +13,25 @@ namespace MapsetParser.objects.events
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
         public readonly string strippedPath;
 
-        public Video(string aCode)
+        public Video(string[] anArgs)
         {
-            offset = GetOffset(aCode);
-            path   = GetPath(aCode);
+            offset = GetOffset(anArgs);
+            path   = GetPath(anArgs);
 
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
         // offset
-        private int GetOffset(string aCode)
+        private int GetOffset(string[] anArgs)
         {
-            return int.Parse(aCode.Split(',')[1]);
+            return int.Parse(anArgs[1]);
         }
 
         // filename
-        private string GetPath(string aCode)
+        private string GetPath(string[] anArgs)
         {
             // remove quotes for consistency, no way to add quotes manually anyway
-            return PathStatic.ParsePath(aCode.Split(',')[2], false, true);
+            return PathStatic.ParsePath(anArgs[2], false, true);
         }
     }
 }

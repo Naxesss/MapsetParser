@@ -26,20 +26,20 @@ namespace MapsetParser.settings
         public float sliderMultiplier;
         public float sliderTickRate;
 
-        public DifficultySettings(string aCode)
+        public DifficultySettings(string[] aLines)
         {
-            hpDrain            = GetValue(aCode, "HPDrainRate");
-            circleSize         = GetValue(aCode, "CircleSize");
-            overallDifficulty  = GetValue(aCode, "OverallDifficulty");
-            approachRate       = GetValue(aCode, "ApproachRate");
+            hpDrain            = GetValue(aLines, "HPDrainRate");
+            circleSize         = GetValue(aLines, "CircleSize");
+            overallDifficulty  = GetValue(aLines, "OverallDifficulty");
+            approachRate       = GetValue(aLines, "ApproachRate");
 
-            sliderMultiplier   = GetValue(aCode, "SliderMultiplier");
-            sliderTickRate     = GetValue(aCode, "SliderTickRate");
+            sliderMultiplier   = GetValue(aLines, "SliderMultiplier");
+            sliderTickRate     = GetValue(aLines, "SliderTickRate");
         }
 
-        private float GetValue(string aCode, string aKey)
+        private float GetValue(string[] aLines, string aKey)
         {
-            string line = aCode.Split(new string[] { "\n" }, StringSplitOptions.None).FirstOrDefault(aLine => aLine.StartsWith(aKey));
+            string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
             if (line == null)
                 return 0;
 

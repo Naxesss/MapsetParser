@@ -62,19 +62,19 @@ namespace MapsetParser.objects
             ManiaHoldNote = 128
         }
 
-        public HitObject(string aCode, Beatmap aBeatmap)
+        public HitObject(string[] anArgs, Beatmap aBeatmap)
         {
             beatmap = aBeatmap;
-            code    = aCode;
+            code    = String.Join(',', anArgs);
 
-            Position = GetPosition(aCode);
+            Position = GetPosition(anArgs);
 
-            time     = GetTime(aCode);
-            type     = GetTypeFlags(aCode);
-            hitSound = GetHitSound(aCode);
+            time     = GetTime(anArgs);
+            type     = GetTypeFlags(anArgs);
+            hitSound = GetHitSound(anArgs);
 
             // extras
-            Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> extras = GetExtras(aCode);
+            Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> extras = GetExtras(anArgs);
             if (extras != null)
             {
                 // custom index and volume are by default 0 if there are edge hitsounds or similar
@@ -94,32 +94,32 @@ namespace MapsetParser.objects
          *  Parsing
          */
 
-        private Vector2 GetPosition(string aCode)
+        private Vector2 GetPosition(string[] anArgs)
         {
-            float x = float.Parse(aCode.Split(',')[0], CultureInfo.InvariantCulture);
-            float y = float.Parse(aCode.Split(',')[1], CultureInfo.InvariantCulture);
+            float x = float.Parse(anArgs[0], CultureInfo.InvariantCulture);
+            float y = float.Parse(anArgs[1], CultureInfo.InvariantCulture);
 
             return new Vector2(x, y);
         }
 
-        private double GetTime(string aCode)
+        private double GetTime(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[2], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[2], CultureInfo.InvariantCulture);
         }
 
-        private Type GetTypeFlags(string aCode)
+        private Type GetTypeFlags(string[] anArgs)
         {
-            return (Type)int.Parse(aCode.Split(',')[3]);
+            return (Type)int.Parse(anArgs[3]);
         }
 
-        private HitSound GetHitSound(string aCode)
+        private HitSound GetHitSound(string[] anArgs)
         {
-            return (HitSound)int.Parse(aCode.Split(',')[4]);
+            return (HitSound)int.Parse(anArgs[4]);
         }
 
-        private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> GetExtras(string aCode)
+        private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> GetExtras(string[] anArgs)
         {
-            string extras = aCode.Split(',').Last();
+            string extras = anArgs.Last();
 
             // hold notes have "endTime:extras" as format
             int index = type.HasFlag(Type.ManiaHoldNote) ? 1 : 0;
@@ -180,11 +180,11 @@ namespace MapsetParser.objects
         /*
          *  Utility
          */
-
+        
         /// <summary> Returns whether a hit object code has the given type. </summary>
-        public static bool HasType(string aCode, Type aType)
+        public static bool HasType(string[] anArgs, Type aType)
         {
-            return ((Type)int.Parse(aCode.Split(',')[3])).HasFlag(aType);
+            return ((Type)int.Parse(anArgs[3])).HasFlag(aType);
         }
 
         /// <summary> Returns whether the hit object has a hit sound, or optionally a certain type of hit sound. </summary>
@@ -343,7 +343,7 @@ namespace MapsetParser.objects
                 // Body
                 foreach (TimingLine line in lines)
                     yield return new HitSample(line.customIndex, line.sampleset, hitSound, HitSample.HitSource.Body, line.offset);
-                
+
                 // Tick
                 foreach (double tickTime in slider.sliderTickTimes)
                 {

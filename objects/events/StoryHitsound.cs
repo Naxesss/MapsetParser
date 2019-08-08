@@ -27,38 +27,38 @@ namespace MapsetParser.objects.events
             Foreground = 3
         }
 
-        public StoryHitSound(string aCode)
+        public StoryHitSound(string[] anArgs)
         {
-            time   = GetTime(aCode);
-            layer  = GetLayer(aCode);
-            path   = GetPath(aCode);
-            volume = GetVolume(aCode);
+            time   = GetTime(anArgs);
+            layer  = GetLayer(anArgs);
+            path   = GetPath(anArgs);
+            volume = GetVolume(anArgs);
 
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
         // time
-        private double GetTime(string aCode)
+        private double GetTime(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[1], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[1], CultureInfo.InvariantCulture);
         }
 
         // layer
-        private Layer GetLayer(string aCode)
+        private Layer GetLayer(string[] anArgs)
         {
-            return (Layer)int.Parse(aCode.Split(',')[2]);
+            return (Layer)int.Parse(anArgs[2]);
         }
 
         // path
-        private string GetPath(string aCode)
+        private string GetPath(string[] anArgs)
         {
-            return PathStatic.ParsePath(aCode.Split(',')[3], false, true);
+            return PathStatic.ParsePath(anArgs[3], false, true);
         }
 
         // volume
-        private float GetVolume(string aCode)
+        private float GetVolume(string[] anArgs)
         {
-            return float.Parse(aCode.Split(',')[4], CultureInfo.InvariantCulture);
+            return float.Parse(anArgs[4], CultureInfo.InvariantCulture);
         }
     }
 }

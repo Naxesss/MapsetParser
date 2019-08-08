@@ -24,69 +24,69 @@ namespace MapsetParser.objects
         // might not be explicit (depending on inherited or not)
         public float svMult;
 
-        public TimingLine(string aCode)
+        public TimingLine(string[] anArgs)
         {
-            code = aCode;
-
-            offset         = GetOffset(aCode);
-            meter          = GetMeter(aCode);
-            sampleset      = GetSampleset(aCode);
-            customIndex    = GetCustomIndex(aCode);
-            volume         = GetVolume(aCode);
-            uninherited    = IsUninherited(aCode);
-            kiai           = IsKiai(aCode);
+            code = String.Join(',', anArgs);
+            
+            offset         = GetOffset(anArgs);
+            meter          = GetMeter(anArgs);
+            sampleset      = GetSampleset(anArgs);
+            customIndex    = GetCustomIndex(anArgs);
+            volume         = GetVolume(anArgs);
+            uninherited    = IsUninherited(anArgs);
+            kiai           = IsKiai(anArgs);
 
             // may not be explicit
-            svMult = GetSvMult(aCode);
+            svMult = GetSvMult(anArgs);
         }
 
         // offset
-        private double GetOffset(string aCode)
+        private double GetOffset(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[0], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[0], CultureInfo.InvariantCulture);
         }
 
         // meter
-        private int GetMeter(string aCode)
+        private int GetMeter(string[] anArgs)
         {
-            return int.Parse(aCode.Split(',')[2]);
+            return int.Parse(anArgs[2]);
         }
 
         // sampleset
-        private Beatmap.Sampleset GetSampleset(string aCode)
+        private Beatmap.Sampleset GetSampleset(string[] anArgs)
         {
-            return (Beatmap.Sampleset)int.Parse(aCode.Split(',')[3]);
+            return (Beatmap.Sampleset)int.Parse(anArgs[3]);
         }
 
         // customIndex
-        private int GetCustomIndex(string aCode)
+        private int GetCustomIndex(string[] anArgs)
         {
-            return int.Parse(aCode.Split(',')[4]);
+            return int.Parse(anArgs[4]);
         }
 
         // volume
-        private float GetVolume(string aCode)
+        private float GetVolume(string[] anArgs)
         {
-            return float.Parse(aCode.Split(',')[5], CultureInfo.InvariantCulture);
+            return float.Parse(anArgs[5], CultureInfo.InvariantCulture);
         }
         
         /// <summary> Returns whether a line of code representing a timing line is uninherited or inherited. </summary>
-        public static bool IsUninherited(string aCode)
+        public static bool IsUninherited(string[] anArgs)
         {
-            return aCode.Split(',')[6] == "1";
+            return anArgs[6] == "1";
         }
 
         // kiai
-        private bool IsKiai(string aCode)
+        private bool IsKiai(string[] anArgs)
         {
-            return aCode.Split(',')[7] == "1";
+            return anArgs[7] == "1";
         }
 
         /// <summary> Returns the slider velocity multiplier (1 for uninherited lines). </summary>
-        public float GetSvMult(string aCode)
+        public float GetSvMult(string[] anArgs)
         {
-            if (!IsUninherited(aCode))
-                return 1 / (float.Parse(aCode.Split(',')[1], CultureInfo.InvariantCulture) * -0.01f);
+            if (!IsUninherited(anArgs))
+                return 1 / (float.Parse(anArgs[1], CultureInfo.InvariantCulture) * -0.01f);
             else
                 return 1;
         }

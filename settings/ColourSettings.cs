@@ -29,12 +29,12 @@ namespace MapsetParser.settings
         public Vector3? sliderTrackOverride;    // The body of the slider
         public Vector3? sliderBorder;           // The edges of the slider
 
-        public ColourSettings(string aCode)
+        public ColourSettings(string[] aLines)
         {
-            combos = ParseColours(GetCombos(aCode)).ToList();
+            combos = ParseColours(GetCombos(aLines)).ToList();
             
-            string sliderTrackOverrideValue    = GetValue(aCode, "SliderTrackOverride");
-            string sliderBorderValue           = GetValue(aCode, "SliderBorder");
+            string sliderTrackOverrideValue    = GetValue(aLines, "SliderTrackOverride");
+            string sliderBorderValue           = GetValue(aLines, "SliderBorder");
             // there is also a "SliderBody" property documented, but it seemingly does nothing
 
             if (sliderTrackOverrideValue != null)
@@ -44,18 +44,16 @@ namespace MapsetParser.settings
                 sliderBorder = ParseColour(sliderBorderValue);
         }
 
-        private IEnumerable<string> GetCombos(string aCode)
+        private IEnumerable<string> GetCombos(string[] aLines)
         {
-            List<string> lines = aCode.Split(new string[] { "\n" }, StringSplitOptions.None).ToList();
-            
-            foreach (string line in lines)
+            foreach (string line in aLines)
                 if (line != null && line.StartsWith("Combo"))
                     yield return line.Split(':')[1].Trim();
         }
 
-        private string GetValue(string aCode, string aKey)
+        private string GetValue(string[] aLines, string aKey)
         {
-            string line = aCode.Split(new string[] { "\n" }, StringSplitOptions.None).FirstOrDefault(aLine => aLine.StartsWith(aKey));
+            string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
             if (line == null)
                 return null;
 

@@ -35,30 +35,30 @@ namespace MapsetParser.settings
         public ulong? beatmapId;
         public ulong? beatmapSetId;
 
-        public MetadataSettings(string aCode)
+        public MetadataSettings(string[] aLines)
         {
             // unlike hitobjects metadata settings gets the whole section and not line by line as code
+            
+            title          = GetValue(aLines, "Title");
+            titleUnicode   = GetValue(aLines, "TitleUnicode");
+            artist         = GetValue(aLines, "Artist");
+            artistUnicode  = GetValue(aLines, "ArtistUnicode");
 
-            title          = GetValue(aCode, "Title");
-            titleUnicode   = GetValue(aCode, "TitleUnicode");
-            artist         = GetValue(aCode, "Artist");
-            artistUnicode  = GetValue(aCode, "ArtistUnicode");
-
-            creator    = GetValue(aCode, "Creator");
-            version    = GetValue(aCode, "Version");
-            source     = GetValue(aCode, "Source");
-            tags       = GetValue(aCode, "Tags");
+            creator    = GetValue(aLines, "Creator");
+            version    = GetValue(aLines, "Version");
+            source     = GetValue(aLines, "Source");
+            tags       = GetValue(aLines, "Tags");
 
             // check to see if the ids are even there (don't exist in lower osu file versions, and aren't set on non-published maps)
-            beatmapId      = GetValue(aCode, "BeatmapID")      == null || GetValue(aCode, "BeatmapID")      == "0" 
-                                ? (ulong?)null  : ulong.Parse(GetValue(aCode, "BeatmapID"));
-            beatmapSetId   = GetValue(aCode, "BeatmapSetID")   == null || GetValue(aCode, "BeatmapSetID")   == "-1"
-                                ? (ulong?)null  : ulong.Parse(GetValue(aCode, "BeatmapSetID"));
+            beatmapId      = GetValue(aLines, "BeatmapID")      == null || GetValue(aLines, "BeatmapID")      == "0" 
+                                ? (ulong?)null  : ulong.Parse(GetValue(aLines, "BeatmapID"));
+            beatmapSetId   = GetValue(aLines, "BeatmapSetID")   == null || GetValue(aLines, "BeatmapSetID")   == "-1"
+                                ? (ulong?)null  : ulong.Parse(GetValue(aLines, "BeatmapSetID"));
         }
 
-        private string GetValue(string aCode, string aKey)
+        private string GetValue(string[] aLines, string aKey)
         {
-            string line = aCode.Split(new string[] { "\n" }, StringSplitOptions.None).FirstOrDefault(aLine => aLine.StartsWith(aKey));
+            string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
             if (line == null)
                 return null;
 

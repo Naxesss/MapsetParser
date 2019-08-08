@@ -75,22 +75,24 @@ namespace MapsetParser.objects
             songPath   = aSongPath;
             mapPath    = aMapPath;
 
-            generalSettings    = ParserStatic.GetSettings(aCode, "General",     aSectionCode => new GeneralSettings(aSectionCode));
-            metadataSettings   = ParserStatic.GetSettings(aCode, "Metadata",    aSectionCode => new MetadataSettings(aSectionCode));
-            difficultySettings = ParserStatic.GetSettings(aCode, "Difficulty",  aSectionCode => new DifficultySettings(aSectionCode));
-            colourSettings     = ParserStatic.GetSettings(aCode, "Colours",     aSectionCode => new ColourSettings(aSectionCode));
+            string[] lines = aCode.Split(new string[] { "\n" }, StringSplitOptions.None);
+
+            generalSettings    = ParserStatic.GetSettings(lines, "General",     aSectionLines => new GeneralSettings(aSectionLines));
+            metadataSettings   = ParserStatic.GetSettings(lines, "Metadata",    aSectionLines => new MetadataSettings(aSectionLines));
+            difficultySettings = ParserStatic.GetSettings(lines, "Difficulty",  aSectionLines => new DifficultySettings(aSectionLines));
+            colourSettings     = ParserStatic.GetSettings(lines, "Colours",     aSectionLines => new ColourSettings(aSectionLines));
 
             // event type 3 seems to be "background colour transformation" https://i.imgur.com/Tqlz3s5.png
             
-            backgrounds    = GetEvents(aCode, new List<string>() { "Background",   "0" }, aLine => new Background(aLine));
-            videos         = GetEvents(aCode, new List<string>() { "Video",        "1" }, aLine => new Video(aLine));
-            breaks         = GetEvents(aCode, new List<string>() { "Break",        "2" }, aLine => new Break(aLine));
-            sprites        = GetEvents(aCode, new List<string>() { "Sprite",       "4" }, aLine => new Sprite(aLine));
-            storyHitSounds = GetEvents(aCode, new List<string>() { "Sample",       "5" }, aLine => new StoryHitSound(aLine));
-            animations     = GetEvents(aCode, new List<string>() { "Animation",    "6" }, aLine => new Animation(aLine));
+            backgrounds    = GetEvents(lines, new List<string>() { "Background",   "0" }, anArgs => new Background(anArgs));
+            videos         = GetEvents(lines, new List<string>() { "Video",        "1" }, anArgs => new Video(anArgs));
+            breaks         = GetEvents(lines, new List<string>() { "Break",        "2" }, anArgs => new Break(anArgs));
+            sprites        = GetEvents(lines, new List<string>() { "Sprite",       "4" }, anArgs => new Sprite(anArgs));
+            storyHitSounds = GetEvents(lines, new List<string>() { "Sample",       "5" }, anArgs => new StoryHitSound(anArgs));
+            animations     = GetEvents(lines, new List<string>() { "Animation",    "6" }, anArgs => new Animation(anArgs));
             
-            timingLines        = GetTimingLines(aCode);
-            hitObjects         = GetHitobjects(aCode);
+            timingLines        = GetTimingLines(lines);
+            hitObjects         = GetHitobjects(lines);
 
             if (generalSettings.mode == Mode.Standard)
             {
@@ -606,39 +608,40 @@ namespace MapsetParser.objects
          *  Parser Methods
         */
         
-        private List<T> GetEvents<T>(string aCode, List<string> aTypes, Func<string, T> aFunc)
+        private List<T> GetEvents<T>(string[] aLines, List<string> aTypes, Func<string[], T> aFunc)
         {
             // find all lines starting with any of aTypes in the event section
             List<T> types = new List<T>();
-            ParserStatic.GetSettings(aCode, "Events", aSection =>
+            ParserStatic.ApplySettings(aLines, "Events", aSectionLines =>
             {
-                foreach (string line in aSection.Split(new string[] { "\n" }, StringSplitOptions.None))
+                foreach (string line in aSectionLines)
                     if (aTypes.Any(aType => line.StartsWith(aType + ",")))
-                        types.Add(aFunc(line));
-                return aSection;
+                        types.Add(aFunc(line.Split(',')));
             });
             return types;
         }
 
-        private List<TimingLine> GetTimingLines(string aCode)
+        private List<TimingLine> GetTimingLines(string[] aLines)
         {
             // find the [TimingPoints] section and parse each timing line
-            return ParserStatic.ParseSection(aCode, "TimingPoints", aLine =>
+            return ParserStatic.ParseSection(aLines, "TimingPoints", aLine =>
             {
-                return TimingLine.IsUninherited(aLine) ? new UninheritedLine(aLine) : (TimingLine)new InheritedLine(aLine);
+                string[] args = aLine.Split(',');
+                return TimingLine.IsUninherited(args) ? new UninheritedLine(args) : (TimingLine)new InheritedLine(args);
             }).ToList();
         }
 
-        private List<HitObject> GetHitobjects(string aCode)
+        private List<HitObject> GetHitobjects(string[] aLines)
         {
             // find the [Hitobjects] section and parse each hitobject until empty line or end of file
-            return ParserStatic.ParseSection(aCode, "HitObjects", aLine =>
+            return ParserStatic.ParseSection(aLines, "HitObjects", aLine =>
             {
+                string[] args = aLine.Split(',');
                 return
-                    HitObject.HasType(aLine, HitObject.Type.Circle)        ? new Circle(aLine, this) :
-                    HitObject.HasType(aLine, HitObject.Type.Slider)        ? new Slider(aLine, this) :
-                    HitObject.HasType(aLine, HitObject.Type.ManiaHoldNote) ? new HoldNote(aLine, this) :
-                    (HitObject)new Spinner(aLine, this);
+                    HitObject.HasType(args, HitObject.Type.Circle)        ? new Circle(args, this) :
+                    HitObject.HasType(args, HitObject.Type.Slider)        ? new Slider(args, this) :
+                    HitObject.HasType(args, HitObject.Type.ManiaHoldNote) ? new HoldNote(args, this) :
+                    (HitObject)new Spinner(args, this);
             }).ToList();
         }
 

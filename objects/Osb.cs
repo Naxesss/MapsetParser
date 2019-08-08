@@ -22,11 +22,13 @@ namespace MapsetParser.objects
         {
             code = aCode;
 
+            string[] lines = aCode.Split(new string[] { "\n" }, StringSplitOptions.None);
+
             // substitute variables in the code before looking at the event part
             List<KeyValuePair<string, string>> substitutions = new List<KeyValuePair<string, string>>();
-            ParserStatic.ApplySettings(aCode, "Variables", aSection =>
+            ParserStatic.ApplySettings(lines, "Variables", aSectionLines =>
             {
-                foreach (string line in aSection.Split(new string[] { "\n" }, StringSplitOptions.None))
+                foreach (string line in aSectionLines)
                     if (line.StartsWith("$"))
                         substitutions.Add(new KeyValuePair<string, string>(
                             line.Split('=')[0].Trim(),
@@ -38,13 +40,14 @@ namespace MapsetParser.objects
                 substitutedCode = substitutedCode.Replace(substitution.Key, substitution.Value);
 
             string codeResult = substitutedCode.ToString();
+            string[] linesResult = codeResult.Split(new string[] { "\n" }, StringSplitOptions.None);
 
-            backgrounds    = GetEvents(codeResult, new List<string>() { "Background",   "0" }, aLine => new Background(aLine));
-            videos         = GetEvents(codeResult, new List<string>() { "Video",        "1" }, aLine => new Video(aLine));
-            breaks         = GetEvents(codeResult, new List<string>() { "Break",        "2" }, aLine => new Break(aLine));
-            sprites        = GetEvents(codeResult, new List<string>() { "Sprite",       "4" }, aLine => new Sprite(aLine));
-            storyHitSounds = GetEvents(codeResult, new List<string>() { "Sample",       "5" }, aLine => new StoryHitSound(aLine));
-            animations     = GetEvents(codeResult, new List<string>() { "Animation",    "6" }, aLine => new Animation(aLine));
+            backgrounds    = GetEvents(linesResult, new List<string>() { "Background",   "0" }, anArgs => new Background(anArgs));
+            videos         = GetEvents(linesResult, new List<string>() { "Video",        "1" }, anArgs => new Video(anArgs));
+            breaks         = GetEvents(linesResult, new List<string>() { "Break",        "2" }, anArgs => new Break(anArgs));
+            sprites        = GetEvents(linesResult, new List<string>() { "Sprite",       "4" }, anArgs => new Sprite(anArgs));
+            storyHitSounds = GetEvents(linesResult, new List<string>() { "Sample",       "5" }, anArgs => new StoryHitSound(anArgs));
+            animations     = GetEvents(linesResult, new List<string>() { "Animation",    "6" }, anArgs => new Animation(anArgs));
         }
 
         /// <summary> Returns whether the .osb file is actually used as a storyboard (or if it's just empty). </summary>
@@ -58,15 +61,15 @@ namespace MapsetParser.objects
                 || animations      .Count > 0;
         }
 
-        private List<T> GetEvents<T>(string aCode, List<string> aTypes, Func<string, T> aFunc)
+        private List<T> GetEvents<T>(string[] aLines, List<string> aTypes, Func<string[], T> aFunc)
         {
             // find all lines starting with any of aTypes in the event section
             List<T> types = new List<T>();
-            ParserStatic.ApplySettings(aCode, "Events", aSection =>
+            ParserStatic.ApplySettings(aLines, "Events", aSectionLines =>
             {
-                foreach (string line in aSection.Split(new string[] { "\n" }, StringSplitOptions.None))
+                foreach (string line in aSectionLines)
                     if (aTypes.Any(aType => line.StartsWith(aType + ",")))
-                        types.Add(aFunc(line));
+                        types.Add(aFunc(line.Split(',')));
             });
             return types;
         }

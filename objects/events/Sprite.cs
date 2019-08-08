@@ -17,20 +17,20 @@ namespace MapsetParser.objects.events
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
         public readonly string strippedPath;
 
-        public Sprite(string aCode)
+        public Sprite(string[] anArgs)
         {
-            layer  = GetLayer(aCode);
-            origin = GetOrigin(aCode);
-            path   = GetPath(aCode);
-            offset = GetOffset(aCode);
+            layer  = GetLayer(anArgs);
+            origin = GetOrigin(anArgs);
+            path   = GetPath(anArgs);
+            offset = GetOffset(anArgs);
 
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
         // layer
-        private int GetLayer(string aCode)
+        private int GetLayer(string[] anArgs)
         {
-            string argument = aCode.Split(',')[1];
+            string argument = anArgs[1];
             int id =
                 argument == "Background"    ? 0 :
                 argument == "Fail"          ? 1 :
@@ -46,9 +46,9 @@ namespace MapsetParser.objects.events
         }
 
         // origin
-        private int GetOrigin(string aCode)
+        private int GetOrigin(string[] anArgs)
         {
-            string argument = aCode.Split(',')[2];
+            string argument = anArgs[2];
             int id =
                 argument == "TopLeft"      ? 0 :
                 argument == "Centre"       ? 1 :
@@ -69,19 +69,19 @@ namespace MapsetParser.objects.events
         }
 
         // filename
-        private string GetPath(string aCode)
+        private string GetPath(string[] anArgs)
         {
             // remove quotes for consistency, no way to add quotes manually anyway
-            return PathStatic.ParsePath(aCode.Split(',')[3], false, true);
+            return PathStatic.ParsePath(anArgs[3], false, true);
         }
 
         // offset
-        private Vector2 GetOffset(string aCode)
+        private Vector2 GetOffset(string[] anArgs)
         {
-            if (aCode.Split(',').Length > 4)
+            if (anArgs.Length > 4)
                 return new Vector2(
-                    float.Parse(aCode.Split(',')[4], CultureInfo.InvariantCulture),
-                    float.Parse(aCode.Split(',')[5], CultureInfo.InvariantCulture));
+                    float.Parse(anArgs[4], CultureInfo.InvariantCulture),
+                    float.Parse(anArgs[5], CultureInfo.InvariantCulture));
             else
                 // default coordinates
                 return new Vector2(320, 240);

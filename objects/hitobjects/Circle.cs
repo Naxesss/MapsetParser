@@ -3,8 +3,8 @@
     public class Circle : Stackable
     {
         // This is the same as the base class, just a different name.
-        public Circle(string aCode, Beatmap aBeatmap)
-            : base(aCode, aBeatmap)
+        public Circle(string[] anArgs, Beatmap aBeatmap)
+            : base(anArgs, aBeatmap)
         {
             
         }

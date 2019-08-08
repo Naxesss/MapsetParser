@@ -13,8 +13,8 @@ namespace MapsetParser.objects.hitobjects
         public Vector2 UnstackedPosition { get => base.Position; }
         public override Vector2 Position { get => GetStackOffset(base.Position); }
 
-        public Stackable(string aCode, Beatmap aBeatmap)
-            : base(aCode, aBeatmap)
+        public Stackable(string[] anArgs, Beatmap aBeatmap)
+            : base(anArgs, aBeatmap)
         {
 
         }

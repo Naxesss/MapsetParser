@@ -16,36 +16,36 @@ namespace MapsetParser.objects.events
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
         public readonly string strippedPath;
 
-        public Background(string aCode)
+        public Background(string[] anArgs)
         {
-            layer  = GetLayer(aCode);
-            path   = GetPath(aCode);
-            offset = GetOffset(aCode);
+            layer  = GetLayer(anArgs);
+            path   = GetPath(anArgs);
+            offset = GetOffset(anArgs);
 
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
         // layer
-        private int GetLayer(string aCode)
+        private int GetLayer(string[] anArgs)
         {
-            return int.Parse(aCode.Split(',')[1]);
+            return int.Parse(anArgs[1]);
         }
 
         // filename
-        private string GetPath(string aCode)
+        private string GetPath(string[] anArgs)
         {
             // remove quotes for consistency, no way to add quotes manually anyway
-            return PathStatic.ParsePath(aCode.Split(',')[2], false, true);
+            return PathStatic.ParsePath(anArgs[2], false, true);
         }
 
         // offset
-        private Vector2? GetOffset(string aCode)
+        private Vector2? GetOffset(string[] anArgs)
         {
             // doesn't exist in file version 9, for example
-            if (aCode.Split(',').Length > 4)
+            if (anArgs.Length > 4)
                 return new Vector2(
-                    float.Parse(aCode.Split(',')[3], CultureInfo.InvariantCulture),
-                    float.Parse(aCode.Split(',')[4], CultureInfo.InvariantCulture));
+                    float.Parse(anArgs[3], CultureInfo.InvariantCulture),
+                    float.Parse(anArgs[4], CultureInfo.InvariantCulture));
             else
                 return null;
         }

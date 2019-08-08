@@ -9,15 +9,15 @@ namespace MapsetParser.objects.hitobjects
         
         public readonly double endTime;
 
-        public HoldNote(string aCode, Beatmap aBeatmap)
-            : base(aCode, aBeatmap)
+        public HoldNote(string[] anArgs, Beatmap aBeatmap)
+            : base(anArgs, aBeatmap)
         {
-            endTime = GetEndTime(aCode);
+            endTime = GetEndTime(anArgs);
         }
         
-        private double GetEndTime(string aCode)
+        private double GetEndTime(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[5].Split(':')[0], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[5].Split(':')[0], CultureInfo.InvariantCulture);
         }
     }
 }

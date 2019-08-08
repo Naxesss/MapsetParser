@@ -48,35 +48,35 @@ namespace MapsetParser.settings
             Double = 3
         }
 
-        public GeneralSettings(string aCode)
+        public GeneralSettings(string[] aLines)
         {
-            audioFileName      = GetValue(aCode, "AudioFilename");
-            audioLeadIn        = float.Parse(GetValue(aCode, "AudioLeadIn"), CultureInfo.InvariantCulture);
-            previewTime        = float.Parse(GetValue(aCode, "PreviewTime"), CultureInfo.InvariantCulture);
-            countdown          = (Countdown)int.Parse(GetValue(aCode, "Countdown"));
-            stackLeniency      = float.Parse(GetValue(aCode, "StackLeniency"), CultureInfo.InvariantCulture) * 10;
-            mode               = (Beatmap.Mode)int.Parse(GetValue(aCode, "Mode"));
-            letterbox          = GetValue(aCode, "LetterboxInBreaks") == "1";
-            widescreenSupport  = GetValue(aCode, "WidescreenStoryboard") == "1";
+            audioFileName      = GetValue(aLines, "AudioFilename");
+            audioLeadIn        = float.Parse(GetValue(aLines, "AudioLeadIn"), CultureInfo.InvariantCulture);
+            previewTime        = float.Parse(GetValue(aLines, "PreviewTime"), CultureInfo.InvariantCulture);
+            countdown          = (Countdown)int.Parse(GetValue(aLines, "Countdown"));
+            stackLeniency      = float.Parse(GetValue(aLines, "StackLeniency"), CultureInfo.InvariantCulture) * 10;
+            mode               = (Beatmap.Mode)int.Parse(GetValue(aLines, "Mode"));
+            letterbox          = GetValue(aLines, "LetterboxInBreaks") == "1";
+            widescreenSupport  = GetValue(aLines, "WidescreenStoryboard") == "1";
 
             // optional
-            countdownBeatOffset    = GetValue(aCode, "CountdownOffset") != null ?
-                                        int.Parse(GetValue(aCode, "CountdownOffset")) : 0;
-            skinPreference         = GetValue(aCode, "SkinPreference");
+            countdownBeatOffset    = GetValue(aLines, "CountdownOffset") != null ?
+                                        int.Parse(GetValue(aLines, "CountdownOffset")) : 0;
+            skinPreference         = GetValue(aLines, "SkinPreference");
 
-            storyInFrontOfFire     = GetValue(aCode, "StoryFireInFront") != null
-                                        && GetValue(aCode, "StoryFireInFront") == "1";
-            specialN1Style         = GetValue(aCode, "SpecialStyle") != null
-                                        && GetValue(aCode, "SpecialStyle") == "1";
-            epilepsyWarning        = GetValue(aCode, "EpilepsyWarning") != null
-                                        && GetValue(aCode, "EpilepsyWarning") == "1";
-            useSkinSprites         = GetValue(aCode, "UseSkinSprites") != null
-                                        && GetValue(aCode, "UseSkinSprites") == "1";
+            storyInFrontOfFire     = GetValue(aLines, "StoryFireInFront") != null
+                                        && GetValue(aLines, "StoryFireInFront") == "1";
+            specialN1Style         = GetValue(aLines, "SpecialStyle") != null
+                                        && GetValue(aLines, "SpecialStyle") == "1";
+            epilepsyWarning        = GetValue(aLines, "EpilepsyWarning") != null
+                                        && GetValue(aLines, "EpilepsyWarning") == "1";
+            useSkinSprites         = GetValue(aLines, "UseSkinSprites") != null
+                                        && GetValue(aLines, "UseSkinSprites") == "1";
         }
 
-        private string GetValue(string aCode, string aKey)
+        private string GetValue(string[] aLines, string aKey)
         {
-            string line = aCode.Split(new string[] { "\n" }, StringSplitOptions.None).FirstOrDefault(aLine => aLine.StartsWith(aKey));
+            string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
             if (line == null)
                 return null;
 

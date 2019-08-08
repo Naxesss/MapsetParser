@@ -19,22 +19,22 @@ namespace MapsetParser.objects.events
         public readonly double time;
         public readonly double endTime;
 
-        public Break(string aCode)
+        public Break(string[] anArgs)
         {
-            time       = GetTime(aCode);
-            endTime    = GetEndTime(aCode);
+            time       = GetTime(anArgs);
+            endTime    = GetEndTime(anArgs);
         }
 
         // start
-        private double GetTime(string aCode)
+        private double GetTime(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[1], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[1], CultureInfo.InvariantCulture);
         }
 
         // end
-        private double GetEndTime(string aCode)
+        private double GetEndTime(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[2], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[2], CultureInfo.InvariantCulture);
         }
 
         /// <summary> Returns the end time of the object before the break. </summary>

@@ -8,18 +8,18 @@ namespace MapsetParser.objects.timinglines
         public readonly double bpm;
 
         // red lines
-        public UninheritedLine(string aCode)
-            : base(aCode)
+        public UninheritedLine(string[] anArgs)
+            : base(anArgs)
         {
-            msPerBeat = GetMsPerBeat(aCode);
+            msPerBeat = GetMsPerBeat(anArgs);
 
             bpm = GetBPM();
         }
 
         // msPerBeat (uninherited) / svMult (inherited)
-        private double GetMsPerBeat(string aCode)
+        private double GetMsPerBeat(string[] anArgs)
         {
-            return double.Parse(aCode.Split(',')[1], CultureInfo.InvariantCulture);
+            return double.Parse(anArgs[1], CultureInfo.InvariantCulture);
         }
 
         private double GetBPM()

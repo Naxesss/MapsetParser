@@ -55,17 +55,17 @@ namespace MapsetParser.objects.hitobjects
         public Vector2 UnstackedEndPosition { get; private set; }
         public Vector2 EndPosition => UnstackedEndPosition + Position - UnstackedPosition;
 
-        public Slider(string aCode, Beatmap aBeatmap)
-            : base(aCode, aBeatmap)
+        public Slider(string[] anArgs, Beatmap aBeatmap)
+            : base(anArgs, aBeatmap)
         {
-            curveType          = GetSliderType(aCode);
-            nodePositions      = GetNodes(aCode).ToList();
-            edgeAmount         = GetEdgeAmount(aCode);
-            pixelLength        = GetPixelLength(aCode);
+            curveType          = GetSliderType(anArgs);
+            nodePositions      = GetNodes(anArgs).ToList();
+            edgeAmount         = GetEdgeAmount(anArgs);
+            pixelLength        = GetPixelLength(anArgs);
 
             // hit sounding
-            var edgeHitSounds = GetEdgeHitSounds(aCode);
-            var edgeAdditions = GetEdgeAdditions(aCode);
+            var edgeHitSounds = GetEdgeHitSounds(anArgs);
+            var edgeAdditions = GetEdgeAdditions(anArgs);
 
             startHitSound      = edgeHitSounds.Item1;
             startSampleset     = edgeAdditions.Item1;
@@ -95,9 +95,9 @@ namespace MapsetParser.objects.hitobjects
          *  Parsing
          */
 
-        private CurveType GetSliderType(string aCode)
+        private CurveType GetSliderType(string[] anArgs)
         {
-            string type = aCode.Split(',')[5].Split('|')[0];
+            string type = anArgs[5].Split('|')[0];
             return
                 type == "L" ? CurveType.Linear :
                 type == "P" ? CurveType.Passthrough :
@@ -105,12 +105,12 @@ namespace MapsetParser.objects.hitobjects
                 CurveType.Catmull;  // Catmull is the default curve type.
         }
         
-        private IEnumerable<Vector2> GetNodes(string aCode)
+        private IEnumerable<Vector2> GetNodes(string[] anArgs)
         {
             // the first position is also a node in the editor so we count that too
             yield return Position;
 
-            string sliderPath = aCode.Split(',')[5];
+            string sliderPath = anArgs[5];
             foreach(string node in sliderPath.Split('|'))
             {
                 // ignores the slider type P|128:50|172:291
@@ -124,25 +124,25 @@ namespace MapsetParser.objects.hitobjects
             }
         }
         
-        private int GetEdgeAmount(string aCode)
+        private int GetEdgeAmount(string[] anArgs)
         {
-            return int.Parse(aCode.Split(',')[6]);
+            return int.Parse(anArgs[6]);
         }
         
-        private float GetPixelLength(string aCode)
+        private float GetPixelLength(string[] anArgs)
         {
-            return float.Parse(aCode.Split(',')[7], CultureInfo.InvariantCulture);
+            return float.Parse(anArgs[7], CultureInfo.InvariantCulture);
         }
         
-        private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitSounds(string aCode)
+        private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitSounds(string[] anArgs)
         {
             HitSound edgeStartHitSound = 0;
             HitSound edgeEndHitSound = 0;
             IEnumerable<HitSound> edgeReverseHitSounds = new List<HitSound>();
 
-            if (aCode.Split(',').Count() > 8)
+            if (anArgs.Count() > 8)
             {
-                string edgeHitSounds = aCode.Split(',')[8];
+                string edgeHitSounds = anArgs[8];
 
                 // not set in some situations
                 if (edgeHitSounds.Contains("|"))
@@ -168,7 +168,7 @@ namespace MapsetParser.objects.hitobjects
         }
         
         private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset,
-            IEnumerable<Beatmap.Sampleset>, IEnumerable<Beatmap.Sampleset>> GetEdgeAdditions(string aCode)
+            IEnumerable<Beatmap.Sampleset>, IEnumerable<Beatmap.Sampleset>> GetEdgeAdditions(string[] anArgs)
         {
             Beatmap.Sampleset edgeStartSampleset = 0;
             Beatmap.Sampleset edgeStartAddition  = 0;
@@ -179,9 +179,9 @@ namespace MapsetParser.objects.hitobjects
             IEnumerable<Beatmap.Sampleset> edgeReverseSamplesets = new List<Beatmap.Sampleset>();
             IEnumerable<Beatmap.Sampleset> edgeReverseAdditions  = new List<Beatmap.Sampleset>();
 
-            if (aCode.Split(',').Count() > 9)
+            if (anArgs.Count() > 9)
             {
-                string edgeAdditions = aCode.Split(',')[9];
+                string edgeAdditions = anArgs[9];
 
                 // not set in some situations
                 if (edgeAdditions.Contains("|"))
