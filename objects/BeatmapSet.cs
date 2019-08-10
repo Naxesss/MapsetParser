@@ -148,13 +148,19 @@ namespace MapsetParser.objects
 
             if (beatmaps.Any(aBeatmap => aBeatmap.generalSettings.audioFileName.ToLower() == parsedPath))
                 return true;
-            
+
             // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
             // So we basically want to find the last path which matches the name.
-            string lastStripped =
-                PathStatic.ParsePath(
-                    Directory.GetFiles(songPath, strippedPath + ".*").LastOrDefault()
-                )?.Substring(songPath.Length + 1);
+            string lastStripped = null;
+            foreach (string file in Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories))
+            {
+                string relPath = PathStatic.RelativePath(file, songPath).Replace("\\", "/");
+                if (relPath.StartsWith(strippedPath + ".", StringComparison.OrdinalIgnoreCase))
+                {
+                    lastStripped = file.Substring(songPath.Length + 1);
+                    break;
+                }
+            }
 
             if (lastStripped == null)
                 return false;
