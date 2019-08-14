@@ -76,10 +76,12 @@ namespace MapsetParser.objects
             return anArgs[6] == "1";
         }
 
-        // kiai
+        // kiai (does not exist in file version 5)
         private bool IsKiai(string[] anArgs)
         {
-            return anArgs[7] == "1";
+            if(anArgs.Length > 7)
+                return anArgs[7] == "1";
+            return false;
         }
 
         /// <summary> Returns the slider velocity multiplier (1 for uninherited lines). </summary>

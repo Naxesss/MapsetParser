@@ -117,12 +117,15 @@ namespace MapsetParser.objects.events
             return double.Parse(anArgs[7], CultureInfo.InvariantCulture);
         }
 
-        // loop type
+        // loop type (does not exist in file version 5)
         private LoopType GetLoopType(string[] anArgs)
         {
-            return anArgs[8] == "LoopForever"
-                ? LoopType.LoopForever
-                : LoopType.LoopOnce;
+            if (anArgs.Length > 8)
+                return anArgs[8] == "LoopOnce"
+                    ? LoopType.LoopOnce
+                    : LoopType.LoopForever;
+            else
+                return LoopType.LoopForever;
         }
 
         /// <summary> Returns all relative file paths for all frames used. </summary>

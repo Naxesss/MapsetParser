@@ -55,10 +55,14 @@ namespace MapsetParser.objects.events
             return PathStatic.ParsePath(anArgs[3], false, true);
         }
 
-        // volume
+        // volume (does not exist in file version 5)
         private float GetVolume(string[] anArgs)
         {
-            return float.Parse(anArgs[4], CultureInfo.InvariantCulture);
+            if (anArgs.Length > 4)
+                return float.Parse(anArgs[4], CultureInfo.InvariantCulture);
+
+            // 100% volume is default
+            return 1.0f;
         }
     }
 }
