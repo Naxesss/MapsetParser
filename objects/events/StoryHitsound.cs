@@ -62,7 +62,7 @@ namespace MapsetParser.objects.events
                 return float.Parse(anArgs[4], CultureInfo.InvariantCulture);
 
             // 100% volume is default
-            return 1.0f;
+            return 100.0f;
         }
     }
 }
