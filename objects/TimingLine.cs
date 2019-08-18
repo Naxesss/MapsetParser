@@ -15,7 +15,10 @@ namespace MapsetParser.objects
         public readonly double  offset;
         public readonly int     meter;         // this exists for both green and red lines but only red uses it
         public readonly bool    uninherited;
+
+        private readonly Type   type;
         public readonly bool    kiai;
+        public readonly bool    omitsBarLine;
 
         public readonly Beatmap.Sampleset sampleset;
         public readonly int               customIndex;
@@ -24,17 +27,27 @@ namespace MapsetParser.objects
         // might not be explicit (depending on inherited or not)
         public float svMult;
 
+        [Flags]
+        public enum Type
+        {
+            Kiai = 1,
+            OmitBarLine = 8
+        }
+
         public TimingLine(string[] anArgs)
         {
             code = String.Join(',', anArgs);
             
-            offset         = GetOffset(anArgs);
-            meter          = GetMeter(anArgs);
-            sampleset      = GetSampleset(anArgs);
-            customIndex    = GetCustomIndex(anArgs);
-            volume         = GetVolume(anArgs);
-            uninherited    = IsUninherited(anArgs);
-            kiai           = IsKiai(anArgs);
+            offset       = GetOffset(anArgs);
+            meter        = GetMeter(anArgs);
+            sampleset    = GetSampleset(anArgs);
+            customIndex  = GetCustomIndex(anArgs);
+            volume       = GetVolume(anArgs);
+            uninherited  = IsUninherited(anArgs);
+
+            type         = GetType(anArgs);
+            kiai         = type.HasFlag(Type.Kiai);
+            omitsBarLine = type.HasFlag(Type.OmitBarLine);
 
             // may not be explicit
             svMult = GetSvMult(anArgs);
@@ -77,11 +90,11 @@ namespace MapsetParser.objects
         }
 
         // kiai (does not exist in file version 5)
-        private bool IsKiai(string[] anArgs)
+        private Type GetType(string[] anArgs)
         {
             if(anArgs.Length > 7)
-                return anArgs[7] == "1";
-            return false;
+                return (Type)int.Parse(anArgs[7]);
+            return 0;
         }
 
         /// <summary> Returns the slider velocity multiplier (1 for uninherited lines). </summary>
