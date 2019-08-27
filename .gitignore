@@ -1,6 +1,6 @@
 ﻿.vs/
 /obj
-*.json
+/bin
 *.csproj
 *.sln
 GlobalSuppressions.cs
