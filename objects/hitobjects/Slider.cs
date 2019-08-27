@@ -204,7 +204,7 @@ namespace MapsetParser.objects.hitobjects
                         else
                         {
                             edgeReverseSamplesets = edgeReverseSamplesets.Concat(new Beatmap.Sampleset[] { sampleset });
-                            edgeReverseAdditions  = edgeReverseAdditions .Concat(new Beatmap.Sampleset[] { sampleset });
+                            edgeReverseAdditions  = edgeReverseAdditions .Concat(new Beatmap.Sampleset[] { addition });
                         }
                     }
                 }

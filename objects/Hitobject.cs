@@ -321,18 +321,14 @@ namespace MapsetParser.objects
                 // Reverse
                 for (int i = 0; i < slider.reverseHitSounds.Count; ++i)
                 {
-                    HitSound?          reverseHitSound  = slider.reverseHitSounds.ElementAt(i);
-                    Beatmap.Sampleset? reverseSampleset = slider.GetReverseSampleset(i);
-                    Beatmap.Sampleset? reverseAddition  =
-                        slider.reverseAdditions.Any() ?   // not a thing in file version 9
-                        slider.reverseAdditions.ElementAt(i) :
-                        (Beatmap.Sampleset?)null;
+                    HitSound? reverseHitSound = slider.reverseHitSounds.ElementAt(i);
 
-                    double reverseTime = slider.GetCurveDuration() * (i + 1);
+                    double theoreticalStart = time - beatmap.GetTheoreticalUnsnap(time);
+                    double reverseTime = Timestamp.Round(theoreticalStart + slider.GetCurveDuration() * (i + 1));
 
                     foreach (HitSound splitReverseHitSound in SplitHitSound(reverseHitSound.GetValueOrDefault()))
-                        yield return GetEdgeSample(reverseTime, reverseAddition ?? reverseSampleset, splitReverseHitSound);
-                    yield return GetEdgeSample(reverseTime, reverseSampleset, HitSound.Normal);
+                        yield return GetEdgeSample(reverseTime, slider.GetReverseSampleset(i, true), splitReverseHitSound);
+                    yield return GetEdgeSample(reverseTime, slider.GetReverseSampleset(i), HitSound.Normal);
                 }
 
                 List<TimingLine> lines =
