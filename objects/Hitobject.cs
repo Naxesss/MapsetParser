@@ -289,10 +289,11 @@ namespace MapsetParser.objects
 
         private HitSample GetEdgeSample(double aTime, Beatmap.Sampleset? aSampleset, HitSound? aHitSound)
         {
+            TimingLine line = beatmap.GetTimingLine(aTime, true);
             return
                 new HitSample(
-                    beatmap.GetTimingLine(aTime, true).customIndex,
-                    aSampleset,
+                    line.customIndex,
+                    aSampleset ?? line.sampleset,
                     aHitSound,
                     HitSample.HitSource.Edge,
                     aTime);
