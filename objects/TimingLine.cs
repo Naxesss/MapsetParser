@@ -36,7 +36,7 @@ namespace MapsetParser.objects
 
         public TimingLine(string[] anArgs)
         {
-            code = String.Join(',', anArgs);
+            code = String.Join(",", anArgs);
             
             offset       = GetOffset(anArgs);
             meter        = GetMeter(anArgs);

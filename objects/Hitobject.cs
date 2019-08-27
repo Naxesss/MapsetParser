@@ -65,7 +65,7 @@ namespace MapsetParser.objects
         public HitObject(string[] anArgs, Beatmap aBeatmap)
         {
             beatmap = aBeatmap;
-            code    = String.Join(',', anArgs);
+            code    = String.Join(",", anArgs);
 
             Position = GetPosition(anArgs);
 
