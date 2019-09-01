@@ -7,9 +7,8 @@ namespace MapsetParser.objects.events
     public class Background
     {
         // 0,0,"apple is oral.jpg",0,0
-        // Background, layer, filename, x offset, y offset
+        // Background, offset (unused), filename, x offset, y offset
 
-        public readonly int      layer;
         public readonly string   path;
         public readonly Vector2? offset;
 
@@ -18,17 +17,10 @@ namespace MapsetParser.objects.events
 
         public Background(string[] anArgs)
         {
-            layer  = GetLayer(anArgs);
             path   = GetPath(anArgs);
             offset = GetOffset(anArgs);
 
             strippedPath = PathStatic.ParsePath(path, true);
-        }
-
-        // layer
-        private int GetLayer(string[] anArgs)
-        {
-            return int.Parse(anArgs[1]);
         }
 
         // filename
