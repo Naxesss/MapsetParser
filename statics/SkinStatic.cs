@@ -107,7 +107,7 @@ namespace MapsetParser.statics
             "hit300.png",
             "hit300g.png",
             "hit300k.png",
-            // hit burst animations (wiki claims they don't support animations but they do)
+            // hit burst animations
             "hit0-{n}.png",
             "hit50-{n}.png",
             "hit100-{n}.png",
