@@ -107,6 +107,14 @@ namespace MapsetParser.statics
             "hit300.png",
             "hit300g.png",
             "hit300k.png",
+            // hit burst animations (wiki claims they don't support animations but they do)
+            "hit0-{n}.png",
+            "hit50-{n}.png",
+            "hit100-{n}.png",
+            "hit100k-{n}.png",
+            "hit300-{n}.png",
+            "hit300g-{n}.png",
+            "hit300k-{n}.png",
             // mod icons exceptions
             "selection-mod-relax2.png",
             "selection-mod-spunout.png",
