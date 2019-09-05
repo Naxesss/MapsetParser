@@ -48,7 +48,11 @@ namespace MapsetParser.objects
             hitSoundFiles = GetUsedHitSoundFiles().ToList();
             hsTrack.Complete();
 
-            beatmaps = beatmaps.OrderBy(aBeatmap => aBeatmap.GetDifficulty(true)).ThenBy(aBeatmap => aBeatmap.starRating).ToList();
+            beatmaps =
+                beatmaps
+                    .OrderBy(aBeatmap => aBeatmap.GetDifficulty(true))
+                    .ThenBy(aBeatmap => aBeatmap.starRating)
+                    .ThenBy(aBeatmap => aBeatmap.GetObjectDensity()).ToList();
 
             mapsetTrack.Complete();
         }
