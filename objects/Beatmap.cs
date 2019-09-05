@@ -576,6 +576,11 @@ namespace MapsetParser.objects
             return combo;
         }
 
+        public double GetObjectDensity()
+        {
+            return hitObjects.Count / GetDrainTime();
+        }
+
         /// <summary> Returns the full audio file path the beatmap uses if any such file exists, otherwise null. </summary>
         public string GetAudioFilePath()
         {
