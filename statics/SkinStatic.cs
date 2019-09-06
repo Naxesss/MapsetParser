@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MapsetParser.statics
 {
@@ -19,7 +20,7 @@ namespace MapsetParser.statics
             "cursor-smoke.png",
             "cursortrail.png",
             // playfield
-            "play-skip.png",
+            "play-skip-{n}.png",
             "play-unranked.png",
             "multi-skipped.png",
             // pause screen
@@ -100,14 +101,6 @@ namespace MapsetParser.statics
         private static string[] skinStandard = new string[]
         {
             // hit bursts
-            "hit0.png",
-            "hit50.png",
-            "hit100.png",
-            "hit100k.png",
-            "hit300.png",
-            "hit300g.png",
-            "hit300k.png",
-            // hit burst animations
             "hit0-{n}.png",
             "hit50-{n}.png",
             "hit100-{n}.png",
@@ -259,13 +252,25 @@ namespace MapsetParser.statics
         };
 
         // here we do skin elements that aren't necessarily used but can be, given a specific condition
-        private static List<Tuple<string[], Func<BeatmapSet, bool>>> conditionalTuples = new List<Tuple<string[], Func<BeatmapSet, bool>>>();
+        private struct SkinCondition
+        {
+            public readonly string[] elementNames;
+            public readonly Func<BeatmapSet, bool> isUsed;
+
+            public SkinCondition(string[] anElementNames, Func<BeatmapSet, bool> anIsUsed)
+            {
+                elementNames = anElementNames;
+                isUsed = anIsUsed;
+            }
+        }
+
+        private static List<SkinCondition> skinConditions = new List<SkinCondition>();
 
         private static void AddElements(string[] anElementList, Func<BeatmapSet, bool> aUseCondition = null) =>
-            conditionalTuples.Add(new Tuple<string[], Func<BeatmapSet, bool>>(anElementList, aUseCondition));
+            skinConditions.Add(new SkinCondition(anElementList, aUseCondition));
 
         private static void AddElement(string anElement, Func<BeatmapSet, bool> aUseCondition = null) =>
-            conditionalTuples.Add(new Tuple<string[], Func<BeatmapSet, bool>>(new string[] { anElement }, aUseCondition));
+            skinConditions.Add(new SkinCondition(new string[] { anElement }, aUseCondition));
 
         private static void Initialize()
         {
@@ -301,17 +306,79 @@ namespace MapsetParser.statics
 
             // depending on other skin elements
             AddElements(skinNotScorebarMarker, aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => aPath.EndsWith("scorebar-marker.png")));
+                aPath => PathStatic.CutPath(aPath) == "scorebar-marker.png"));
             AddElements(skinNotSliderb, aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => aPath.EndsWith("sliderb.png")));
+                aPath => PathStatic.CutPath(aPath) == "sliderb.png"));
             AddElement("particle50.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => aPath.EndsWith("hit50.png")));
+                aPath => PathStatic.CutPath(aPath) == "hit50.png"));
             AddElement("particle100.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => aPath.EndsWith("hit100.png")));
+                aPath => PathStatic.CutPath(aPath) == "hit100.png"));
             AddElement("particle300.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => aPath.EndsWith("hit300.png")));
+                aPath => PathStatic.CutPath(aPath) == "hit300.png"));
+
+            // animatable elements (animation takes priority over still frame)
+            foreach (SkinCondition skinCondition in skinConditions)
+                foreach (string elementName in skinCondition.elementNames)
+                    if (elementName.Contains("-{n}"))
+                        AddStillFrame(elementName.Replace("-{n}", ""));
 
             isInitialized = true;
+        }
+
+        private static void AddStillFrame(string aStillFrameVersion)
+        {
+            string animatedVersion = aStillFrameVersion.Insert(aStillFrameVersion.IndexOf(".") - 1, "-{n}");
+            if (skinConditions.Any(aCondition => aCondition.elementNames.Contains(animatedVersion)))
+                AddElement(aStillFrameVersion, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
+                    aPath => IsAnimationFrameOf(PathStatic.CutPath(aPath), animatedVersion)));
+        }
+
+        private static bool IsAnimationFrameOf(string anElementName, string anAnimationName)
+        {
+            // anAnimationName "abc-{n}.png"
+            // anElementName   "abc-71.png"
+
+            int startIndex = anAnimationName.IndexOf("{n}");
+            if (startIndex != -1 && anElementName.Length > startIndex)
+            {
+                // Capture from where {n} is until no digits are left.
+                string animationFrame = Regex.Match(anElementName.Substring(startIndex), @"^\d+").Value;
+
+                if (anAnimationName.Replace("{n}", animationFrame).ToLower() == anElementName)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static SkinCondition? GetSkinCondition(string anElementName)
+        {
+            foreach (SkinCondition skinCondition in skinConditions.ToList())
+            {
+                foreach (string elementName in skinCondition.elementNames)
+                {
+                    if (elementName.ToLower() == anElementName.ToLower())
+                        return skinCondition;
+
+                    // animation frames, i.e. "followpoint-{n}.png"
+                    if (elementName.Contains("{n}"))
+                    {
+                        int startIndex = elementName.IndexOf("{n}");
+                        if (startIndex != -1 &&
+                            anElementName.Length > startIndex &&
+                            anElementName.IndexOf('.', startIndex) != -1)
+                        {
+                            int endIndex = anElementName.IndexOf('.', startIndex);
+                            string frame = anElementName.Substring(startIndex, endIndex - startIndex);
+
+                            if (elementName.Replace("{n}", frame).ToLower() == anElementName)
+                                return skinCondition;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary> Returns whether the given skin name is used in the given beatmapset (including animations). </summary>
@@ -320,38 +387,11 @@ namespace MapsetParser.statics
             if (!isInitialized)
                 Initialize();
 
-            // find the tuple that contains the element name
-            Tuple<string[], Func<BeatmapSet, bool>> skinCondition = null;
-            foreach (Tuple<string[], Func<BeatmapSet, bool>> conditionalTuple in conditionalTuples.ToList())
-            {
-                foreach (string elementName in conditionalTuple.Item1)
-                {
-                    if (elementName.ToLower() == anElementName.ToLower())
-                        skinCondition = conditionalTuple;
+            // Find the respective condition for the skin element to be used.
+            SkinCondition? skinCondition = GetSkinCondition(anElementName);
 
-                    // animation frames, i.e. "followpoint-{n}.png"
-                    if (elementName.Contains("{n}"))
-                    {
-                        int startIndex = elementName.IndexOf("{n}");
-                        if (   startIndex != -1
-                            && anElementName.Length > startIndex
-                            && anElementName.IndexOf('.', startIndex) != -1)
-                        {
-                            int endIndex = anElementName.IndexOf('.', startIndex);
-                            string frame = anElementName.Substring(startIndex, endIndex - startIndex);
-
-                            if (elementName.Replace("{n}", frame).ToLower() == anElementName)
-                                skinCondition = conditionalTuple;
-                        }
-                    }
-                }
-            }
-
-            // if it's use condition matches, it's used
-            if(skinCondition != null && (skinCondition.Item2 == null || skinCondition.Item2(aBeatmapSet)))
-                return true;
-            
-            return false;
+            // If this condition exists and is true, it is used.
+            return skinCondition?.isUsed != null && (skinCondition?.isUsed(aBeatmapSet) ?? false);
         }
     }
 }
