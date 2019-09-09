@@ -318,7 +318,7 @@ namespace MapsetParser.statics
                 aPath => PathStatic.CutPath(aPath) == "hit300.png"));
 
             // animatable elements (animation takes priority over still frame)
-            foreach (SkinCondition skinCondition in skinConditions)
+            foreach (SkinCondition skinCondition in skinConditions.ToList())
                 foreach (string elementName in skinCondition.elementNames)
                     if (elementName.Contains("-{n}"))
                         AddStillFrame(elementName.Replace("-{n}", ""));
