@@ -136,7 +136,7 @@ namespace MapsetParser.objects
 
             foreach (Beatmap beatmap in beatmaps)
                 foreach (HitObject hitObject in beatmap.hitObjects)
-                    foreach (string usedFileName in hitObject.GetUsedHitSoundFiles())
+                    foreach (string usedFileName in hitObject.GetUsedHitSoundFileNames())
                         foreach (string fileName in aFileNames)
                             if (fileName.StartsWith(usedFileName + ".") && !usedFilesNames.Contains(fileName))
                                 usedFilesNames.Add(fileName);
