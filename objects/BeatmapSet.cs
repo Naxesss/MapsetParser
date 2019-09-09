@@ -20,7 +20,9 @@ namespace MapsetParser.objects
 
         public string               songPath;
         public List<string>         songFilePaths  = new List<string>();
-        public IEnumerable<string>  hitSoundFiles;
+
+        /// <summary> Used hit sound files' relative path from the song folder. </summary>
+        public IEnumerable<string> hitSoundFiles;
 
         private struct BeatmapFile
         {
