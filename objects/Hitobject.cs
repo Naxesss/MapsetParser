@@ -361,13 +361,29 @@ namespace MapsetParser.objects
 
         /// <summary> Returns all potentially used hit sound file names (should they be
         /// in the song folder) for this object without extension. </summary>
-        public IEnumerable<string> GetUsedHitSoundFiles()
+        public IEnumerable<string> GetUsedHitSoundFileNames()
         {
-            return
+            // If you supply a specific hit sound file to the object, this file will replace all
+            // other hit sounds, customs, etc, including the hit normal.
+            string specificHsFileName = null;
+            if (filename != null)
+            {
+                if (filename.Contains("."))
+                    specificHsFileName = filename.Substring(0, filename.IndexOf("."));
+                else
+                    specificHsFileName = filename;
+            }
+
+            if (specificHsFileName != null)
+                return new List<string>() { specificHsFileName };
+
+            IEnumerable<string> usedHitSoundFileNames =
                 GetUsedHitSamples()
                     .Select(aSample => aSample.GetFileName())
                     .Where(aName => aName != null)
                     .Distinct();
+
+            return usedHitSoundFileNames;
         }
 
         /// <summary> Returns the end time of the hit object, or the start time if no end time exists. </summary>
