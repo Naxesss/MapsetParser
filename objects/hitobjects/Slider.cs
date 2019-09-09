@@ -340,11 +340,11 @@ namespace MapsetParser.objects.hitobjects
             double theoreticalStart = base.time - beatmap.GetTheoreticalUnsnap(base.time);
             double time = Timestamp.Round(theoreticalStart + GetCurveDuration() * (aReverseIndex + 1));
 
-            if (anAddition && reverseAdditions.ElementAt(aReverseIndex) != Beatmap.Sampleset.Auto)
+            // Reverse additions and samplesets do not exist in file version 7 and below, hence ElementAtOrDefault.
+            if (anAddition && reverseAdditions.ElementAtOrDefault(aReverseIndex) != Beatmap.Sampleset.Auto)
                 return reverseAdditions.ElementAt(aReverseIndex);
 
-            // doesn't exist in file version 9
-            return reverseSamplesets.Count == 0 || reverseSamplesets.ElementAt(aReverseIndex) == Beatmap.Sampleset.Auto
+            return reverseSamplesets.ElementAtOrDefault(aReverseIndex) == Beatmap.Sampleset.Auto
                 ? beatmap.GetTimingLine(time, true).sampleset : reverseSamplesets.ElementAt(aReverseIndex);
         }
 
