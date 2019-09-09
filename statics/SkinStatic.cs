@@ -391,8 +391,10 @@ namespace MapsetParser.statics
             // Find the respective condition for the skin element to be used.
             SkinCondition? skinCondition = GetSkinCondition(anElementName);
 
-            // If this condition exists and is true, it is used.
-            return skinCondition?.isUsed != null && (skinCondition?.isUsed(aBeatmapSet) ?? false);
+            // If the condition is null, the skin element is unrecognized and as such not used.
+            return
+                skinCondition.GetValueOrDefault() is SkinCondition condition &&
+                (condition.isUsed == null || condition.isUsed(aBeatmapSet));
         }
     }
 }
