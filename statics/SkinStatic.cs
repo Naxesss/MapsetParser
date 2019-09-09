@@ -156,7 +156,8 @@ namespace MapsetParser.statics
         private static string[] skinCatch = new string[]
         {
             // hit burst exception, appears in both modes' result screens
-            "hit0.png",
+            // it does but the beatmap-specific skins don't have an effect there
+            // "hit0.png",
             // input overlay
             "inputoverlay-background.png",
             "inputoverlay-key.png"
