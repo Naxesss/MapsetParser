@@ -86,7 +86,7 @@ namespace MapsetParser.objects
                 // hitsound filenames only apply to circles and hold notes
                 string hitSoundFile = extras.Item5;
                 if (hitSoundFile.Trim() != "" && (type.HasFlag(Type.Circle) || type.HasFlag(Type.ManiaHoldNote)))
-                    filename = PathStatic.ParsePath(hitSoundFile);
+                    filename = PathStatic.ParsePath(hitSoundFile, false, true);
             }
         }
 

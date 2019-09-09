@@ -138,7 +138,7 @@ namespace MapsetParser.objects
                 foreach (HitObject hitObject in beatmap.hitObjects)
                     foreach (string usedFileName in hitObject.GetUsedHitSoundFileNames())
                         foreach (string fileName in aFileNames)
-                            if (fileName.StartsWith(usedFileName + ".") && !usedFilesNames.Contains(fileName))
+                            if (fileName.ToLower().StartsWith(usedFileName.ToLower() + ".") && !usedFilesNames.Any(aName => aName.ToLower() == fileName.ToLower()))
                                 usedFilesNames.Add(fileName);
 
             return usedFilesNames;
@@ -253,7 +253,7 @@ namespace MapsetParser.objects
 
             IEnumerable<string> usedHitSoundFiles =
                 GetUsedHitSoundFilesOf(hitSoundFilePaths.Select(aPath =>
-                    aPath.Split(new char[] { '/', '\\' }).Last().ToLower()));
+                    aPath.Split(new char[] { '/', '\\' }).Last()));
 
             return usedHitSoundFiles;
         }
