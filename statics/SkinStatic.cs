@@ -306,9 +306,9 @@ namespace MapsetParser.statics
                 aBeatmap => aBeatmap.breaks.Any()));
 
             // depending on other skin elements
-            AddElements(skinNotScorebarMarker, aBeatmapSet => aBeatmapSet.songFilePaths.Any(
+            AddElements(skinNotScorebarMarker, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
                 aPath => PathStatic.CutPath(aPath) == "scorebar-marker.png"));
-            AddElements(skinNotSliderb, aBeatmapSet => aBeatmapSet.songFilePaths.Any(
+            AddElements(skinNotSliderb, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
                 aPath => PathStatic.CutPath(aPath) == "sliderb.png"));
             AddElement("particle50.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
                 aPath => PathStatic.CutPath(aPath) == "hit50.png"));
