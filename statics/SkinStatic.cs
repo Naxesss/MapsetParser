@@ -328,7 +328,7 @@ namespace MapsetParser.statics
 
         private static void AddStillFrame(string aStillFrameVersion)
         {
-            string animatedVersion = aStillFrameVersion.Insert(aStillFrameVersion.IndexOf(".") - 1, "-{n}");
+            string animatedVersion = aStillFrameVersion.Insert(aStillFrameVersion.IndexOf("."), "-{n}");
             if (skinConditions.Any(aCondition => aCondition.elementNames.Contains(animatedVersion)))
                 AddElement(aStillFrameVersion, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
                     aPath => IsAnimationFrameOf(PathStatic.CutPath(aPath), animatedVersion)));
