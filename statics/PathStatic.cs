@@ -31,6 +31,6 @@ namespace MapsetParser.statics
 
         /// <summary> Returns the file path relative to another path, usually song path in this context. </summary>
         public static string RelativePath(string aFilePath, string aSongPath) =>
-            aFilePath.Replace(aSongPath + "\\", "").Replace(aSongPath + "/", "");
+            aFilePath.Replace("\\", "/").Replace(aSongPath.Replace("\\", "/") + "/", "");
     }
 }
