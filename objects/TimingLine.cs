@@ -97,11 +97,19 @@ namespace MapsetParser.objects
             return 0;
         }
 
-        /// <summary> Returns the slider velocity multiplier (1 for uninherited lines). </summary>
+        /// <summary> Returns the slider velocity multiplier (1 for uninherited lines). Fit into range 0.1 - 10 before returning. </summary>
         public float GetSvMult(string[] anArgs)
         {
             if (!IsUninherited(anArgs))
-                return 1 / (float.Parse(anArgs[1], CultureInfo.InvariantCulture) * -0.01f);
+            {
+                float svMult = 1 / (float.Parse(anArgs[1], CultureInfo.InvariantCulture) * -0.01f);
+
+                // Min 0.1x, max 10x.
+                if (svMult > 10f)  svMult = 10f;
+                if (svMult < 0.1f) svMult = 0.1f;
+
+                return svMult;
+            }
             else
                 return 1;
         }
