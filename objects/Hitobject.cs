@@ -337,24 +337,36 @@ namespace MapsetParser.objects
                         aLine.offset <= slider.endTime).ToList();
                 lines.Add(beatmap.GetTimingLine(slider.time, true));
                 
-                // Body
-                foreach (TimingLine line in lines)
-                    yield return new HitSample(line.customIndex, line.sampleset, hitSound, HitSample.HitSource.Body, line.offset);
+                // Body, only applies to standard. Catch has droplets instead of body. Taiko and mania have a body but play no background sound.
+                if(beatmap.generalSettings.mode == Beatmap.Mode.Standard)
+                    foreach (TimingLine line in lines)
+                        yield return new HitSample(
+                            line.customIndex,
+                            sampleset == Beatmap.Sampleset.Auto ?
+                                line.sampleset :
+                                sampleset,
+                            hitSound,
+                            HitSample.HitSource.Body,
+                            line.offset);
 
-                // Tick
-                foreach (double tickTime in slider.sliderTickTimes)
+                // Tick, only applies to standard and catch. Mania has no ticks, taiko sliders play regular impacts.
+                if (beatmap.generalSettings.mode == Beatmap.Mode.Standard ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Catch)
                 {
-                    TimingLine line = beatmap.GetTimingLine(tickTime);
+                    foreach (double tickTime in slider.sliderTickTimes)
+                    {
+                        TimingLine line = beatmap.GetTimingLine(tickTime);
 
-                    // If no line exists, we use the default settings.
-                    int               customIndex = line?.customIndex ?? 1;
-                    Beatmap.Sampleset sampleset   = GetSampleset(true, tickTime);
+                        // If no line exists, we use the default settings.
+                        int customIndex = line?.customIndex ?? 1;
+                        Beatmap.Sampleset sampleset = GetSampleset(true, tickTime);
 
-                    // Defaults to normal if none is set (before any timing line).
-                    if (sampleset == Beatmap.Sampleset.Auto)
-                        sampleset = Beatmap.Sampleset.Normal;
+                        // Defaults to normal if none is set (before any timing line).
+                        if (sampleset == Beatmap.Sampleset.Auto)
+                            sampleset = Beatmap.Sampleset.Normal;
 
-                    yield return new HitSample(customIndex, sampleset, null, HitSample.HitSource.Tick, tickTime);
+                        yield return new HitSample(customIndex, sampleset, null, HitSample.HitSource.Tick, tickTime);
+                    }
                 }
             }
         }
