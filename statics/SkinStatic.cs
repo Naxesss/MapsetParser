@@ -393,7 +393,7 @@ namespace MapsetParser.statics
 
             // If the condition is null, the skin element is unrecognized and as such not used.
             return
-                skinCondition.GetValueOrDefault() is SkinCondition condition &&
+                skinCondition is SkinCondition condition &&
                 (condition.isUsed == null || condition.isUsed(aBeatmapSet));
         }
     }
