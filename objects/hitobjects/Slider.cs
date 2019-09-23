@@ -304,7 +304,7 @@ namespace MapsetParser.objects.hitobjects
             double minSVMult = 0.1;
 
             double msPerBeat          = beatmap.GetTimingLine<UninheritedLine>(aTime).msPerBeat;
-            double effectiveSVMult    = beatmap.GetTimingLine(time).svMult < minSVMult ? minSVMult : beatmap.GetTimingLine(time).svMult;
+            double effectiveSVMult    = beatmap.GetTimingLine(time).svMult;
             double sliderSpeed        = 100 * effectiveSVMult * beatmap.difficultySettings.sliderMultiplier / msPerBeat;
 
             return sliderSpeed;
