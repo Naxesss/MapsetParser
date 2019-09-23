@@ -19,10 +19,10 @@ namespace MapsetParser.objects.events
             LoopOnce
         }
 
-        public readonly int      layer;
-        public readonly int      origin;
-        public readonly string   path;
-        public readonly Vector2  offset;
+        public readonly Sprite.Layer  layer;
+        public readonly Sprite.Origin origin;
+        public readonly string        path;
+        public readonly Vector2       offset;
 
         // animation-specific
         public readonly int      frameCount;
@@ -47,45 +47,12 @@ namespace MapsetParser.objects.events
         }
 
         // layer
-        private int GetLayer(string[] anArgs)
-        {
-            string argument = anArgs[1];
-            int id =
-                argument == "Background" ? 0 :
-                argument == "Fail"       ? 1 :
-                argument == "Pass"       ? 2 :
-                argument == "Foreground" ? 3 :
-                -1;
-
-            // Throws an exception if not a number.
-            if (id == -1)
-                return int.Parse(argument);
-
-            return id;
-        }
+        private Sprite.Layer GetLayer(string[] anArgs) =>
+            ParserStatic.GetStoryboardLayer(anArgs);
 
         // origin
-        private int GetOrigin(string[] anArgs)
-        {
-            string argument = anArgs[2];
-            int id =
-                argument == "TopLeft"      ? 0 :
-                argument == "Centre"       ? 1 :
-                argument == "CentreLeft"   ? 2 :
-                argument == "TopRight"     ? 3 :
-                argument == "BottomCentre" ? 4 :
-                argument == "TopCentre"    ? 5 :
-                argument == "Custom"       ? 6 :
-                argument == "CentreRight"  ? 7 :
-                argument == "BottomLeft"   ? 8 :
-                argument == "BottomRight"  ? 9 :
-                -1;
-
-            if (id == -1)
-                return int.Parse(argument);
-
-            return id;
-        }
+        private Sprite.Origin GetOrigin(string[] anArgs) =>
+            ParserStatic.GetStoryboardOrigin(anArgs);
 
         // filename
         private string GetPath(string[] anArgs)

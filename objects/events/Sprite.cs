@@ -9,8 +9,33 @@ namespace MapsetParser.objects.events
         // Sprite,Foreground,Centre,"SB\whitenamebar.png",320,240
         // Sprite, layer, origin, filename, x offset, y offset
 
-        public readonly int     layer;
-        public readonly int     origin;
+        public enum Layer
+        {
+            Background,
+            Fail,
+            Pass,
+            Foreground,
+            Overlay,
+            Unknown
+        }
+
+        public enum Origin
+        {
+            TopLeft,
+            Centre,
+            CentreLeft,
+            TopRight,
+            BottomCentre,
+            TopCentre,
+            Custom,
+            CentreRight,
+            BottomLeft,
+            BottomRight,
+            Unknown
+        }
+
+        public readonly Layer   layer;
+        public readonly Origin  origin;
         public readonly string  path;
         public readonly Vector2 offset;
 
@@ -28,45 +53,12 @@ namespace MapsetParser.objects.events
         }
 
         // layer
-        private int GetLayer(string[] anArgs)
-        {
-            string argument = anArgs[1];
-            int id =
-                argument == "Background"    ? 0 :
-                argument == "Fail"          ? 1 :
-                argument == "Pass"          ? 2 :
-                argument == "Foreground"    ? 3 :
-                -1;
-
-            // Throws an exception if not a number.
-            if (id == -1)
-                return int.Parse(argument);
-
-            return id;
-        }
+        private Layer GetLayer(string[] anArgs) =>
+            ParserStatic.GetStoryboardLayer(anArgs);
 
         // origin
-        private int GetOrigin(string[] anArgs)
-        {
-            string argument = anArgs[2];
-            int id =
-                argument == "TopLeft"      ? 0 :
-                argument == "Centre"       ? 1 :
-                argument == "CentreLeft"   ? 2 :
-                argument == "TopRight"     ? 3 :
-                argument == "BottomCentre" ? 4 :
-                argument == "TopCentre"    ? 5 :
-                argument == "Custom"       ? 6 :
-                argument == "CentreRight"  ? 7 :
-                argument == "BottomLeft"   ? 8 :
-                argument == "BottomRight"  ? 9 :
-                -1;
-
-            if (id == -1)
-                return int.Parse(argument);
-
-            return id;
-        }
+        private Origin GetOrigin(string[] anArgs) =>
+            ParserStatic.GetStoryboardOrigin(anArgs);
 
         // filename
         private string GetPath(string[] anArgs)
