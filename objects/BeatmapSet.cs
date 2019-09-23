@@ -52,9 +52,10 @@ namespace MapsetParser.objects
 
             beatmaps =
                 beatmaps
-                    .OrderBy(aBeatmap => aBeatmap.GetDifficulty(true))
-                    .ThenBy(aBeatmap => aBeatmap.starRating)
-                    .ThenBy(aBeatmap => aBeatmap.GetObjectDensity()).ToList();
+                    .OrderBy(aBeatmap => aBeatmap.generalSettings.mode)
+                    .ThenBy(aBeatmap  => aBeatmap.GetDifficulty(true))
+                    .ThenBy(aBeatmap  => aBeatmap.starRating)
+                    .ThenBy(aBeatmap  => aBeatmap.GetObjectDensity()).ToList();
 
             mapsetTrack.Complete();
         }
