@@ -28,22 +28,28 @@ namespace MapsetParser.settings
 
         public DifficultySettings(string[] aLines)
         {
-            hpDrain            = GetValue(aLines, "HPDrainRate");
-            circleSize         = GetValue(aLines, "CircleSize");
-            overallDifficulty  = GetValue(aLines, "OverallDifficulty");
-            approachRate       = GetValue(aLines, "ApproachRate");
+            hpDrain            = GetValue(aLines, "HPDrainRate", 0f, 10f);
+            circleSize         = GetValue(aLines, "CircleSize", 0f, 10f);
+            overallDifficulty  = GetValue(aLines, "OverallDifficulty", 0f, 10f);
+            approachRate       = GetValue(aLines, "ApproachRate", 0f, 10f);
 
-            sliderMultiplier   = GetValue(aLines, "SliderMultiplier");
-            sliderTickRate     = GetValue(aLines, "SliderTickRate");
+            sliderMultiplier   = GetValue(aLines, "SliderMultiplier", 0.4f, 3.6f);
+            sliderTickRate     = GetValue(aLines, "SliderTickRate", 0.5f, 8f);
         }
 
-        private float GetValue(string[] aLines, string aKey)
+        private float GetValue(string[] aLines, string aKey, float? aMin = null, float? aMax = null)
         {
             string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
             if (line == null)
                 return 0;
 
-            return float.Parse(line.Substring(line.IndexOf(":") + 1).Trim(), CultureInfo.InvariantCulture);
+            float value = float.Parse(line.Substring(line.IndexOf(":") + 1).Trim(), CultureInfo.InvariantCulture);
+
+            // Comparison with < > return false with null.
+            if (value < aMin) value = aMin.GetValueOrDefault();
+            if (value > aMax) value = aMax.GetValueOrDefault();
+
+            return value;
         }
 
         /// <summary> Returns the radius of a circle or slider from the circle size. </summary>
