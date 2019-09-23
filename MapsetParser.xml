@@ -301,7 +301,7 @@
             <summary> Returns whether a line of code representing a timing line is uninherited or inherited. </summary>
         </member>
         <member name="M:MapsetParser.objects.TimingLine.GetSvMult(System.String[])">
-            <summary> Returns the slider velocity multiplier (1 for uninherited lines). </summary>
+            <summary> Returns the slider velocity multiplier (1 for uninherited lines). Fit into range 0.1 - 10 before returning. </summary>
         </member>
         <member name="F:MapsetParser.settings.ColourSettings.combos">
             <summary> Starts at index 0, so combo colour 1 is the 0th element in the list. </summary>
@@ -353,6 +353,16 @@
         </member>
         <member name="M:MapsetParser.statics.ParserStatic.ApplySettings(System.String[],System.String,System.Action{System.String[]})">
             <summary> Same as <see cref="M:MapsetParser.statics.ParserStatic.GetSettings``1(System.String[],System.String,System.Func{System.String[],``0})"/> except does not return. </summary>
+        </member>
+        <member name="M:MapsetParser.statics.ParserStatic.GetStoryboardLayer(System.String[])">
+            <summary> Returns the layer id from the given storyboard line arguments.
+            This converts identifiers like "Background", "Fail", and "Pass" to their
+            respective numerical value. </summary>
+        </member>
+        <member name="M:MapsetParser.statics.ParserStatic.GetStoryboardOrigin(System.String[])">
+            <summary> Returns the origin id from the given storyboard line arguments.
+            This converts identifiers like "TopLeft", "Centre", and "BottomRight" to
+            their respective numerical value. </summary>
         </member>
         <member name="M:MapsetParser.statics.PathStatic.ParsePath(System.String,System.Boolean,System.Boolean)">
             <summary> Returns the file path in its base form as seen by the game, optionally allowing
