@@ -91,8 +91,8 @@ namespace MapsetParser.objects
             storyHitSounds = GetEvents(lines, new List<string>() { "Sample",       "5" }, anArgs => new StoryHitSound(anArgs));
             animations     = GetEvents(lines, new List<string>() { "Animation",    "6" }, anArgs => new Animation(anArgs));
             
-            timingLines        = GetTimingLines(lines);
-            hitObjects         = GetHitobjects(lines);
+            timingLines = GetTimingLines(lines);
+            hitObjects  = GetHitobjects(lines);
 
             if (generalSettings.mode == Mode.Standard)
             {
@@ -633,7 +633,7 @@ namespace MapsetParser.objects
             {
                 string[] args = aLine.Split(',');
                 return TimingLine.IsUninherited(args) ? new UninheritedLine(args) : (TimingLine)new InheritedLine(args);
-            }).ToList();
+            }).OrderBy(aLine => aLine.offset).ThenBy(aLine => aLine is InheritedLine).ToList();
         }
 
         private List<HitObject> GetHitobjects(string[] aLines)
@@ -647,7 +647,7 @@ namespace MapsetParser.objects
                     HitObject.HasType(args, HitObject.Type.Slider)        ? new Slider(args, this) :
                     HitObject.HasType(args, HitObject.Type.ManiaHoldNote) ? new HoldNote(args, this) :
                     (HitObject)new Spinner(args, this);
-            }).ToList();
+            }).OrderBy(anObject => anObject.time).ToList();
         }
 
         /// <summary> Returns the beatmap as a string in the format "[Insane]", if the difficulty is called "Insane", for example. </summary>
