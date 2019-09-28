@@ -252,9 +252,9 @@ namespace MapsetParser.objects
             IEnumerable<string> hitSoundFilePaths =
                 songFilePaths.Select(aPath => aPath.Substring(songPath.Length + 1));
 
+            // If we input a path here, like "sb/c.ogg", it won't be found since we only check for the name itself.
             IEnumerable<string> usedHitSoundFiles =
-                GetUsedHitSoundFilesOf(hitSoundFilePaths.Select(aPath =>
-                    aPath.Split(new char[] { '/', '\\' }).Last()));
+                GetUsedHitSoundFilesOf(hitSoundFilePaths);
 
             return usedHitSoundFiles;
         }
