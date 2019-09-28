@@ -529,12 +529,12 @@ namespace MapsetParser.objects
             double currentFraction = beatOffset / line.msPerBeat;
 
             // 1/16
-            double desiredFractionSecond = (float)Math.Round(currentFraction * aSecondDivisor) / aSecondDivisor;
+            double desiredFractionSecond = Math.Round(currentFraction * aSecondDivisor) / aSecondDivisor;
             double differenceFractionSecond = currentFraction - desiredFractionSecond;
             double theoreticalUnsnapSecond = differenceFractionSecond * line.msPerBeat;
 
             // 1/12
-            double desiredFractionThird = (float)Math.Round(currentFraction * aThirdDivisor) / aThirdDivisor;
+            double desiredFractionThird = Math.Round(currentFraction * aThirdDivisor) / aThirdDivisor;
             double differenceFractionThird = currentFraction - desiredFractionThird;
             double theoreticalUnsnapThird = differenceFractionThird * line.msPerBeat;
 
