@@ -16,13 +16,14 @@ namespace MapsetParser.statics
             bool read = false;
             foreach (string line in aLines)
             {
-                if (line.Trim().Length == 0)
+                if (line.StartsWith("["))
                     read = false;
 
-                if (read)
+                if (read && line.Trim().Length != 0)
                     yield return aFunc(line.Replace("\r", ""));
 
-                if (line.StartsWith("[" + aSectionName + "]"))
+                // "[[TimingLines]]]]" works, but "a[TimingLines]b" doesn't.
+                if (line.StartsWith("[") && line.Contains("[" + aSectionName + "]") && line.EndsWith("]"))
                     read = true;
             }
         }
