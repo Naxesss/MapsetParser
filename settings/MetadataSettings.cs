@@ -40,20 +40,20 @@ namespace MapsetParser.settings
             // unlike hitobjects metadata settings gets the whole section and not line by line as code
             
             title          = GetValue(aLines, "Title");
-            titleUnicode   = GetValue(aLines, "TitleUnicode");
+            titleUnicode   = GetValue(aLines, "TitleUnicode") ?? title;
             artist         = GetValue(aLines, "Artist");
-            artistUnicode  = GetValue(aLines, "ArtistUnicode");
+            artistUnicode  = GetValue(aLines, "ArtistUnicode") ?? artist;
 
             creator    = GetValue(aLines, "Creator");
             version    = GetValue(aLines, "Version");
-            source     = GetValue(aLines, "Source");
-            tags       = GetValue(aLines, "Tags");
+            source     = GetValue(aLines, "Source") ?? "";
+            tags       = GetValue(aLines, "Tags") ?? "";
 
             // check to see if the ids are even there (don't exist in lower osu file versions, and aren't set on non-published maps)
-            beatmapId      = GetValue(aLines, "BeatmapID")      == null || GetValue(aLines, "BeatmapID")      == "0" 
-                                ? (ulong?)null  : ulong.Parse(GetValue(aLines, "BeatmapID"));
-            beatmapSetId   = GetValue(aLines, "BeatmapSetID")   == null || GetValue(aLines, "BeatmapSetID")   == "-1"
-                                ? (ulong?)null  : ulong.Parse(GetValue(aLines, "BeatmapSetID"));
+            beatmapId       = (GetValue(aLines, "BeatmapID") ?? "0") == "0" ?
+                                (ulong?)null : ulong.Parse(GetValue(aLines, "BeatmapID"));
+            beatmapSetId    = (GetValue(aLines, "BeatmapSetID") ?? "-1") == "-1" ?
+                                (ulong?)null : ulong.Parse(GetValue(aLines, "BeatmapSetID"));
         }
 
         private string GetValue(string[] aLines, string aKey)

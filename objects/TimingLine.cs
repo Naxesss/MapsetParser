@@ -84,9 +84,12 @@ namespace MapsetParser.objects
         }
         
         /// <summary> Returns whether a line of code representing a timing line is uninherited or inherited. </summary>
+        // inherited (does not exist in file version 5)
         public static bool IsUninherited(string[] anArgs)
         {
-            return anArgs[6] == "1";
+            if (anArgs.Length > 6)
+                return anArgs[6] == "1";
+            return true;
         }
 
         // kiai (does not exist in file version 5)
