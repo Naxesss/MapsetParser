@@ -22,8 +22,8 @@ namespace MapsetParser.statics
                 if (read && line.Trim().Length != 0)
                     yield return aFunc(line.Replace("\r", ""));
 
-                // "[[TimingLines]]]]" works, but "a[TimingLines]b" doesn't.
-                if (line.StartsWith("[") && line.Contains("[" + aSectionName + "]") && line.EndsWith("]"))
+                // "[[TimingLines]]]]" works. Anything that doesn't work will be very obvious (map corrupted warnings etc).
+                if (line.Contains("[" + aSectionName + "]"))
                     read = true;
             }
         }
