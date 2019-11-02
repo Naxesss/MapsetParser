@@ -27,8 +27,9 @@ namespace MapsetParser.statics
         {
             double time = Round(aTime);
 
+            // For negative timestamps we simply post the raw offset (e.g. "-14 -").
             if (time < 0)
-                return time.ToString();
+                return time.ToString() + " - ";
 
             double minutes = 0;
             while (time >= 60000)
