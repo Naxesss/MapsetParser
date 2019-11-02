@@ -166,7 +166,12 @@ namespace MapsetParser.statics
         private static string[] skinNotMania = new string[]
         {
             // scorebar exception, bar is in a different position and excludes this element because of that
+            // marker is currently unused (contradicting the wiki), but it's part of the scorebar skin set and may be used in the future
             "scorebar-marker.png",
+            // these were meant to be overriden by the marker, but the marker currently does nothing and can even be excluded
+            "scorebar-ki.png",
+            "scorebar-kidanger.png",
+            "scorebar-kidanger2.png",
             // mod icons exception, in mania there's no difference between something clicking for you and just using auto
             "selection-mod-relax.png"
         };
@@ -227,14 +232,6 @@ namespace MapsetParser.statics
             // sounds
             "spinnerspin.wav", "spinnerspin.mp3",
             "spinnerbonus.wav", "spinnerbonus.mp3"
-        };
-
-        private static string[] skinNotScorebarMarker = new string[]
-        {
-            // scorebar marker has higher priority, so if it exists in the folder it will be used instead of these
-            "scorebar-ki.png",
-            "scorebar-kidanger.png",
-            "scorebar-kidanger2.png"
         };
 
         private static string[] skinNotSliderb = new string[]
@@ -306,8 +303,6 @@ namespace MapsetParser.statics
                 aBeatmap => aBeatmap.breaks.Any()));
 
             // depending on other skin elements
-            AddElements(skinNotScorebarMarker, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
-                aPath => PathStatic.CutPath(aPath) == "scorebar-marker.png"));
             AddElements(skinNotSliderb, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
                 aPath => PathStatic.CutPath(aPath) == "sliderb.png"));
             AddElement("particle50.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
