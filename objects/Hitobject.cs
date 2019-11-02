@@ -336,18 +336,39 @@ namespace MapsetParser.objects
                         aLine.offset > slider.time &&
                         aLine.offset <= slider.endTime).ToList();
                 lines.Add(beatmap.GetTimingLine(slider.time, true));
-                
+
                 // Body, only applies to standard. Catch has droplets instead of body. Taiko and mania have a body but play no background sound.
-                if(beatmap.generalSettings.mode == Beatmap.Mode.Standard)
+                if (beatmap.generalSettings.mode == Beatmap.Mode.Standard)
+                {
                     foreach (TimingLine line in lines)
+                    {
+                        // Priority: object addition > object sampleset > line sampleset
+                        Beatmap.Sampleset effectiveSampleset =
+                            addition != Beatmap.Sampleset.Auto ?
+                                addition :
+                                sampleset != Beatmap.Sampleset.Auto ?
+                                    sampleset :
+                                    line.sampleset;
+
+                        // The regular sliderslide will always play regardless of using sliderwhistle.
                         yield return new HitSample(
                             line.customIndex,
-                            sampleset == Beatmap.Sampleset.Auto ?
-                                line.sampleset :
-                                sampleset,
-                            hitSound,
+                            effectiveSampleset,
+                            HitSound.None,
                             HitSample.HitSource.Body,
                             line.offset);
+
+                        if (hitSound != HitSound.None)
+                        {
+                            yield return new HitSample(
+                                line.customIndex,
+                                effectiveSampleset,
+                                hitSound,
+                                HitSample.HitSource.Body,
+                                line.offset);
+                        }
+                    }
+                }
 
                 // Tick, only applies to standard and catch. Mania has no ticks, taiko sliders play regular impacts.
                 if (beatmap.generalSettings.mode == Beatmap.Mode.Standard ||
