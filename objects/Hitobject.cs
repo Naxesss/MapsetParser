@@ -380,7 +380,9 @@ namespace MapsetParser.objects
 
                         // If no line exists, we use the default settings.
                         int customIndex = line?.customIndex ?? 1;
-                        Beatmap.Sampleset sampleset = GetSampleset(true, tickTime);
+
+                        // Unlike the slider body and edges, slider ticks are unaffected by additions.
+                        Beatmap.Sampleset sampleset = GetSampleset(false, tickTime);
 
                         // Defaults to normal if none is set (before any timing line).
                         if (sampleset == Beatmap.Sampleset.Auto)
