@@ -90,12 +90,12 @@ namespace MapsetParser.statics
             "selection-mod-perfect.png",
             "selection-mod-suddendeath.png",
             // sounds in gameplay
-            "applause.wav", "applause.mp3",
-            "comboburst.wav", "comboburst.mp3",
-            "combobreak.wav", "combobreak.mp3",
-            "failsound.wav", "failsound.mp3",
+            "applause.wav", "applause.mp3", "applause.ogg",
+            "comboburst.wav", "comboburst.mp3", "comboburst.ogg",
+            "combobreak.wav", "combobreak.mp3", "combobreak.ogg",
+            "failsound.wav", "failsound.mp3", "failsound.ogg",
             // sounds in the pause screen
-            "pause-loop.wav", "pause-loop.mp3"
+            "pause-loop.wav", "pause-loop.mp3", "pause-loop.ogg"
         };
 
         private static string[] skinStandard = new string[]
@@ -185,11 +185,11 @@ namespace MapsetParser.statics
             "go.png",
             "ready.png",
             // sounds
-            "count1s.wav", "count1s.mp3",
-            "count2s.wav", "count2s.mp3",
-            "count3s.wav", "count3s.mp3",
-            "gos.wav", "gos.mp3",
-            "readys.wav", "readys.mp3"
+            "count1s.wav", "count1s.mp3", "count1s.ogg",
+            "count2s.wav", "count2s.mp3", "count2s.ogg",
+            "count3s.wav", "count3s.mp3", "count3s.ogg",
+            "gos.wav", "gos.mp3", "gos.ogg",
+            "readys.wav", "readys.mp3", "readys.ogg"
         };
 
         private static string[] skinStandardSlider = new string[]
@@ -230,8 +230,8 @@ namespace MapsetParser.statics
             "spinner-metre.png",
             "spinner-osu.png",
             // sounds
-            "spinnerspin.wav", "spinnerspin.mp3",
-            "spinnerbonus.wav", "spinnerbonus.mp3"
+            "spinnerspin.wav", "spinnerspin.mp3", "spinnerspin.ogg",
+            "spinnerbonus.wav", "spinnerbonus.mp3", "spinnerbonus.ogg"
         };
 
         private static string[] skinNotSliderb = new string[]
@@ -245,8 +245,8 @@ namespace MapsetParser.statics
             "section-fail.png",
             "section-pass.png",
             // sounds
-            "sectionpass.wav", "sectionpass.mp3",
-            "sectionfail.wav", "sectionfail.mp3"
+            "sectionpass.wav", "sectionpass.mp3", "sectionpass.ogg",
+            "sectionfail.wav", "sectionfail.mp3", "sectionfail.ogg"
         };
 
         // here we do skin elements that aren't necessarily used but can be, given a specific condition
