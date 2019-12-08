@@ -555,20 +555,35 @@ namespace MapsetParser.objects
             return practicalUnsnap;
         }
 
-        /// <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
+        /// <summary> Returns the combo number (the number you see on the notes), of a given hit object.
+        /// If you already have the index of the object, use <see cref="GetCombo(int)"/> for performance. </summary>
         public int GetCombo(HitObject aHitObject)
+        {
+            if (hitObjects.Count == 0 || aHitObject.type.HasFlag(HitObject.Type.NewCombo))
+                return 1;
+
+            return GetCombo(hitObjects.IndexOf(aHitObject));
+        }
+
+        /// <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
+        /// This function is usually more performant than <see cref="GetCombo(HitObject)"/>. </summary>
+        public int GetCombo(int aHitObjectIndex)
         {
             int combo = 1;
 
-            // add a combo number for each object before this that isn't a new combo
-            HitObject lastHitObject = aHitObject;
-            while (true)
+            if (hitObjects.Count == 0 || hitObjects.Count <= aHitObjectIndex)
+                return combo;
+
+            // Adds a combo number for each object before this that isn't a new combo.
+            HitObject lastHitObject = hitObjects[aHitObjectIndex];
+            HitObject firstHitObject = hitObjects[0];
+            while (aHitObjectIndex > 0)
             {
-                // if either there are no more objects behind it or it's a new combo, break
-                if (lastHitObject == hitObjects.FirstOrDefault() || lastHitObject.type.HasFlag(HitObject.Type.NewCombo))
+                // The first object in the beatmap is always a new combo.
+                if (lastHitObject.type.HasFlag(HitObject.Type.NewCombo) || lastHitObject == firstHitObject)
                     break;
 
-                lastHitObject = GetPrevHitObject(lastHitObject.time);
+                lastHitObject = hitObjects[--aHitObjectIndex];
 
                 ++combo;
             }

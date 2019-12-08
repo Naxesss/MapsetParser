@@ -125,7 +125,12 @@
             The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)">
-            <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
+            <summary> Returns the combo number (the number you see on the notes), of a given hit object.
+            If you already have the index of the object, use <see cref="M:MapsetParser.objects.Beatmap.GetCombo(System.Int32)"/> for performance. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.Beatmap.GetCombo(System.Int32)">
+            <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
+            This function is usually more performant than <see cref="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)"/>. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetAudioFilePath">
             <summary> Returns the full audio file path the beatmap uses if any such file exists, otherwise null. </summary>
