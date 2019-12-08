@@ -256,8 +256,10 @@ namespace MapsetParser.objects
         public T GetTimingLine<T>(double aTime, bool aHitSoundLeniency = false) where T : TimingLine
         {
             return
-                timingLines.OfType<T>().LastOrDefault( aLine =>
-                    aLine.offset <= aTime + (aHitSoundLeniency ? 5 : 0)) ??
+                timingLines.OfType<T>()
+                    .Where(aLine =>
+                        aLine.offset <= aTime + (aHitSoundLeniency ? 5 : 0))
+                    .LastOrDefault() ??
                 GetNextTimingLine<T>(aTime);
         }
 
@@ -266,9 +268,7 @@ namespace MapsetParser.objects
         /// <summary> Same as <see cref="GetNextTimingLine"/> except only considers objects of a given type. </summary>
         public T GetNextTimingLine<T>(double aTime) where T : TimingLine
         {
-            return
-                timingLines.OfType<T>().FirstOrDefault(aLine =>
-                    aLine.offset > aTime);
+            return timingLines.OfType<T>().Where(aLine => aLine.offset > aTime).FirstOrDefault();
         }
 
         /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
@@ -277,8 +277,10 @@ namespace MapsetParser.objects
         public T GetHitObject<T>(double aTime) where T : HitObject
         {
             return
-                hitObjects.OfType<T>().LastOrDefault(anObject =>
-                    (anObject.GetEndTime() <= aTime || anObject.time == aTime)) ??
+                hitObjects.OfType<T>()
+                    .Where(anObject =>
+                        anObject.GetEndTime() <= aTime || anObject.time == aTime)
+                    .LastOrDefault() ??
                 GetNextHitObject<T>(aTime);
         }
         
@@ -288,8 +290,10 @@ namespace MapsetParser.objects
         public T GetPrevHitObject<T>(double aTime) where T : HitObject
         {
             return
-                hitObjects.OfType<T>().LastOrDefault(aHitObject =>
-                    aHitObject.time < aTime) ??
+                hitObjects.OfType<T>()
+                    .Where(anObject =>
+                        anObject.time < aTime)
+                    .LastOrDefault() ??
                 hitObjects.OfType<T>().FirstOrDefault();
         }
 
@@ -298,9 +302,7 @@ namespace MapsetParser.objects
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
         public T GetNextHitObject<T>(double aTime) where T : HitObject
         {
-            return
-                hitObjects.OfType<T>().FirstOrDefault(anObject =>
-                    anObject.time > aTime);
+            return hitObjects.OfType<T>().Where(anObject => anObject.time > aTime).FirstOrDefault();
         }
 
         /// <summary> Returns the unsnap in ms of notes unsnapped by 2 ms or more, otherwise null. </summary>
