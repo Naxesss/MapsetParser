@@ -11,26 +11,26 @@ namespace MapsetParser.objects.events
 
         public enum Layer
         {
-            Background,
-            Fail,
-            Pass,
-            Foreground,
-            Overlay,
+            Background = 0,
+            Fail = 1,
+            Pass = 2,
+            Foreground = 3,
+            Overlay = 4,
             Unknown
         }
 
         public enum Origin
         {
-            TopLeft,
-            Centre,
-            CentreLeft,
-            TopRight,
-            BottomCentre,
-            TopCentre,
-            Custom,
-            CentreRight,
-            BottomLeft,
-            BottomRight,
+            TopLeft = 0,
+            Centre = 1,
+            CentreLeft = 2,
+            TopRight = 3,
+            BottomCentre = 4,
+            TopCentre = 5,
+            Custom = 6,
+            CentreRight = 7,
+            BottomLeft = 8,
+            BottomRight = 9,
             Unknown
         }
 
