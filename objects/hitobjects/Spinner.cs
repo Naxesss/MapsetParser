@@ -6,15 +6,13 @@ namespace MapsetParser.objects.hitobjects
     {
         public readonly double endTime;
 
-        public Spinner(string[] anArgs, Beatmap aBeatmap)
-            : base(anArgs, aBeatmap)
+        public Spinner(string[] args, Beatmap beatmap)
+            : base(args, beatmap)
         {
-            endTime = GetEndTime(anArgs);
+            endTime = GetEndTime(args);
         }
 
-        private double GetEndTime(string[] anArgs)
-        {
-            return double.Parse(anArgs[5], CultureInfo.InvariantCulture);
-        }
+        private double GetEndTime(string[] args) =>
+            double.Parse(args[5], CultureInfo.InvariantCulture);
     }
 }
