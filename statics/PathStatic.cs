@@ -10,15 +10,15 @@ namespace MapsetParser.statics
     {
         /// <summary> Returns the file path in its base form as seen by the game, optionally allowing
         /// extensions to be stripped or maintaining case. </summary>
-        public static string ParsePath(string aFilePath, bool aCanStrip = false, bool aKeepCase = false)
+        public static string ParsePath(string filePath, bool withoutExtension = false, bool retainCase = false)
         {
-            if (aFilePath == null)
+            if (filePath == null)
                 return null;
 
-            string trimmedPath = aFilePath.Replace("\"", "").Replace("\\", "/").Trim();
-            if (!aKeepCase)
+            string trimmedPath = filePath.Replace("\"", "").Replace("\\", "/").Trim();
+            if (!retainCase)
                 trimmedPath = trimmedPath.ToLower();
-            if (!aCanStrip)
+            if (!withoutExtension)
                 return trimmedPath;
 
             string strippedPath = trimmedPath.LastIndexOf(".") != -1 ? trimmedPath.Substring(0, trimmedPath.LastIndexOf(".")) : trimmedPath;
@@ -26,11 +26,11 @@ namespace MapsetParser.statics
         }
 
         /// <summary> Returns the file or folder name rather than its path. Takes the last split of "\\" and "/". </summary>
-        public static string CutPath(string aFilePath) =>
-            aFilePath.Split(new char[] { '\\', '/' }).Last();
+        public static string CutPath(string filePath) =>
+            filePath.Split(new char[] { '\\', '/' }).Last();
 
-        /// <summary> Returns the file path relative to another path, usually song path in this context. </summary>
-        public static string RelativePath(string aFilePath, string aSongPath) =>
-            aFilePath.Replace("\\", "/").Replace(aSongPath.Replace("\\", "/") + "/", "");
+        /// <summary> Returns the file path relative to another path, usually song path in most cases. </summary>
+        public static string RelativePath(string filePath, string songPath) =>
+            filePath.Replace("\\", "/").Replace(songPath.Replace("\\", "/") + "/", "");
     }
 }

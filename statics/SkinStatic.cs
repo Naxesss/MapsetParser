@@ -12,7 +12,7 @@ namespace MapsetParser.statics
     {
         private static bool isInitialized = false;
         
-        private static string[] skinGeneral = new string[]
+        private static readonly string[] skinGeneral = new string[]
         {
             // cursor
             "cursor.png",
@@ -98,7 +98,7 @@ namespace MapsetParser.statics
             "pause-loop.wav", "pause-loop.mp3", "pause-loop.ogg"
         };
 
-        private static string[] skinStandard = new string[]
+        private static readonly string[] skinStandard = new string[]
         {
             // hit bursts
             "hit0-{n}.png",
@@ -136,7 +136,7 @@ namespace MapsetParser.statics
             "lighting.png"
         };
 
-        private static string[] skinMania = new string[]
+        private static readonly string[] skinMania = new string[]
         {
             // mod icons
             "selection-mod-fadein.png",
@@ -153,7 +153,7 @@ namespace MapsetParser.statics
             "selection-mod-random.png"
         };
 
-        private static string[] skinCatch = new string[]
+        private static readonly string[] skinCatch = new string[]
         {
             // hit burst exception, appears in both modes' result screens
             // it does but the beatmap-specific skins don't have an effect there
@@ -163,7 +163,7 @@ namespace MapsetParser.statics
             "inputoverlay-key.png"
         };
 
-        private static string[] skinNotMania = new string[]
+        private static readonly string[] skinNotMania = new string[]
         {
             // scorebar exception, bar is in a different position and excludes this element because of that
             // marker is currently unused (contradicting the wiki), but it's part of the scorebar skin set and may be used in the future
@@ -176,7 +176,7 @@ namespace MapsetParser.statics
             "selection-mod-relax.png"
         };
 
-        private static string[] skinCountdown = new string[]
+        private static readonly string[] skinCountdown = new string[]
         {
             // playfield
             "count1.png",
@@ -192,7 +192,7 @@ namespace MapsetParser.statics
             "readys.wav", "readys.mp3", "readys.ogg"
         };
 
-        private static string[] skinStandardSlider = new string[]
+        private static readonly string[] skinStandardSlider = new string[]
         {
             // slider
             "sliderstartcircle.png",
@@ -212,7 +212,7 @@ namespace MapsetParser.statics
             "sliderpoint30.png"
         };
 
-        private static string[] skinStandardSpinner = new string[]
+        private static readonly string[] skinStandardSpinner = new string[]
         {
             // spinner
             "spinner-approachcircle.png",
@@ -234,13 +234,13 @@ namespace MapsetParser.statics
             "spinnerbonus.wav", "spinnerbonus.mp3", "spinnerbonus.ogg"
         };
 
-        private static string[] skinNotSliderb = new string[]
+        private static readonly string[] skinNotSliderb = new string[]
         {
             "sliderb-nd.png",
             "sliderb-spec.png"
         };
 
-        private static string[] skinBreak = new string[]
+        private static readonly string[] skinBreak = new string[]
         {
             "section-fail.png",
             "section-pass.png",
@@ -255,62 +255,64 @@ namespace MapsetParser.statics
             public readonly string[] elementNames;
             public readonly Func<BeatmapSet, bool> isUsed;
 
-            public SkinCondition(string[] anElementNames, Func<BeatmapSet, bool> anIsUsed)
+            public SkinCondition(string[] elementNames, Func<BeatmapSet, bool> isUsed)
             {
-                elementNames = anElementNames;
-                isUsed = anIsUsed;
+                this.elementNames = elementNames;
+                this.isUsed = isUsed;
             }
         }
 
         private static List<SkinCondition> skinConditions = new List<SkinCondition>();
 
-        private static void AddElements(string[] anElementList, Func<BeatmapSet, bool> aUseCondition = null) =>
-            skinConditions.Add(new SkinCondition(anElementList, aUseCondition));
+        private static void AddElements(string[] elements, Func<BeatmapSet, bool> useCondition = null) =>
+            skinConditions.Add(new SkinCondition(elements, useCondition));
 
-        private static void AddElement(string anElement, Func<BeatmapSet, bool> aUseCondition = null) =>
-            skinConditions.Add(new SkinCondition(new string[] { anElement }, aUseCondition));
+        private static void AddElement(string element, Func<BeatmapSet, bool> useCondition = null) =>
+            skinConditions.Add(new SkinCondition(new string[] { element }, useCondition));
 
         private static void Initialize()
         {
             // modes, doing or-gates on standard for everything because conversions
             AddElements(skinGeneral);
-            AddElements(skinStandard, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.generalSettings.mode == Beatmap.Mode.Standard));
-            AddElements(skinCatch, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.generalSettings.mode == Beatmap.Mode.Catch
-                         || aBeatmap.generalSettings.mode == Beatmap.Mode.Standard));
-            AddElements(skinMania, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.generalSettings.mode == Beatmap.Mode.Mania
-                         || aBeatmap.generalSettings.mode == Beatmap.Mode.Standard));
-            AddElements(skinNotMania, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.generalSettings.mode != Beatmap.Mode.Mania));
+            AddElements(skinStandard, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.generalSettings.mode == Beatmap.Mode.Standard));
+            AddElements(skinCatch, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    beatmap.generalSettings.mode == Beatmap.Mode.Catch ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard));
+            AddElements(skinMania, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    beatmap.generalSettings.mode == Beatmap.Mode.Mania ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard));
+            AddElements(skinNotMania, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.generalSettings.mode != Beatmap.Mode.Mania));
 
             // TODO: Taiko skin conversion, see issue #6
-            /*AddElements(mSkinTaiko, aBeatmapSet => aBeatmapSet.mBeatmaps.Any(
-                aBeatmap => aBeatmap.mGeneralSettings.mMode == Beatmap.Mode.Taiko
-                         || aBeatmap.mGeneralSettings.mMode == Beatmap.Mode.Standard));*/
+            /*AddElements(mSkinTaiko, beatmapSet => beatmapSet.mBeatmaps.Any(
+                beatmap => beatmap.mGeneralSettings.mMode == Beatmap.Mode.Taiko
+                         || beatmap.mGeneralSettings.mMode == Beatmap.Mode.Standard));*/
 
             // only used in specific cases
-            AddElements(skinCountdown, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.generalSettings.countdown > 0));
-            AddElements(skinStandardSlider, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.hitObjects.Any(anObject => anObject is Slider)));
-            AddElement("reversearrow.png", aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.hitObjects.Any(anObject => (anObject as Slider)?.edgeAmount > 1)));
-            AddElements(skinStandardSpinner, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.hitObjects.Any(anObject => anObject is Spinner)));
-            AddElements(skinBreak, aBeatmapSet => aBeatmapSet.beatmaps.Any(
-                aBeatmap => aBeatmap.breaks.Any()));
+            AddElements(skinCountdown, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.generalSettings.countdown > 0));
+            AddElements(skinStandardSlider, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.hitObjects.Any(hitObject => hitObject is Slider)));
+            AddElement("reversearrow.png", beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.hitObjects.Any(hitObject => (hitObject as Slider)?.edgeAmount > 1)));
+            AddElements(skinStandardSpinner, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.hitObjects.Any(hitObject => hitObject is Spinner)));
+            AddElements(skinBreak, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap => beatmap.breaks.Any()));
 
             // depending on other skin elements
-            AddElements(skinNotSliderb, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
-                aPath => PathStatic.CutPath(aPath) == "sliderb.png"));
-            AddElement("particle50.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => PathStatic.CutPath(aPath) == "hit50.png"));
-            AddElement("particle100.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => PathStatic.CutPath(aPath) == "hit100.png"));
-            AddElement("particle300.png", aBeatmapSet => aBeatmapSet.songFilePaths.Any(
-                aPath => PathStatic.CutPath(aPath) == "hit300.png"));
+            AddElements(skinNotSliderb, beatmapSet => !beatmapSet.songFilePaths.Any(
+                path => PathStatic.CutPath(path) == "sliderb.png"));
+            AddElement("particle50.png", beatmapSet => beatmapSet.songFilePaths.Any(
+                path => PathStatic.CutPath(path) == "hit50.png"));
+            AddElement("particle100.png", beatmapSet => beatmapSet.songFilePaths.Any(
+                path => PathStatic.CutPath(path) == "hit100.png"));
+            AddElement("particle300.png", beatmapSet => beatmapSet.songFilePaths.Any(
+                path => PathStatic.CutPath(path) == "hit300.png"));
 
             // animatable elements (animation takes priority over still frame)
             foreach (SkinCondition skinCondition in skinConditions.ToList())
@@ -321,53 +323,53 @@ namespace MapsetParser.statics
             isInitialized = true;
         }
 
-        private static void AddStillFrame(string aStillFrameVersion)
+        private static void AddStillFrame(string stillFrame)
         {
-            string animatedVersion = aStillFrameVersion.Insert(aStillFrameVersion.IndexOf("."), "-{n}");
-            if (skinConditions.Any(aCondition => aCondition.elementNames.Contains(animatedVersion)))
-                AddElement(aStillFrameVersion, aBeatmapSet => !aBeatmapSet.songFilePaths.Any(
-                    aPath => IsAnimationFrameOf(PathStatic.CutPath(aPath), animatedVersion)));
+            string animatedVersion = stillFrame.Insert(stillFrame.IndexOf("."), "-{n}");
+            if (skinConditions.Any(condition => condition.elementNames.Contains(animatedVersion)))
+                AddElement(stillFrame, beatmapSet => !beatmapSet.songFilePaths.Any(
+                    path => IsAnimationFrameOf(PathStatic.CutPath(path), animatedVersion)));
         }
 
-        private static bool IsAnimationFrameOf(string anElementName, string anAnimationName)
+        private static bool IsAnimationFrameOf(string elementName, string animationName)
         {
             // anAnimationName "abc-{n}.png"
             // anElementName   "abc-71.png"
 
-            int startIndex = anAnimationName.IndexOf("{n}");
-            if (startIndex != -1 && anElementName.Length > startIndex)
+            int startIndex = animationName.IndexOf("{n}");
+            if (startIndex != -1 && elementName.Length > startIndex)
             {
                 // Capture from where {n} is until no digits are left.
-                string animationFrame = Regex.Match(anElementName.Substring(startIndex), @"^\d+").Value;
+                string animationFrame = Regex.Match(elementName.Substring(startIndex), @"^\d+").Value;
 
-                if (anAnimationName.Replace("{n}", animationFrame).ToLower() == anElementName)
+                if (animationName.Replace("{n}", animationFrame).ToLower() == elementName)
                     return true;
             }
 
             return false;
         }
 
-        private static SkinCondition? GetSkinCondition(string anElementName)
+        private static SkinCondition? GetSkinCondition(string elementName)
         {
             foreach (SkinCondition skinCondition in skinConditions.ToList())
             {
-                foreach (string elementName in skinCondition.elementNames)
+                foreach (string otherElementName in skinCondition.elementNames)
                 {
-                    if (elementName.ToLower() == anElementName.ToLower())
+                    if (otherElementName.ToLower() == elementName.ToLower())
                         return skinCondition;
 
-                    // animation frames, i.e. "followpoint-{n}.png"
-                    if (elementName.Contains("{n}"))
+                    // Animation frames (i.e. "followpoint-{n}.png").
+                    if (otherElementName.Contains("{n}"))
                     {
-                        int startIndex = elementName.IndexOf("{n}");
+                        int startIndex = otherElementName.IndexOf("{n}");
                         if (startIndex != -1 &&
-                            anElementName.Length > startIndex &&
-                            anElementName.IndexOf('.', startIndex) != -1)
+                            elementName.Length > startIndex &&
+                            elementName.IndexOf('.', startIndex) != -1)
                         {
-                            int endIndex = anElementName.IndexOf('.', startIndex);
-                            string frame = anElementName.Substring(startIndex, endIndex - startIndex);
+                            int endIndex = elementName.IndexOf('.', startIndex);
+                            string frame = elementName.Substring(startIndex, endIndex - startIndex);
 
-                            if (elementName.Replace("{n}", frame).ToLower() == anElementName)
+                            if (otherElementName.Replace("{n}", frame).ToLower() == elementName)
                                 return skinCondition;
                         }
                     }
@@ -378,18 +380,18 @@ namespace MapsetParser.statics
         }
 
         /// <summary> Returns whether the given skin name is used in the given beatmapset (including animations). </summary>
-        public static bool IsUsed(string anElementName, BeatmapSet aBeatmapSet)
+        public static bool IsUsed(string elementName, BeatmapSet beatmapSet)
         {
             if (!isInitialized)
                 Initialize();
 
             // Find the respective condition for the skin element to be used.
-            SkinCondition? skinCondition = GetSkinCondition(anElementName);
+            SkinCondition? skinCondition = GetSkinCondition(elementName);
 
             // If the condition is null, the skin element is unrecognized and as such not used.
             return
                 skinCondition is SkinCondition condition &&
-                (condition.isUsed == null || condition.isUsed(aBeatmapSet));
+                (condition.isUsed == null || condition.isUsed(beatmapSet));
         }
     }
 }
