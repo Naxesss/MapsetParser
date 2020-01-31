@@ -196,10 +196,8 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns whether two stackable objects should be stacked, but currently are not. </summary>
-        private bool ShouldStack(Stackable stackable, Stackable otherStackable)
-        {
-            return CanStack(stackable, otherStackable) && !IsStacked(stackable, otherStackable);
-        }
+        private bool ShouldStack(Stackable stackable, Stackable otherStackable) =>
+            CanStack(stackable, otherStackable) && !IsStacked(stackable, otherStackable);
 
         /// <summary> Returns whether a stackable following a slider could be stacked under the tail
         /// (or over in case of slider and slider). </summary>
@@ -266,10 +264,8 @@ namespace MapsetParser.objects
         /// <summary> Returns the next timing line after the current if any. </summary>
         public TimingLine GetNextTimingLine(double time) => GetNextTimingLine<TimingLine>(time);
         /// <summary> Same as <see cref="GetNextTimingLine"/> except only considers objects of a given type. </summary>
-        public T GetNextTimingLine<T>(double time) where T : TimingLine
-        {
-            return timingLines.OfType<T>().Where(line => line.offset > time).FirstOrDefault();
-        }
+        public T GetNextTimingLine<T>(double time) where T : TimingLine =>
+            timingLines.OfType<T>().Where(line => line.offset > time).FirstOrDefault();
 
         /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
         public HitObject GetHitObject(double time) => GetHitObject<HitObject>(time);
@@ -300,10 +296,8 @@ namespace MapsetParser.objects
         /// <summary> Returns the next hit object after the current, if any, otherwise null. </summary>
         public HitObject GetNextHitObject(double time) => GetNextHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
-        public T GetNextHitObject<T>(double time) where T : HitObject
-        {
-            return hitObjects.OfType<T>().Where(hitObject => hitObject.time > time).FirstOrDefault();
-        }
+        public T GetNextHitObject<T>(double time) where T : HitObject =>
+            hitObjects.OfType<T>().Where(hitObject => hitObject.time > time).FirstOrDefault();
 
         /// <summary> Returns the unsnap in ms of notes unsnapped by 2 ms or more, otherwise null. </summary>
         public double? GetUnsnapIssue(double time)
@@ -667,9 +661,7 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the beatmap as a string in the format "[Insane]", if the difficulty is called "Insane", for example. </summary>
-        public override string ToString()
-        {
-            return "[" + metadataSettings.version + "]";
-        }
+        public override string ToString() =>
+            "[" + metadataSettings.version + "]";
     }
 }
