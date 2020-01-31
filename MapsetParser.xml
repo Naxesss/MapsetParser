@@ -132,6 +132,9 @@
             <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
             This function is usually more performant than <see cref="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)"/>. </summary>
         </member>
+        <member name="M:MapsetParser.objects.Beatmap.GetObjectDensity">
+            <summary> Returns the hit object count divided by the drain time. </summary>
+        </member>
         <member name="M:MapsetParser.objects.Beatmap.GetAudioFilePath">
             <summary> Returns the full audio file path the beatmap uses if any such file exists, otherwise null. </summary>
         </member>
@@ -159,14 +162,24 @@
         <member name="M:MapsetParser.objects.BeatmapSet.IsFileUsed(System.String)">
             <summary> Returns whether the given full file path is used by the beatmapset. </summary>
         </member>
+        <member name="M:MapsetParser.objects.BeatmapSet.IsAnimationPathUsed(System.String,System.Collections.Generic.List{MapsetParser.objects.events.Animation})">
+            <summary> Returns whether the given path (case insensitive) is used by any of the given animations. </summary>
+        </member>
         <member name="M:MapsetParser.objects.BeatmapSet.GetUsedHitSoundFiles">
             <summary> Returns all used hit sound files in the folder. </summary>
         </member>
         <member name="M:MapsetParser.objects.BeatmapSet.ToString">
             <summary> Returns the beatmapset as a string in the format "Artist - Title (Creator)". </summary>
         </member>
-        <member name="T:MapsetParser.objects.events.Animation.LoopType">
-            <summary> Whether the animation repeats or ends after going through all frames. </summary>
+        <member name="M:MapsetParser.objects.events.Animation.GetFrameCount(System.String[])">
+            <summary> Returns the amount of frames this animation contains.
+            Determines how many "filename_i" to use, where i starts at 0. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Animation.GetFrameDelay(System.String[])">
+            <summary> Returns the delay between each frame of this animation in miliseconds. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Animation.IsLooping(System.String[])">
+            <summary> Returns whether the animation loops, by default true. </summary>
         </member>
         <member name="M:MapsetParser.objects.events.Animation.GetFramePaths">
             <summary> Returns all relative file paths for all frames used. </summary>
@@ -174,27 +187,74 @@
         <member name="F:MapsetParser.objects.events.Background.strippedPath">
             <summary> The path in lowercase without extension or quotationmarks. </summary>
         </member>
+        <member name="M:MapsetParser.objects.events.Background.GetPath(System.String[])">
+            <summary> Returns the file path which this background uses. Retains case and extension. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Background.GetOffset(System.String[])">
+            <summary> Returns the positional offset from the top left corner of the screen, if specified, otherwise null.
+            This value is currently unused by the game. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Break.GetTime(System.String[])">
+            <summary> Returns the visual start time of the break.
+            See <see cref="M:MapsetParser.objects.events.Break.GetRealStart(MapsetParser.objects.Beatmap)"/> for where HP stops draining. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Break.GetEndTime(System.String[])">
+            <summary> Returns the visual end time of the break.
+            See <see cref="M:MapsetParser.objects.events.Break.GetRealEnd(MapsetParser.objects.Beatmap)"/> for where HP starts draining again. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Break.GetDuration(MapsetParser.objects.Beatmap)">
+            <summary> Returns the duration between the end of the object before the break and the start of the
+            object after it. During this time, no health will be drained. </summary>
+        </member>
         <member name="M:MapsetParser.objects.events.Break.GetRealStart(MapsetParser.objects.Beatmap)">
             <summary> Returns the end time of the object before the break. </summary>
         </member>
         <member name="M:MapsetParser.objects.events.Break.GetRealEnd(MapsetParser.objects.Beatmap)">
             <summary> Returns the start time of the object after the break. </summary>
         </member>
-        <member name="M:MapsetParser.objects.events.Break.GetDuration(MapsetParser.objects.Beatmap)">
-            <summary> Returns the duration between the end of the object before the break and the start of the
-            object after it. During this time, no health will be drained. </summary>
+        <member name="F:MapsetParser.objects.events.Sample.strippedPath">
+            <summary> The path in lowercase without extension or quotationmarks. </summary>
+        </member>
+        <member name="T:MapsetParser.objects.events.Sample.Layer">
+            <summary> The layer the hit sound is audible on, for example only when passing a section if "Pass". </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Sample.GetTime(System.String[])">
+            <summary> Returns after how many miliseconds this storyboard sample will play. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Sample.GetLayer(System.String[])">
+            <summary> Returns on which layer the storyboard sample will play (e.g. Fail or Pass). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Sample.GetPath(System.String[])">
+            <summary> Returns the file path which this sample uses. Retains case and extension. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Sample.GetVolume(System.String[])">
+            <summary> Returns the volume percentage (0-100) that this sample will play at. </summary>
         </member>
         <member name="F:MapsetParser.objects.events.Sprite.strippedPath">
             <summary> The path in lowercase without extension or quotationmarks. </summary>
         </member>
-        <member name="F:MapsetParser.objects.events.StoryHitSound.strippedPath">
-            <summary> The path in lowercase without extension or quotationmarks. </summary>
+        <member name="M:MapsetParser.objects.events.Sprite.GetLayer(System.String[])">
+            <summary> Returns the layer which this sprite exists on (e.g. Foreground, Pass, or Overlay). </summary>
         </member>
-        <member name="T:MapsetParser.objects.events.StoryHitSound.Layer">
-            <summary> The layer the hit sound is audible on, for example only when passing a section if "Pass". </summary>
+        <member name="M:MapsetParser.objects.events.Sprite.GetOrigin(System.String[])">
+            <summary> Returns the local origin of the sprite, determining around which point it is transformed
+            (e.g. TopLeft, Center, or Bottom). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Sprite.GetPath(System.String[])">
+            <summary> Returns the file path which this sprite uses. Retains case sensitivity and extension. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Sprite.GetOffset(System.String[])">
+            <summary> Returns the positional offset from the top left corner of the screen, if specified,
+            otherwise default (320, 240). </summary>
         </member>
         <member name="F:MapsetParser.objects.events.Video.strippedPath">
             <summary> The path in lowercase without extension or quotationmarks. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Video.GetOffset(System.String[])">
+            <summary> Returns the temporal offset of the video (i.e. when it should start playing). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.events.Video.GetPath(System.String[])">
+            <summary> Returns the file path which this video uses. Retains case and extension. </summary>
         </member>
         <member name="T:MapsetParser.objects.HitObject.HitSound">
             <summary> Determines which sounds will be played as feedback (can be combined, bitflags). </summary>
@@ -229,19 +289,24 @@
             <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetStartSampleset(System.Boolean)">
-            <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
+            <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition.
+            Spinners have no start sample. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetEndSampleset(System.Boolean)">
-            <summary> Returns the effective sampleset of the tail of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
+            <summary> Returns the effective sampleset of the tail of the object, if applicable, otherwise null, optionally prioritizing the addition.
+            Spinners have no start sample. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetStartHitSound">
-            <summary> Returns the hit sound(s) of the head of the object, if applicable, otherwise null. </summary>
+            <summary> Returns the hit sound(s) of the head of the object, if applicable, otherwise null. 
+            Spinners have no start sample. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetEndHitSound">
-            <summary> Returns the hit sound(s) of the tail of the object, if it applicable, otherwise null. </summary>
+            <summary> Returns the hit sound(s) of the tail of the object, if it applicable, otherwise null.
+            Circles and hold notes have no end sample.</summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetSliderSlide">
-            <summary> Returns the hit sound(s) of the slide of the object, if applicable, otherwise null. </summary>
+            <summary> Returns the hit sound(s) of the slide of the object, if applicable, otherwise null.
+            Circles, hold notes and spinners have no sliderslide. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.SplitHitSound(MapsetParser.objects.HitObject.HitSound)">
             <summary> Returns all individual hit sounds used by a specific hit sound instnace,
@@ -270,7 +335,7 @@
             <summary> Returns the position on the curve at a given point in time (intensive, consider using mPathPxPositions). </summary>
         </member>
         <member name="M:MapsetParser.objects.hitobjects.Slider.GetSliderSpeed(System.Double)">
-            <summary> Returns the speed of any slider starting from the given time in px/ms. </summary>
+            <summary> Returns the speed of any slider starting from the given time in px/ms. Caps SV within range 0.1-10. </summary>
         </member>
         <member name="M:MapsetParser.objects.hitobjects.Slider.GetCurveDuration">
             <summary> Returns the duration of the curve (i.e. from edge to edge), ignoring reverses. </summary>
@@ -296,17 +361,60 @@
         <member name="M:MapsetParser.objects.hitobjects.Stackable.GetStackOffset(System.Numerics.Vector2)">
             <summary> Returns the same position but offseted to account for its stacking, if stacked. </summary>
         </member>
+        <member name="M:MapsetParser.objects.HitSample.ParseSampleset(System.String)">
+            <summary> Returns the sampleset corresponding to the given text representation, e.g. "drum" or "soft".
+            Unrecognized representation returns null. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitSample.ParseHitSource(System.String)">
+            <summary> Returns the hit source corresponding to the given text representation, e.g. "hitnormal" or "sliderslide".
+            Unrecognized representation returns a hit source of type unknown. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitSample.ParseHitSound(System.String)">
+            <summary> Returns the hit sound corresponding to the given text representation, e.g. "whistle", "clap" or "finish".
+            Unrecognized representation, or N/A (e.g. sliderslide/tick), returns null. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitSample.ParseCustomIndex(System.String)">
+            <summary> Returns the given text as an integer if possible, else 1 (i.e. implicit custom index). </summary>
+        </member>
         <member name="M:MapsetParser.objects.HitSample.GetFileName">
             <summary> Returns the file name of this sample without extension, or null if no file is associated. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitSample.SameFileName(System.String)">
+            <summary> Returns whether the sample file name is the same as the given file name (i.e. same sample file).
+            Ignores case sensitivity. </summary>
         </member>
         <member name="M:MapsetParser.objects.Osb.IsUsed">
             <summary> Returns whether the .osb file is actually used as a storyboard (or if it's just empty). </summary>
         </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetOffset(System.String[])">
+            <summary> Returns the offset of the line. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetMeter(System.String[])">
+            <summary> Returns the meter (i.e. timing signature) of the line. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetSampleset(System.String[])">
+            <summary> Returns the sampleset which this line applies to any sample set to Auto sampleset. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetCustomIndex(System.String[])">
+            <summary> Returns the custom sample index of the line. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetVolume(System.String[])">
+            <summary> Returns the sample volume of the line. </summary>
+        </member>
         <member name="M:MapsetParser.objects.TimingLine.IsUninherited(System.String[])">
             <summary> Returns whether a line of code representing a timing line is uninherited or inherited. </summary>
         </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetType(System.String[])">
+            <summary> Returns whether kiai is enabled for this line. </summary>
+        </member>
         <member name="M:MapsetParser.objects.TimingLine.GetSvMult(System.String[])">
             <summary> Returns the slider velocity multiplier (1 for uninherited lines). Fit into range 0.1 - 10 before returning. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.timinglines.UninheritedLine.GetMsPerBeat(System.String[])">
+            <summary> Returns the miliseconds per beat of the uninherited line. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.timinglines.UninheritedLine.GetBPM">
+            <summary> Returns the beats per minute (BPM) of the uninherited line. </summary>
         </member>
         <member name="F:MapsetParser.settings.ColourSettings.combos">
             <summary> Starts at index 0, so combo colour 1 is the 0th element in the list. </summary>
@@ -351,23 +459,18 @@
             <summary> Called whenever loading of something is completed. </summary>
         </member>
         <member name="M:MapsetParser.statics.ParserStatic.ParseSection``1(System.String[],System.String,System.Func{System.String,``0})">
-            <summary> Returns the given function for each line in this section. </summary>
+            <summary> Yields the result of the given function for each line in this section. </summary>
         </member>
         <member name="M:MapsetParser.statics.ParserStatic.GetSettings``1(System.String[],System.String,System.Func{System.String[],``0})">
-            <summary> Returns all the lines in this section ran through the given function, excluding the section identifier (e.g. [HitObjects]). </summary>
+            <summary> Returns all the lines in this section ran through the given function, excluding
+            the section identifier (e.g. [HitObjects]). </summary>
         </member>
         <member name="M:MapsetParser.statics.ParserStatic.ApplySettings(System.String[],System.String,System.Action{System.String[]})">
             <summary> Same as <see cref="M:MapsetParser.statics.ParserStatic.GetSettings``1(System.String[],System.String,System.Func{System.String[],``0})"/> except does not return. </summary>
         </member>
-        <member name="M:MapsetParser.statics.ParserStatic.GetStoryboardLayer(System.String[])">
-            <summary> Returns the layer id from the given storyboard line arguments.
-            This converts identifiers like "Background", "Fail", and "Pass" to their
-            respective numerical value. </summary>
-        </member>
-        <member name="M:MapsetParser.statics.ParserStatic.GetStoryboardOrigin(System.String[])">
-            <summary> Returns the origin id from the given storyboard line arguments.
-            This converts identifiers like "TopLeft", "Centre", and "BottomRight" to
-            their respective numerical value. </summary>
+        <member name="M:MapsetParser.statics.ParserStatic.GetEnumMatch``1(System.String)">
+            <summary> Returns the first enum which has the same name as the given string,
+            or null if none match. </summary>
         </member>
         <member name="M:MapsetParser.statics.PathStatic.ParsePath(System.String,System.Boolean,System.Boolean)">
             <summary> Returns the file path in its base form as seen by the game, optionally allowing
@@ -377,7 +480,7 @@
             <summary> Returns the file or folder name rather than its path. Takes the last split of "\\" and "/". </summary>
         </member>
         <member name="M:MapsetParser.statics.PathStatic.RelativePath(System.String,System.String)">
-            <summary> Returns the file path relative to another path, usually song path in this context. </summary>
+            <summary> Returns the file path relative to another path, usually song path in most cases. </summary>
         </member>
         <member name="M:MapsetParser.statics.SkinStatic.IsUsed(System.String,MapsetParser.objects.BeatmapSet)">
             <summary> Returns whether the given skin name is used in the given beatmapset (including animations). </summary>
