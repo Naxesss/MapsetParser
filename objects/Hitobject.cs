@@ -62,19 +62,19 @@ namespace MapsetParser.objects
             ManiaHoldNote = 128
         }
 
-        public HitObject(string[] anArgs, Beatmap aBeatmap)
+        public HitObject(string[] args, Beatmap beatmap)
         {
-            beatmap = aBeatmap;
-            code    = String.Join(",", anArgs);
+            this.beatmap = beatmap;
+            code = String.Join(",", args);
 
-            Position = GetPosition(anArgs);
+            Position = GetPosition(args);
 
-            time     = GetTime(anArgs);
-            type     = GetTypeFlags(anArgs);
-            hitSound = GetHitSound(anArgs);
+            time     = GetTime(args);
+            type     = GetTypeFlags(args);
+            hitSound = GetHitSound(args);
 
             // extras
-            Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> extras = GetExtras(anArgs);
+            Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> extras = GetExtras(args);
             if (extras != null)
             {
                 // custom index and volume are by default 0 if there are edge hitsounds or similar
@@ -94,34 +94,34 @@ namespace MapsetParser.objects
          *  Parsing
          */
 
-        private Vector2 GetPosition(string[] anArgs)
+        private Vector2 GetPosition(string[] args)
         {
-            float x = float.Parse(anArgs[0], CultureInfo.InvariantCulture);
-            float y = float.Parse(anArgs[1], CultureInfo.InvariantCulture);
+            float x = float.Parse(args[0], CultureInfo.InvariantCulture);
+            float y = float.Parse(args[1], CultureInfo.InvariantCulture);
 
             return new Vector2(x, y);
         }
 
-        private double GetTime(string[] anArgs)
+        private double GetTime(string[] args)
         {
-            return double.Parse(anArgs[2], CultureInfo.InvariantCulture);
+            return double.Parse(args[2], CultureInfo.InvariantCulture);
         }
 
-        private Type GetTypeFlags(string[] anArgs)
+        private Type GetTypeFlags(string[] args)
         {
-            return (Type)int.Parse(anArgs[3]);
+            return (Type)int.Parse(args[3]);
         }
 
-        private HitSound GetHitSound(string[] anArgs)
+        private HitSound GetHitSound(string[] args)
         {
-            return (HitSound)int.Parse(anArgs[4]);
+            return (HitSound)int.Parse(args[4]);
         }
 
-        private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> GetExtras(string[] anArgs)
+        private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, int?, int?, string> GetExtras(string[] args)
         {
-            string extras = anArgs.Last();
+            string extras = args.Last();
 
-            // hold notes have "endTime:extras" as format
+            // Hold notes have "endTime:extras" as format.
             int index = type.HasFlag(Type.ManiaHoldNote) ? 1 : 0;
             if (extras.Contains(":"))
             {
@@ -129,7 +129,7 @@ namespace MapsetParser.objects
                 Beatmap.Sampleset additionsValue = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index + 1]);
                 int? customIndexValue = int.Parse(extras.Split(':')[index + 2]);
 
-                // does not exist in file v11
+                // Does not exist in file v11.
                 int? volumeValue = null;
                 if (extras.Split(':').Count() > index + 3)
                     volumeValue = int.Parse(extras.Split(':')[index + 3]);
@@ -151,8 +151,8 @@ namespace MapsetParser.objects
         /// Note: This always returns at least 50 ms, to mimic the star rating algorithm.</summary>
         public double GetPrevDeltaStartTime()
         {
-            // smallest value is 50 ms for pp calc as a safety measure apparently
-            // it's equivalent to 375 BPM streaming speed
+            // Smallest value is 50 ms for pp calc as a safety measure apparently,
+            // it's equivalent to 375 BPM streaming speed.
             return Math.Max(50, time - beatmap.GetPrevHitObject(time).time);
         }
 
@@ -182,24 +182,18 @@ namespace MapsetParser.objects
          */
         
         /// <summary> Returns whether a hit object code has the given type. </summary>
-        public static bool HasType(string[] anArgs, Type aType)
-        {
-            return ((Type)int.Parse(anArgs[3])).HasFlag(aType);
-        }
+        public static bool HasType(string[] args, Type type) =>
+            ((Type)int.Parse(args[3])).HasFlag(type);
 
         /// <summary> Returns whether the hit object has a hit sound, or optionally a certain type of hit sound. </summary>
-        public bool HasHitSound(HitSound? aHitSound = null)
-        {
-            return aHitSound == null
-                ? hitSound > 0
-                : hitSound.HasFlag(aHitSound);
-        }
+        public bool HasHitSound(HitSound? hitSound = null) =>
+            hitSound == null ?
+                this.hitSound > 0 :
+                this.hitSound.HasFlag(hitSound);
 
         /// <summary> Returns the difference in time between the start of this object and the end of the previous object. </summary>
-        public double GetPrevDeltaTime()
-        {
-            return time - beatmap.GetPrevHitObject(time).GetEndTime();
-        }
+        public double GetPrevDeltaTime() =>
+            time - beatmap.GetPrevHitObject(time).GetEndTime();
 
         /// <summary> Returns the difference in distance between the start of this object and the end of the previous object. </summary>
         public double GetPrevDistance()
@@ -216,6 +210,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the points in time where heads, tails or reverses exist (i.e. the start, end or reverses of any object). </summary>
         public IEnumerable<double> GetEdgeTimes()
         {
+            // Head counts as an edge.
             yield return time;
 
             if (this is Slider slider)
@@ -230,73 +225,63 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset GetSampleset(bool anAddition = false, double? aSpecificTime = null)
+        public Beatmap.Sampleset GetSampleset(bool additionOverrides = false, double? specificTime = null)
         {
-            if (anAddition && addition != Beatmap.Sampleset.Auto)
+            if (additionOverrides && addition != Beatmap.Sampleset.Auto)
                 return addition;
 
-            // inherits from timing line if auto
-            return sampleset == Beatmap.Sampleset.Auto
-                ? beatmap.GetTimingLine(aSpecificTime ?? time, true).sampleset : sampleset;
+            // Inherits from timing line if auto.
+            return sampleset == Beatmap.Sampleset.Auto ?
+                beatmap.GetTimingLine(specificTime ?? time, true).sampleset : sampleset;
         }
 
-        /// <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset? GetStartSampleset(bool anAddition = false)
-        {
-            return (this as Slider)?.GetStartSampleset(anAddition) ?? ((this is Spinner) ? null : (Beatmap.Sampleset?)GetSampleset(anAddition));
-        }
+        /// <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition.
+        /// Spinners have no start sample. </summary>
+        public Beatmap.Sampleset? GetStartSampleset(bool additionOverrides = false) =>
+            (this as Slider)?.GetStartSampleset(additionOverrides) ??
+                ((this is Spinner) ? null : (Beatmap.Sampleset?)GetSampleset(additionOverrides));
 
-        /// <summary> Returns the effective sampleset of the tail of the object, if applicable, otherwise null, optionally prioritizing the addition. </summary>
-        public virtual Beatmap.Sampleset? GetEndSampleset(bool anAddition = false)
-        {
-            return (this as Slider)?.GetEndSampleset(anAddition) ?? ((this is Spinner) ? (Beatmap.Sampleset?)GetSampleset(anAddition) : null);
-        }
+        /// <summary> Returns the effective sampleset of the tail of the object, if applicable, otherwise null, optionally prioritizing the addition.
+        /// Spinners have no start sample. </summary>
+        public virtual Beatmap.Sampleset? GetEndSampleset(bool additionOverrides = false) =>
+            (this as Slider)?.GetEndSampleset(additionOverrides) ??
+                ((this is Spinner) ? (Beatmap.Sampleset?)GetSampleset(additionOverrides) : null);
 
-        /// <summary> Returns the hit sound(s) of the head of the object, if applicable, otherwise null. </summary>
-        public HitSound? GetStartHitSound()
-        {
-            // spinners have no start
-            return
-                (this as Slider)?.startHitSound ??
+        /// <summary> Returns the hit sound(s) of the head of the object, if applicable, otherwise null. 
+        /// Spinners have no start sample. </summary>
+        public HitSound? GetStartHitSound() =>
+            (this as Slider)?.startHitSound ??
                 ((this is Spinner) ? null : (HitSound?)hitSound);
-        }
 
-        /// <summary> Returns the hit sound(s) of the tail of the object, if it applicable, otherwise null. </summary>
-        public HitSound? GetEndHitSound()
-        {
-            // circles and hold notes have no end
-            return
-                (this as Slider)?.endHitSound ??
-                (this as Spinner)?.hitSound ??
-                null;
-        }
+        /// <summary> Returns the hit sound(s) of the tail of the object, if it applicable, otherwise null.
+        /// Circles and hold notes have no end sample.</summary>
+        public HitSound? GetEndHitSound() =>
+            (this as Slider)?.endHitSound ?? (this as Spinner)?.hitSound ?? null;
 
-        /// <summary> Returns the hit sound(s) of the slide of the object, if applicable, otherwise null. </summary>
-        public HitSound? GetSliderSlide()
-        {
-            // circles, hold notes and spinners have no sliderslide
-            return (this as Slider)?.hitSound ?? null;
-        }
+        /// <summary> Returns the hit sound(s) of the slide of the object, if applicable, otherwise null.
+        /// Circles, hold notes and spinners have no sliderslide. </summary>
+        public HitSound? GetSliderSlide() =>
+            (this as Slider)?.hitSound ?? null;
 
         /// <summary> Returns all individual hit sounds used by a specific hit sound instnace,
         /// excluding <see cref="HitSound.None"/>. </summary>
-        private IEnumerable<HitSound> SplitHitSound(HitSound aHitSound)
+        private IEnumerable<HitSound> SplitHitSound(HitSound hitSound)
         {
             foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
-                if (aHitSound.HasFlag(individualHitSound) && individualHitSound != HitSound.None)
+                if (hitSound.HasFlag(individualHitSound) && individualHitSound != HitSound.None)
                     yield return individualHitSound;
         }
 
-        private HitSample GetEdgeSample(double aTime, Beatmap.Sampleset? aSampleset, HitSound? aHitSound)
+        private HitSample GetEdgeSample(double time, Beatmap.Sampleset? sampleset, HitSound? hitSound)
         {
-            TimingLine line = beatmap.GetTimingLine(aTime, true);
+            TimingLine line = beatmap.GetTimingLine(time, true);
             return
                 new HitSample(
                     line.customIndex,
-                    aSampleset ?? line.sampleset,
-                    aHitSound,
+                    sampleset ?? line.sampleset,
+                    hitSound,
                     HitSample.HitSource.Edge,
-                    aTime);
+                    time);
         }
 
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
@@ -332,9 +317,9 @@ namespace MapsetParser.objects
                 }
 
                 List<TimingLine> lines =
-                    beatmap.timingLines.Where(aLine =>
-                        aLine.offset > slider.time &&
-                        aLine.offset <= slider.endTime).ToList();
+                    beatmap.timingLines.Where(line =>
+                        line.offset > slider.time &&
+                        line.offset <= slider.endTime).ToList();
                 lines.Add(beatmap.GetTimingLine(slider.time, true));
 
                 // Body, only applies to standard. Catch has droplets instead of body. Taiko and mania have a body but play no background sound.
@@ -414,8 +399,8 @@ namespace MapsetParser.objects
 
             IEnumerable<string> usedHitSoundFileNames =
                 GetUsedHitSamples()
-                    .Select(aSample => aSample.GetFileName())
-                    .Where(aName => aName != null)
+                    .Select(sample => sample.GetFileName())
+                    .Where(name => name != null)
                     .Distinct();
 
             return usedHitSoundFileNames;
@@ -433,17 +418,17 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Slider reverse", "Circle" or "Spinner tail". </summary>
-        public string GetPartName(double aTime)
+        public string GetPartName(double time)
         {
-            // Checks within 1 ms leniency in case of decimals and precision errors.
-            bool isClose(double anEdgeTime, double anOtherTime) =>
-                anEdgeTime <= anOtherTime + 2 &&
-                anEdgeTime >= anOtherTime - 2;
+            // Checks within 2 ms leniency in case of decimals or unsnaps.
+            bool isClose(double edgeTime, double otherTime) =>
+                edgeTime <= otherTime + 2 &&
+                edgeTime >= otherTime - 2;
 
             string edgeType =
-                isClose(time, aTime)                                                    ? "head" :
-                isClose(GetEndTime(), aTime) || isClose(GetEdgeTimes().Last(), aTime)   ? "tail" :
-                GetEdgeTimes().Any(anEdgeTime => isClose(anEdgeTime, aTime))            ? "reverse" :
+                isClose(this.time, time)                                            ? "head" :
+                isClose(GetEndTime(), time) || isClose(GetEdgeTimes().Last(), time) ? "tail" :
+                GetEdgeTimes().Any(edgeTime => isClose(edgeTime, time))             ? "reverse" :
                 "body";
 
             return GetObjectType() + (!(this is Circle) ? (" " + edgeType) : "");
