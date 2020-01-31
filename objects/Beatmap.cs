@@ -33,7 +33,7 @@ namespace MapsetParser.objects
         public List<Video>          videos;
         public List<Break>          breaks;
         public List<Sprite>         sprites;
-        public List<StoryHitSound>  storyHitSounds;
+        public List<Sample>         samples;
         public List<Animation>      animations;
 
         // objects
@@ -84,11 +84,11 @@ namespace MapsetParser.objects
 
             // event type 3 seems to be "background colour transformation" https://i.imgur.com/Tqlz3s5.png
             
-            storyHitSounds = GetEvents(lines, new List<string>() { "Sample",       "5" }, anArgs => new StoryHitSound(anArgs));
             backgrounds = GetEvents(lines, new List<string>() { "Background",   "0" }, args => new Background(args));
             videos      = GetEvents(lines, new List<string>() { "Video",        "1" }, args => new Video(args));
             breaks      = GetEvents(lines, new List<string>() { "Break",        "2" }, args => new Break(args));
             sprites     = GetEvents(lines, new List<string>() { "Sprite",       "4" }, args => new Sprite(args));
+            samples     = GetEvents(lines, new List<string>() { "Sample",       "5" }, args => new Sample(args));
             animations  = GetEvents(lines, new List<string>() { "Animation",    "6" }, args => new Animation(args));
             
             timingLines = GetTimingLines(lines);
