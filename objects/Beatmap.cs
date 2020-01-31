@@ -297,7 +297,7 @@ namespace MapsetParser.objects
                 hitObjects.OfType<T>().FirstOrDefault();
         }
 
-        /// <summary> Returns the next hit object after the current if any. </summary>
+        /// <summary> Returns the next hit object after the current, if any, otherwise null. </summary>
         public HitObject GetNextHitObject(double time) => GetNextHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
         public T GetNextHitObject<T>(double time) where T : HitObject
