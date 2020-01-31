@@ -13,17 +13,17 @@ namespace MapsetParser.objects.hitobjects
         public Vector2 UnstackedPosition { get => base.Position; }
         public override Vector2 Position { get => GetStackOffset(base.Position); }
 
-        public Stackable(string[] anArgs, Beatmap aBeatmap)
-            : base(anArgs, aBeatmap)
+        public Stackable(string[] args, Beatmap beatmap)
+            : base(args, beatmap)
         {
 
         }
 
         /// <summary> Returns the same position but offseted to account for its stacking, if stacked. </summary>
-        public Vector2 GetStackOffset(Vector2 aPosition) =>
-            new Vector2(GetStackOffset(aPosition.X), GetStackOffset(aPosition.Y));
+        public Vector2 GetStackOffset(Vector2 position) =>
+            new Vector2(GetStackOffset(position.X), GetStackOffset(position.Y));
 
-        private float GetStackOffset(float aValue) =>
-            aValue + stackIndex * (beatmap?.difficultySettings.GetCircleRadius() ?? 0) * -0.1f;
+        private float GetStackOffset(float value) =>
+            value + stackIndex * (beatmap?.difficultySettings.GetCircleRadius() ?? 0) * -0.1f;
     }
 }
