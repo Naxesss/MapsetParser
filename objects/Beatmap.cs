@@ -69,27 +69,27 @@ namespace MapsetParser.objects
             Ultra
         }
 
-        public Beatmap(string aCode, float? aStarRating = null, string aSongPath = null, string aMapPath = null)
+        public Beatmap(string code, float? starRating = null, string songPath = null, string mapPath = null)
         {
-            code       = aCode;
-            songPath   = aSongPath;
-            mapPath    = aMapPath;
+            this.code       = code;
+            this.songPath   = songPath;
+            this.mapPath    = mapPath;
 
-            string[] lines = aCode.Split(new string[] { "\n" }, StringSplitOptions.None);
+            string[] lines = code.Split(new string[] { "\n" }, StringSplitOptions.None);
 
-            generalSettings    = ParserStatic.GetSettings(lines, "General",     aSectionLines => new GeneralSettings(aSectionLines));
-            metadataSettings   = ParserStatic.GetSettings(lines, "Metadata",    aSectionLines => new MetadataSettings(aSectionLines));
-            difficultySettings = ParserStatic.GetSettings(lines, "Difficulty",  aSectionLines => new DifficultySettings(aSectionLines));
-            colourSettings     = ParserStatic.GetSettings(lines, "Colours",     aSectionLines => new ColourSettings(aSectionLines));
+            generalSettings    = ParserStatic.GetSettings(lines, "General",     sectionLines => new GeneralSettings(sectionLines));
+            metadataSettings   = ParserStatic.GetSettings(lines, "Metadata",    sectionLines => new MetadataSettings(sectionLines));
+            difficultySettings = ParserStatic.GetSettings(lines, "Difficulty",  sectionLines => new DifficultySettings(sectionLines));
+            colourSettings     = ParserStatic.GetSettings(lines, "Colours",     sectionLines => new ColourSettings(sectionLines));
 
             // event type 3 seems to be "background colour transformation" https://i.imgur.com/Tqlz3s5.png
             
-            backgrounds    = GetEvents(lines, new List<string>() { "Background",   "0" }, anArgs => new Background(anArgs));
-            videos         = GetEvents(lines, new List<string>() { "Video",        "1" }, anArgs => new Video(anArgs));
-            breaks         = GetEvents(lines, new List<string>() { "Break",        "2" }, anArgs => new Break(anArgs));
-            sprites        = GetEvents(lines, new List<string>() { "Sprite",       "4" }, anArgs => new Sprite(anArgs));
             storyHitSounds = GetEvents(lines, new List<string>() { "Sample",       "5" }, anArgs => new StoryHitSound(anArgs));
-            animations     = GetEvents(lines, new List<string>() { "Animation",    "6" }, anArgs => new Animation(anArgs));
+            backgrounds = GetEvents(lines, new List<string>() { "Background",   "0" }, args => new Background(args));
+            videos      = GetEvents(lines, new List<string>() { "Video",        "1" }, args => new Video(args));
+            breaks      = GetEvents(lines, new List<string>() { "Break",        "2" }, args => new Break(args));
+            sprites     = GetEvents(lines, new List<string>() { "Sprite",       "4" }, args => new Sprite(args));
+            animations  = GetEvents(lines, new List<string>() { "Animation",    "6" }, args => new Animation(args));
             
             timingLines = GetTimingLines(lines);
             hitObjects  = GetHitobjects(lines);
@@ -99,7 +99,7 @@ namespace MapsetParser.objects
                 // Stacking is standard-only.
                 ApplyStacking();
 
-                starRating = aStarRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
+                this.starRating = starRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
             }
         }
 
@@ -179,68 +179,68 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns whether two stackable objects could be stacked. </summary>
-        private bool CanStack(Stackable anObject, Stackable anOtherObject)
+        private bool CanStack(Stackable stackable, Stackable otherStackable)
         {
-            bool isNearInTime = MeetsStackTime(anObject, anOtherObject);
-            bool isNearInSpace = MeetsStackDistance(anObject, anOtherObject);
+            bool isNearInTime = MeetsStackTime(stackable, otherStackable);
+            bool isNearInSpace = MeetsStackDistance(stackable, otherStackable);
 
             return isNearInTime && isNearInSpace;
         }
 
         /// <summary> Returns whether two stackable objects are currently stacked. </summary>
-        private bool IsStacked(Stackable anObject, Stackable anOtherObject)
+        private bool IsStacked(Stackable stackable, Stackable otherStackable)
         {
-            bool isAlreadyStacked = anObject.stackIndex == anOtherObject.stackIndex + 1;
+            bool isAlreadyStacked = stackable.stackIndex == otherStackable.stackIndex + 1;
 
-            return CanStack(anObject, anOtherObject) && isAlreadyStacked;
+            return CanStack(stackable, otherStackable) && isAlreadyStacked;
         }
 
         /// <summary> Returns whether two stackable objects should be stacked, but currently are not. </summary>
-        private bool ShouldStack(Stackable anObject, Stackable anOtherObject)
+        private bool ShouldStack(Stackable stackable, Stackable otherStackable)
         {
-            return CanStack(anObject, anOtherObject) && !IsStacked(anObject, anOtherObject);
+            return CanStack(stackable, otherStackable) && !IsStacked(stackable, otherStackable);
         }
 
         /// <summary> Returns whether a stackable following a slider could be stacked under the tail
         /// (or over in case of slider and slider). </summary>
-        private bool CanStackTail(Slider aSlider, Stackable anOtherObject)
+        private bool CanStackTail(Slider slider, Stackable stackable)
         {
             double distanceSq =
                 Vector2.DistanceSquared(
-                    anOtherObject.UnstackedPosition,
-                    aSlider.edgeAmount % 2 == 0 ?
-                        aSlider.UnstackedPosition :
-                        aSlider.UnstackedEndPosition);
+                    stackable.UnstackedPosition,
+                    slider.edgeAmount % 2 == 0 ?
+                        slider.UnstackedPosition :
+                        slider.UnstackedEndPosition);
 
-            bool isNearInTime = MeetsStackTime(aSlider, anOtherObject);
+            bool isNearInTime = MeetsStackTime(slider, stackable);
             bool isNearInSpace = distanceSq < 3 * 3;
 
-            return isNearInTime && isNearInSpace && aSlider.time < anOtherObject.time;
+            return isNearInTime && isNearInSpace && slider.time < stackable.time;
         }
 
         /// <summary> Returns whether a stackable following a slider is stacked under the tail
         /// (or over in case of slider and slider). </summary>
-        private bool IsStackedTail(Slider aSlider, Stackable anOtherObject)
+        private bool IsStackedTail(Slider slider, Stackable stackable)
         {
-            bool isAlreadyStacked = aSlider.stackIndex == anOtherObject.stackIndex + 1;
+            bool isAlreadyStacked = slider.stackIndex == stackable.stackIndex + 1;
 
-            return CanStackTail(aSlider, anOtherObject) && isAlreadyStacked;
+            return CanStackTail(slider, stackable) && isAlreadyStacked;
         }
 
         /// <summary> Returns whether a stackable following a slider should be stacked under the slider tail 
         /// (or slider over the head in case of slider and slider), but currently is not. </summary>
-        private bool ShouldStackTail(Slider aSlider, Stackable anOtherObject)
+        private bool ShouldStackTail(Slider slider, Stackable stackable)
         {
-            return CanStackTail(aSlider, anOtherObject) && !IsStackedTail(aSlider, anOtherObject);
+            return CanStackTail(slider, stackable) && !IsStackedTail(slider, stackable);
         }
 
         /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start Hitsoundtime. </summary>
-        private bool MeetsStackTime(Stackable anObject, Stackable anOtherObject) =>
-            anOtherObject.time - anObject.GetEndTime() <= StackTimeThreshold();
+        private bool MeetsStackTime(Stackable stackable, Stackable otherStackable) =>
+            otherStackable.time - stackable.GetEndTime() <= StackTimeThreshold();
 
         /// <summary> Returns whether two stackable objects are close enough in space to be stacked. Measures from head to head. </summary>
-        private bool MeetsStackDistance(Stackable anObject, Stackable anOtherObject) =>
-            Vector2.DistanceSquared(anObject.UnstackedPosition, anOtherObject.UnstackedPosition) < 3 * 3;
+        private bool MeetsStackDistance(Stackable stackable, Stackable otherStackable) =>
+            Vector2.DistanceSquared(stackable.UnstackedPosition, otherStackable.UnstackedPosition) < 3 * 3;
 
         /// <summary> Returns how far apart in time two objects can be and still be able to stack. </summary>
         private double StackTimeThreshold() =>
@@ -251,66 +251,66 @@ namespace MapsetParser.objects
         */
 
         /// <summary> Returns the timing line currently in effect at the given time, optionally with a 5 ms backward leniency. </summary>
-        public TimingLine GetTimingLine(double aTime, bool aHitSoundLeniency = false) => GetTimingLine<TimingLine>(aTime, aHitSoundLeniency);
+        public TimingLine GetTimingLine(double time, bool hitSoundLeniency = false) => GetTimingLine<TimingLine>(time, hitSoundLeniency);
         /// <summary> Same as <see cref="GetTimingLine"/> except only considers objects of a given type. </summary>
-        public T GetTimingLine<T>(double aTime, bool aHitSoundLeniency = false) where T : TimingLine
+        public T GetTimingLine<T>(double time, bool hitSoundLeniency = false) where T : TimingLine
         {
             return
                 timingLines.OfType<T>()
-                    .Where(aLine =>
-                        aLine.offset <= aTime + (aHitSoundLeniency ? 5 : 0))
+                    .Where(line =>
+                        line.offset <= time + (hitSoundLeniency ? 5 : 0))
                     .LastOrDefault() ??
-                GetNextTimingLine<T>(aTime);
+                GetNextTimingLine<T>(time);
         }
 
         /// <summary> Returns the next timing line after the current if any. </summary>
-        public TimingLine GetNextTimingLine(double aTime) => GetNextTimingLine<TimingLine>(aTime);
+        public TimingLine GetNextTimingLine(double time) => GetNextTimingLine<TimingLine>(time);
         /// <summary> Same as <see cref="GetNextTimingLine"/> except only considers objects of a given type. </summary>
-        public T GetNextTimingLine<T>(double aTime) where T : TimingLine
+        public T GetNextTimingLine<T>(double time) where T : TimingLine
         {
-            return timingLines.OfType<T>().Where(aLine => aLine.offset > aTime).FirstOrDefault();
+            return timingLines.OfType<T>().Where(line => line.offset > time).FirstOrDefault();
         }
 
         /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
-        public HitObject GetHitObject(double aTime) => GetHitObject<HitObject>(aTime);
+        public HitObject GetHitObject(double time) => GetHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetHitObject"/> except only considers objects of a given type. </summary>
-        public T GetHitObject<T>(double aTime) where T : HitObject
+        public T GetHitObject<T>(double time) where T : HitObject
         {
             return
                 hitObjects.OfType<T>()
-                    .Where(anObject =>
-                        anObject.GetEndTime() <= aTime || anObject.time == aTime)
+                    .Where(hitObject =>
+                        hitObject.GetEndTime() <= time || hitObject.time == time)
                     .LastOrDefault() ??
-                GetNextHitObject<T>(aTime);
+                GetNextHitObject<T>(time);
         }
         
         /// <summary> Returns the previous hit object if any, otherwise the first. </summary>
-        public HitObject GetPrevHitObject(double aTime) => GetPrevHitObject<HitObject>(aTime);
+        public HitObject GetPrevHitObject(double time) => GetPrevHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetPrevHitObject"/> except only considers objects of a given type. </summary>
-        public T GetPrevHitObject<T>(double aTime) where T : HitObject
+        public T GetPrevHitObject<T>(double time) where T : HitObject
         {
             return
                 hitObjects.OfType<T>()
-                    .Where(anObject =>
-                        anObject.time < aTime)
+                    .Where(hitObject =>
+                        hitObject.time < time)
                     .LastOrDefault() ??
                 hitObjects.OfType<T>().FirstOrDefault();
         }
 
         /// <summary> Returns the next hit object after the current if any. </summary>
-        public HitObject GetNextHitObject(double aTime) => GetNextHitObject<HitObject>(aTime);
+        public HitObject GetNextHitObject(double time) => GetNextHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
-        public T GetNextHitObject<T>(double aTime) where T : HitObject
+        public T GetNextHitObject<T>(double time) where T : HitObject
         {
-            return hitObjects.OfType<T>().Where(anObject => anObject.time > aTime).FirstOrDefault();
+            return hitObjects.OfType<T>().Where(hitObject => hitObject.time > time).FirstOrDefault();
         }
 
         /// <summary> Returns the unsnap in ms of notes unsnapped by 2 ms or more, otherwise null. </summary>
-        public double? GetUnsnapIssue(double aTime)
+        public double? GetUnsnapIssue(double time)
         {
             int thresholdUnrankable = 2;
 
-            double unsnap      = GetPracticalUnsnap(aTime);
+            double unsnap = GetPracticalUnsnap(time);
             double roundUnsnap = Math.Abs(unsnap);
 
             if (roundUnsnap >= thresholdUnrankable)
@@ -320,12 +320,12 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the current combo colour number, starts at 0. </summary>
-        public int GetComboColourIndex(double aTime)
+        public int GetComboColourIndex(double time)
         {
             int combo = 0;
             foreach (HitObject hitObject in hitObjects)
             {
-                if (hitObject.time > aTime)
+                if (hitObject.time > time)
                     break;
 
                 // ignore spinners
@@ -356,9 +356,9 @@ namespace MapsetParser.objects
 
         /// <summary> Same as <see cref="GetComboColourIndex"/>, except accounts for a bug which makes the last registered colour in
         /// the code the first number in the editor. Basically use for display purposes.</summary>
-        public int GetDisplayedComboColourIndex(double aTime)
+        public int GetDisplayedComboColourIndex(double time)
         {
-            int colourIndex = GetComboColourIndex(aTime);
+            int colourIndex = GetComboColourIndex(time);
             if (colourIndex == 0)
                 return colourSettings.combos.Count;
             else
@@ -376,7 +376,7 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the interpreted difficulty level based on the star rating of the beatmap
         /// (may be inaccurate since recent sr reworks were done), can optionally consider diff names. </summary>
-        public Difficulty GetDifficulty(bool aConsiderDiffName = false)
+        public Difficulty GetDifficulty(bool considerName = false)
         {
             Difficulty difficulty;
 
@@ -387,7 +387,7 @@ namespace MapsetParser.objects
             else if (starRating < 6.5f) difficulty = Difficulty.Expert;
             else                        difficulty = Difficulty.Ultra;
 
-            if(!aConsiderDiffName)
+            if(!considerName)
                 return difficulty;
 
             return GetDifficultyFromName() ?? difficulty;
@@ -410,11 +410,11 @@ namespace MapsetParser.objects
 
             foreach (var pair in nameDiffPairs)
                 if (pair.Value.Any(
-                    aValue =>
-                        name.ToLower() == aValue.ToLower() ||
-                        name.ToLower().StartsWith(aValue.ToLower() + " ") ||
-                        name.ToLower().EndsWith(" " + aValue.ToLower()) ||
-                        name.ToLower().Contains(" " + aValue.ToLower() + " ")))
+                    value =>
+                        name.ToLower() == value.ToLower() ||
+                        name.ToLower().StartsWith(value.ToLower() + " ") ||
+                        name.ToLower().EndsWith(" " + value.ToLower()) ||
+                        name.ToLower().Contains(" " + value.ToLower() + " ")))
                     return pair.Key;
 
             return null;
@@ -422,9 +422,9 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the name of the difficulty in a gramatically correct way, for example "an Easy" and "a Normal".
         /// Mostly useful for adding in the middle of sentences.</summary>
-        public string GetDifficultyName(Difficulty? aDifficulty = null)
+        public string GetDifficultyName(Difficulty? difficulty = null)
         {
-            switch (aDifficulty ?? GetDifficulty())
+            switch (difficulty ?? GetDifficulty())
             {
                 case Difficulty.Easy:   return "an Easy";
                 case Difficulty.Normal: return "a Normal";
@@ -495,13 +495,13 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns how many ms into a beat the given time is. </summary>
-        public double GetOffsetIntoBeat(double aTime)
+        public double GetOffsetIntoBeat(double time)
         {
-            UninheritedLine line = GetTimingLine<UninheritedLine>(aTime);
+            UninheritedLine line = GetTimingLine<UninheritedLine>(time);
 
             // gets how many miliseconds into a beat we are
-            double time        = aTime - line.offset;
-            double division    = time / line.msPerBeat;
+            double msOffset    = time - line.offset;
+            double division    = msOffset / line.msPerBeat;
             double fraction    = division - (float)Math.Floor(division);
             double beatOffset  = fraction * line.msPerBeat;
 
@@ -510,11 +510,11 @@ namespace MapsetParser.objects
 
         private readonly int[] divisors = new int[] { 1, 2, 3, 4, 6, 8, 12, 16 };
         /// <summary> Returns the lowest possible beat snap divisor to get to the given time with less than 2 ms of unsnap, 0 if unsnapped. </summary>
-        public int GetLowestDivisor(double aTime)
+        public int GetLowestDivisor(double time)
         {
             foreach (int divisor in divisors)
             {
-                double unsnap = Math.Abs(GetPracticalUnsnap(aTime, divisor, 1));
+                double unsnap = Math.Abs(GetPracticalUnsnap(time, divisor, 1));
                 if (unsnap < 2)
                     return divisor;
             }
@@ -523,20 +523,20 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. </summary>
-        public double GetTheoreticalUnsnap(double aTime, int aSecondDivisor = 16, int aThirdDivisor = 12)
+        public double GetTheoreticalUnsnap(double time, int twoDivisor = 16, int threeDivisor = 12)
         {
-            UninheritedLine line = GetTimingLine<UninheritedLine>(aTime);
+            UninheritedLine line = GetTimingLine<UninheritedLine>(time);
 
-            double beatOffset      = GetOffsetIntoBeat(aTime);
+            double beatOffset      = GetOffsetIntoBeat(time);
             double currentFraction = beatOffset / line.msPerBeat;
 
             // 1/16
-            double desiredFractionSecond = Math.Round(currentFraction * aSecondDivisor) / aSecondDivisor;
+            double desiredFractionSecond = Math.Round(currentFraction * twoDivisor) / twoDivisor;
             double differenceFractionSecond = currentFraction - desiredFractionSecond;
             double theoreticalUnsnapSecond = differenceFractionSecond * line.msPerBeat;
 
             // 1/12
-            double desiredFractionThird = Math.Round(currentFraction * aThirdDivisor) / aThirdDivisor;
+            double desiredFractionThird = Math.Round(currentFraction * threeDivisor) / threeDivisor;
             double differenceFractionThird = currentFraction - desiredFractionThird;
             double theoreticalUnsnapThird = differenceFractionThird * line.msPerBeat;
 
@@ -547,45 +547,45 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the unsnap accounting for the way the game rounds (or more accurately doesn't round) snapping. <para/>
         /// The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
-        public double GetPracticalUnsnap(double aTime, int aSecondDivisor = 16, int aThirdDivisor = 12)
+        public double GetPracticalUnsnap(double time, int twoDivisor = 16, int threeDivisor = 12)
         {
-            double theoreticalUnsnap = GetTheoreticalUnsnap(aTime, aSecondDivisor, aThirdDivisor);
+            double theoreticalUnsnap = GetTheoreticalUnsnap(time, twoDivisor, threeDivisor);
             
-            double desiredTime = Timestamp.Round(aTime - theoreticalUnsnap);
-            double practicalUnsnap = desiredTime - aTime;
+            double desiredTime = Timestamp.Round(time - theoreticalUnsnap);
+            double practicalUnsnap = desiredTime - time;
 
             return practicalUnsnap;
         }
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object.
         /// If you already have the index of the object, use <see cref="GetCombo(int)"/> for performance. </summary>
-        public int GetCombo(HitObject aHitObject)
+        public int GetCombo(HitObject hitObject)
         {
-            if (hitObjects.Count == 0 || aHitObject.type.HasFlag(HitObject.Type.NewCombo))
+            if (hitObjects.Count == 0 || hitObject.type.HasFlag(HitObject.Type.NewCombo))
                 return 1;
 
-            return GetCombo(hitObjects.IndexOf(aHitObject));
+            return GetCombo(hitObjects.IndexOf(hitObject));
         }
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
         /// This function is usually more performant than <see cref="GetCombo(HitObject)"/>. </summary>
-        public int GetCombo(int aHitObjectIndex)
+        public int GetCombo(int hitObjectIndex)
         {
             int combo = 1;
 
-            if (hitObjects.Count == 0 || hitObjects.Count <= aHitObjectIndex)
+            if (hitObjects.Count == 0 || hitObjects.Count <= hitObjectIndex)
                 return combo;
 
             // Adds a combo number for each object before this that isn't a new combo.
-            HitObject lastHitObject = hitObjects[aHitObjectIndex];
+            HitObject lastHitObject = hitObjects[hitObjectIndex];
             HitObject firstHitObject = hitObjects[0];
-            while (aHitObjectIndex > 0)
+            while (hitObjectIndex > 0)
             {
                 // The first object in the beatmap is always a new combo.
                 if (lastHitObject.type.HasFlag(HitObject.Type.NewCombo) || lastHitObject == firstHitObject)
                     break;
 
-                lastHitObject = hitObjects[--aHitObjectIndex];
+                lastHitObject = hitObjects[--hitObjectIndex];
 
                 ++combo;
             }
@@ -593,10 +593,9 @@ namespace MapsetParser.objects
             return combo;
         }
 
-        public double GetObjectDensity()
-        {
-            return hitObjects.Count / GetDrainTime();
-        }
+        /// <summary> Returns the hit object count divided by the drain time. </summary>
+        public double GetObjectDensity() =>
+            hitObjects.Count / GetDrainTime();
 
         /// <summary> Returns the full audio file path the beatmap uses if any such file exists, otherwise null. </summary>
         public string GetAudioFilePath()
@@ -630,41 +629,41 @@ namespace MapsetParser.objects
          *  Parser Methods
         */
         
-        private List<T> GetEvents<T>(string[] aLines, List<string> aTypes, Func<string[], T> aFunc)
+        private List<T> GetEvents<T>(string[] lines, List<string> types, Func<string[], T> func)
         {
             // find all lines starting with any of aTypes in the event section
-            List<T> types = new List<T>();
-            ParserStatic.ApplySettings(aLines, "Events", aSectionLines =>
+            List<T> foundTypes = new List<T>();
+            ParserStatic.ApplySettings(lines, "Events", sectionLines =>
             {
-                foreach (string line in aSectionLines)
-                    if (aTypes.Any(aType => line.StartsWith(aType + ",")))
-                        types.Add(aFunc(line.Split(',')));
+                foreach (string line in sectionLines)
+                    if (types.Any(type => line.StartsWith(type + ",")))
+                        foundTypes.Add(func(line.Split(',')));
             });
-            return types;
+            return foundTypes;
         }
 
-        private List<TimingLine> GetTimingLines(string[] aLines)
+        private List<TimingLine> GetTimingLines(string[] lines)
         {
             // find the [TimingPoints] section and parse each timing line
-            return ParserStatic.ParseSection(aLines, "TimingPoints", aLine =>
+            return ParserStatic.ParseSection(lines, "TimingPoints", line =>
             {
-                string[] args = aLine.Split(',');
+                string[] args = line.Split(',');
                 return TimingLine.IsUninherited(args) ? new UninheritedLine(args) : (TimingLine)new InheritedLine(args);
-            }).OrderBy(aLine => aLine.offset).ThenBy(aLine => aLine is InheritedLine).ToList();
+            }).OrderBy(line => line.offset).ThenBy(line => line is InheritedLine).ToList();
         }
 
-        private List<HitObject> GetHitobjects(string[] aLines)
+        private List<HitObject> GetHitobjects(string[] lines)
         {
             // find the [Hitobjects] section and parse each hitobject until empty line or end of file
-            return ParserStatic.ParseSection(aLines, "HitObjects", aLine =>
+            return ParserStatic.ParseSection(lines, "HitObjects", line =>
             {
-                string[] args = aLine.Split(',');
+                string[] args = line.Split(',');
                 return
                     HitObject.HasType(args, HitObject.Type.Circle)        ? new Circle(args, this) :
                     HitObject.HasType(args, HitObject.Type.Slider)        ? new Slider(args, this) :
                     HitObject.HasType(args, HitObject.Type.ManiaHoldNote) ? new HoldNote(args, this) :
                     (HitObject)new Spinner(args, this);
-            }).OrderBy(anObject => anObject.time).ToList();
+            }).OrderBy(hitObject => hitObject.time).ToList();
         }
 
         /// <summary> Returns the beatmap as a string in the format "[Insane]", if the difficulty is called "Insane", for example. </summary>
