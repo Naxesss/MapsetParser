@@ -71,7 +71,7 @@
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetPrevHitObject(System.Double)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextHitObject(System.Double)">
-            <summary> Returns the next hit object after the current if any. </summary>
+            <summary> Returns the next hit object after the current, if any, otherwise null. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextHitObject``1(System.Double)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetNextHitObject(System.Double)"/> except only considers objects of a given type. </summary>
@@ -210,7 +210,7 @@
             <summary> Returns the end time of the object before the break. </summary>
         </member>
         <member name="M:MapsetParser.objects.events.Break.GetRealEnd(MapsetParser.objects.Beatmap)">
-            <summary> Returns the start time of the object after the break. </summary>
+            <summary> Returns the start time of the object after the break, if any, otherwise the end of the map. </summary>
         </member>
         <member name="F:MapsetParser.objects.events.Sample.strippedPath">
             <summary> The path in lowercase without extension or quotationmarks. </summary>
