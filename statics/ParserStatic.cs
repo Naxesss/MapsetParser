@@ -8,40 +8,41 @@ namespace MapsetParser.statics
 {
     public static class ParserStatic
     {
-        /// <summary> Returns the given function for each line in this section. </summary>
-        public static IEnumerable<T> ParseSection<T>(string[] aLines, string aSectionName, Func<string, T> aFunc)
+        /// <summary> Yields the result of the given function for each line in this section. </summary>
+        public static IEnumerable<T> ParseSection<T>(string[] lines, string section, Func<string, T> func)
         {
             // Find the section, always from a line starting with [ and ending with ]
             // then ending on either end of file or an empty line.
             bool read = false;
-            foreach (string line in aLines)
+            foreach (string line in lines)
             {
                 if (line.StartsWith("["))
                     read = false;
 
                 if (read && line.Trim().Length != 0)
-                    yield return aFunc(line.Replace("\r", ""));
+                    yield return func(line.Replace("\r", ""));
 
                 // "[[TimingLines]]]]" works. Anything that doesn't work will be very obvious (map corrupted warnings etc).
-                if (line.Contains("[" + aSectionName + "]"))
+                if (line.Contains("[" + section + "]"))
                     read = true;
             }
         }
 
-        /// <summary> Returns all the lines in this section ran through the given function, excluding the section identifier (e.g. [HitObjects]). </summary>
-        public static T GetSettings<T>(string[] aLines, string aSection, Func<string[], T> aFunc)
+        /// <summary> Returns all the lines in this section ran through the given function, excluding
+        /// the section identifier (e.g. [HitObjects]). </summary>
+        public static T GetSettings<T>(string[] lines, string section, Func<string[], T> func)
         {
-            IEnumerable<string> lines = ParseSection(aLines, aSection, aLine => aLine);
+            IEnumerable<string> parsedLines = ParseSection(lines, section, line => line);
 
-            return aFunc(lines.ToArray());
+            return func(parsedLines.ToArray());
         }
 
         /// <summary> Same as <see cref="GetSettings"/> except does not return. </summary>
-        public static void ApplySettings(string[] aLines, string aSection, Action<string[]> anAction)
+        public static void ApplySettings(string[] lines, string section, Action<string[]> action)
         {
-            IEnumerable<string> lines = ParseSection(aLines, aSection, aLine => aLine);
+            IEnumerable<string> parsedLines = ParseSection(lines, section, line => line);
 
-            anAction(lines.ToArray());
+            action(parsedLines.ToArray());
         }
 
         /// <summary> Returns the first enum which has the same name as the given string,
