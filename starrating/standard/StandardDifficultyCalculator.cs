@@ -13,9 +13,9 @@ namespace MapsetParser.starrating.standard
         private const double    difficultyMultiplier   = 0.0675;
         
         /// <summary> Returns a tuple of aim rating, speed rating, and star rating (calculated from the other two) respectively. </summary>
-        public static Tuple<double, double, double> Calculate(Beatmap aBeatmap)
+        public static Tuple<double, double, double> Calculate(Beatmap beatmap)
         {
-            if (aBeatmap.hitObjects.Count == 0)
+            if (beatmap.hitObjects.Count == 0)
                 return new Tuple<double, double, double>(0, 0, 0);
 
             Skill[] skills =
@@ -27,7 +27,7 @@ namespace MapsetParser.starrating.standard
             // First object cannot generate strain, so we offset this to account for that.
             double currentSectionEnd = sectionLength;
             
-            foreach (HitObject hitObject in aBeatmap.hitObjects.Skip(1))
+            foreach (HitObject hitObject in beatmap.hitObjects.Skip(1))
             {
                 // Performed on the previous object, hence before Process.
                 while (hitObject.time > currentSectionEnd)

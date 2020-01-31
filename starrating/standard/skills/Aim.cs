@@ -10,10 +10,10 @@ namespace MapsetParser.starrating.standard
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecay => 0.15;
 
-        protected override double StrainValueOf(HitObject anObject)
+        protected override double StrainValueOf(HitObject hitObject)
         {
-            double distance   = anObject.GetPrevStartDistance();
-            double time       = anObject.GetPrevDeltaStartTime();
+            double distance   = hitObject.GetPrevStartDistance();
+            double time       = hitObject.GetPrevDeltaStartTime();
 
             double strainValue = Math.Pow(distance, 0.99) / time;
             return strainValue;

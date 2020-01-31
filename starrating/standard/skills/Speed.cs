@@ -15,9 +15,9 @@ namespace MapsetParser.starrating.standard
         private const double streamSpacingThreshold    = 110;
         private const double almostDiameter            = 90;
 
-        protected override double StrainValueOf(HitObject anObject)
+        protected override double StrainValueOf(HitObject hitObject)
         {
-            double distance = anObject.GetPrevStartDistance();
+            double distance = hitObject.GetPrevStartDistance();
 
             // determines speed based on distance to the note, where the further spaced the streams are the more speed is given
             // basically describes how fast you're forced to move your cursor at the same time as clicking
@@ -33,7 +33,7 @@ namespace MapsetParser.starrating.standard
             else
                 speedValue = 0.95;
 
-            return speedValue / anObject.GetPrevDeltaStartTime();
+            return speedValue / hitObject.GetPrevDeltaStartTime();
         }
     }
 }
