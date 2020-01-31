@@ -44,36 +44,18 @@ namespace MapsetParser.statics
             anAction(lines.ToArray());
         }
 
-        /// <summary> Returns the layer id from the given storyboard line arguments.
-        /// This converts identifiers like "Background", "Fail", and "Pass" to their
-        /// respective numerical value. </summary>
-        public static Sprite.Layer GetStoryboardLayer(string[] anArgs)
+        /// <summary> Returns the first enum which has the same name as the given string,
+        /// or null if none match. </summary>
+        public static T? GetEnumMatch<T>(string str) where T : struct, Enum
         {
-            string layerArg = anArgs[1];
-            foreach (Sprite.Layer layer in Enum.GetValues(typeof(Sprite.Layer)))
+            foreach (T @enum in Enum.GetValues(typeof(T)))
             {
-                string layerName = Enum.GetName(typeof(Sprite.Layer), layer);
-                if (layerName == layerArg)
-                    return layer;
+                string enumName = Enum.GetName(typeof(T), @enum);
+                if (enumName == str)
+                    return @enum;
             }
 
-            return Sprite.Layer.Unknown;
-        }
-
-        /// <summary> Returns the origin id from the given storyboard line arguments.
-        /// This converts identifiers like "TopLeft", "Centre", and "BottomRight" to
-        /// their respective numerical value. </summary>
-        public static Sprite.Origin GetStoryboardOrigin(string[] anArgs)
-        {
-            string originArg = anArgs[2];
-            foreach (Sprite.Origin origin in Enum.GetValues(typeof(Sprite.Origin)))
-            {
-                string originName = Enum.GetName(typeof(Sprite.Origin), origin);
-                if (originName == originArg)
-                    return origin;
-            }
-
-            return Sprite.Origin.Unknown;
+            return default;
         }
     }
 }
