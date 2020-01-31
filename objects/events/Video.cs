@@ -13,25 +13,20 @@ namespace MapsetParser.objects.events
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
         public readonly string strippedPath;
 
-        public Video(string[] anArgs)
+        public Video(string[] args)
         {
-            offset = GetOffset(anArgs);
-            path   = GetPath(anArgs);
+            offset = GetOffset(args);
+            path   = GetPath(args);
 
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
-        // offset
-        private int GetOffset(string[] anArgs)
-        {
-            return int.Parse(anArgs[1]);
-        }
+        /// <summary> Returns the temporal offset of the video (i.e. when it should start playing). </summary>
+        private int GetOffset(string[] args) =>
+            int.Parse(args[1]);
 
-        // filename
-        private string GetPath(string[] anArgs)
-        {
-            // remove quotes for consistency, no way to add quotes manually anyway
-            return PathStatic.ParsePath(anArgs[2], false, true);
-        }
+        /// <summary> Returns the file path which this video uses. Retains case and extension. </summary>
+        private string GetPath(string[] args) =>
+            PathStatic.ParsePath(args[2], retainCase: true);
     }
 }
