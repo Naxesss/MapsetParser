@@ -7,93 +7,40 @@ using System.Numerics;
 
 namespace MapsetParser.objects.events
 {
-    public class Animation
+    public class Animation : Sprite
     {
         // Animation,Fail,Centre,"spr\scn1_spr3_2_b.png",320,280,2,40,LoopForever
         // Animation, layer, origin, filename, x offset, y offset, frame count, frame delay, loop type
 
-        /// <summary> Whether the animation repeats or ends after going through all frames. </summary>
-        public enum LoopType
-        {
-            LoopForever,
-            LoopOnce
-        }
-
-        public readonly Sprite.Layer  layer;
-        public readonly Sprite.Origin origin;
-        public readonly string        path;
-        public readonly Vector2       offset;
-
-        // animation-specific
-        public readonly int      frameCount;
-        public readonly double   frameDelay;
-        public readonly LoopType loopType;
+        public readonly int frameCount;
+        public readonly double frameDelay;
+        public readonly bool loops;
 
         public readonly List<string> framePaths;
 
-        public Animation(string[] anArgs)
+        public Animation(string[] args)
+            : base(args)
         {
-            layer  = GetLayer(anArgs);
-            origin = GetOrigin(anArgs);
-            path   = GetPath(anArgs);
-            offset = GetOffset(anArgs);
-
-            // animation-specific
-            frameCount = GetFrameCount(anArgs);
-            frameDelay = GetFrameDelay(anArgs);
-            loopType   = GetLoopType(anArgs);
+            frameCount = GetFrameCount(args);
+            frameDelay = GetFrameDelay(args);
+            loops = IsLooping(args);
 
             framePaths = GetFramePaths().ToList();
         }
 
-        // layer
-        private Sprite.Layer GetLayer(string[] anArgs) =>
-            ParserStatic.GetStoryboardLayer(anArgs);
+        /// <summary> Returns the amount of frames this animation contains.
+        /// Determines how many "filename_i" to use, where i starts at 0. </summary>
+        private int GetFrameCount(string[] args) =>
+            int.Parse(args[6]);
 
-        // origin
-        private Sprite.Origin GetOrigin(string[] anArgs) =>
-            ParserStatic.GetStoryboardOrigin(anArgs);
+        /// <summary> Returns the delay between each frame of this animation in miliseconds. </summary>
+        private double GetFrameDelay(string[] args) =>
+            double.Parse(args[7], CultureInfo.InvariantCulture);
 
-        // filename
-        private string GetPath(string[] anArgs)
-        {
-            // remove quotes for consistency, no way to add quotes manually anyway
-            return PathStatic.ParsePath(anArgs[3], false, true);
-        }
-
-        // offset
-        private Vector2 GetOffset(string[] anArgs)
-        {
-            if (anArgs.Length > 4)
-                return new Vector2(float.Parse(anArgs[4], CultureInfo.InvariantCulture),
-                                   float.Parse(anArgs[5], CultureInfo.InvariantCulture));
-            else
-                // default coordinates
-                return new Vector2(320, 240);
-        }
-
-        // frame count
-        private int GetFrameCount(string[] anArgs)
-        {
-            return int.Parse(anArgs[6]);
-        }
-
-        // frame delay
-        private double GetFrameDelay(string[] anArgs)
-        {
-            return double.Parse(anArgs[7], CultureInfo.InvariantCulture);
-        }
-
-        // loop type (does not exist in file version 5)
-        private LoopType GetLoopType(string[] anArgs)
-        {
-            if (anArgs.Length > 8)
-                return anArgs[8] == "LoopOnce"
-                    ? LoopType.LoopOnce
-                    : LoopType.LoopForever;
-            else
-                return LoopType.LoopForever;
-        }
+        /// <summary> Returns whether the animation loops, by default true. </summary>
+        private bool IsLooping(string[] args) =>
+            // Does not exist in file version 5.
+            args?[8] != "LoopOnce";
 
         /// <summary> Returns all relative file paths for all frames used. </summary>
         public IEnumerable<string> GetFramePaths()
