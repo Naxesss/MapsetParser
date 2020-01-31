@@ -132,5 +132,10 @@ namespace MapsetParser.objects
             else
                 return null;
         }
+
+        /// <summary> Returns whether the sample file name is the same as the given file name (i.e. same sample file).
+        /// Ignores case sensitivity. </summary>
+        public bool SameFileName(string aFileNameWithExtension) =>
+            aFileNameWithExtension.ToLower().StartsWith(GetFileName() + ".");
     }
 }
