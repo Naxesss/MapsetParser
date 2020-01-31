@@ -5,7 +5,6 @@ namespace MapsetParser.objects.events
     public class Break
     {
         // 2,66281,71774
-
         // 2, start, end
 
         /*  Notes:
@@ -19,41 +18,33 @@ namespace MapsetParser.objects.events
         public readonly double time;
         public readonly double endTime;
 
-        public Break(string[] anArgs)
+        public Break(string[] args)
         {
-            time       = GetTime(anArgs);
-            endTime    = GetEndTime(anArgs);
+            time = GetTime(args);
+            endTime = GetEndTime(args);
         }
 
-        // start
-        private double GetTime(string[] anArgs)
-        {
-            return double.Parse(anArgs[1], CultureInfo.InvariantCulture);
-        }
+        /// <summary> Returns the visual start time of the break.
+        /// See <see cref="GetRealStart(Beatmap)"/> for where HP stops draining. </summary>
+        private double GetTime(string[] args) => 
+            double.Parse(args[1], CultureInfo.InvariantCulture);
 
-        // end
-        private double GetEndTime(string[] anArgs)
-        {
-            return double.Parse(anArgs[2], CultureInfo.InvariantCulture);
-        }
-
-        /// <summary> Returns the end time of the object before the break. </summary>
-        public double GetRealStart(Beatmap aBeatmap)
-        {
-            return aBeatmap.GetPrevHitObject(time).GetEndTime();
-        }
-
-        /// <summary> Returns the start time of the object after the break. </summary>
-        public double GetRealEnd(Beatmap aBeatmap)
-        {
-            return aBeatmap.GetNextHitObject(endTime).time;
-        }
+        /// <summary> Returns the visual end time of the break.
+        /// See <see cref="GetRealEnd(Beatmap)"/> for where HP starts draining again. </summary>
+        private double GetEndTime(string[] args) =>
+            double.Parse(args[2], CultureInfo.InvariantCulture);
 
         /// <summary> Returns the duration between the end of the object before the break and the start of the
         /// object after it. During this time, no health will be drained. </summary>
-        public double GetDuration(Beatmap aBeatmap)
-        {
-            return GetRealEnd(aBeatmap) - GetRealStart(aBeatmap);
-        }
+        public double GetDuration(Beatmap beatmap) => 
+            GetRealEnd(beatmap) - GetRealStart(beatmap);
+
+        /// <summary> Returns the end time of the object before the break. </summary>
+        public double GetRealStart(Beatmap beatmap) => 
+            beatmap.GetPrevHitObject(time).GetEndTime();
+
+        /// <summary> Returns the start time of the object after the break. </summary>
+        public double GetRealEnd(Beatmap beatmap) =>
+            beatmap.GetNextHitObject(endTime).time;
     }
 }
