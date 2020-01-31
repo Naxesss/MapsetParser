@@ -7,24 +7,19 @@ namespace MapsetParser.objects.timinglines
         public readonly double msPerBeat;
         public readonly double bpm;
 
-        // red lines
-        public UninheritedLine(string[] anArgs)
-            : base(anArgs)
+        public UninheritedLine(string[] args)
+            : base(args)
         {
-            msPerBeat = GetMsPerBeat(anArgs);
+            msPerBeat = GetMsPerBeat(args);
 
             bpm = GetBPM();
         }
 
-        // msPerBeat (uninherited) / svMult (inherited)
-        private double GetMsPerBeat(string[] anArgs)
-        {
-            return double.Parse(anArgs[1], CultureInfo.InvariantCulture);
-        }
+        /// <summary> Returns the miliseconds per beat of the uninherited line. </summary>
+        private double GetMsPerBeat(string[] args) =>
+            double.Parse(args[1], CultureInfo.InvariantCulture);
 
-        private double GetBPM()
-        {
-            return 60000 / msPerBeat;
-        }
+        /// <summary> Returns the beats per minute (BPM) of the uninherited line. </summary>
+        private double GetBPM() => 60000 / msPerBeat;
     }
 }
