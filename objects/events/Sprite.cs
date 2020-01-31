@@ -52,13 +52,14 @@ namespace MapsetParser.objects.events
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
-        // layer
-        private Layer GetLayer(string[] anArgs) =>
-            ParserStatic.GetStoryboardLayer(anArgs);
+        /// <summary> Returns the layer which this sprite exists on (e.g. Foreground, Pass, or Overlay). </summary>
+        private Layer GetLayer(string[] args) =>
+            ParserStatic.GetEnumMatch<Layer>(args[1]) ?? Layer.Unknown;
 
-        // origin
-        private Origin GetOrigin(string[] anArgs) =>
-            ParserStatic.GetStoryboardOrigin(anArgs);
+        /// <summary> Returns the local origin of the sprite, determining around which point it is transformed
+        /// (e.g. TopLeft, Center, or Bottom). </summary>
+        private Origin GetOrigin(string[] args) =>
+            ParserStatic.GetEnumMatch<Origin>(args[2]) ?? Origin.Unknown;
 
         /// <summary> Returns the file path which this sprite uses. Retains case sensitivity and extension. </summary>
         private string GetPath(string[] args) =>
