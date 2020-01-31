@@ -26,28 +26,27 @@ namespace MapsetParser.settings
         public float sliderMultiplier;
         public float sliderTickRate;
 
-        public DifficultySettings(string[] aLines)
+        public DifficultySettings(string[] lines)
         {
-            hpDrain            = GetValue(aLines, "HPDrainRate", 0f, 10f);
-            circleSize         = GetValue(aLines, "CircleSize", 0f, 10f);
-            overallDifficulty  = GetValue(aLines, "OverallDifficulty", 0f, 10f);
-            approachRate       = GetValue(aLines, "ApproachRate", 0f, 10f);
+            hpDrain            = GetValue(lines, "HPDrainRate", 0f, 10f);
+            circleSize         = GetValue(lines, "CircleSize", 0f, 10f);
+            overallDifficulty  = GetValue(lines, "OverallDifficulty", 0f, 10f);
+            approachRate       = GetValue(lines, "ApproachRate", 0f, 10f);
 
-            sliderMultiplier   = GetValue(aLines, "SliderMultiplier", 0.4f, 3.6f);
-            sliderTickRate     = GetValue(aLines, "SliderTickRate", 0.5f, 8f);
+            sliderMultiplier   = GetValue(lines, "SliderMultiplier", 0.4f, 3.6f);
+            sliderTickRate     = GetValue(lines, "SliderTickRate", 0.5f, 8f);
         }
 
-        private float GetValue(string[] aLines, string aKey, float? aMin = null, float? aMax = null)
+        private float GetValue(string[] lines, string key, float? min = null, float? max = null)
         {
-            string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
+            string line = lines.FirstOrDefault(otherLine => otherLine.StartsWith(key));
             if (line == null)
                 return 0;
 
             float value = float.Parse(line.Substring(line.IndexOf(":") + 1).Trim(), CultureInfo.InvariantCulture);
 
-            // Comparison with < > return false with null.
-            if (value < aMin) value = aMin.GetValueOrDefault();
-            if (value > aMax) value = aMax.GetValueOrDefault();
+            if (value < min) value = min.GetValueOrDefault();
+            if (value > max) value = max.GetValueOrDefault();
 
             return value;
         }

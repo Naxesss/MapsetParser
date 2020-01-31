@@ -35,30 +35,30 @@ namespace MapsetParser.settings
         public ulong? beatmapId;
         public ulong? beatmapSetId;
 
-        public MetadataSettings(string[] aLines)
+        public MetadataSettings(string[] lines)
         {
             // unlike hitobjects metadata settings gets the whole section and not line by line as code
             
-            title          = GetValue(aLines, "Title");
-            titleUnicode   = GetValue(aLines, "TitleUnicode") ?? title;
-            artist         = GetValue(aLines, "Artist");
-            artistUnicode  = GetValue(aLines, "ArtistUnicode") ?? artist;
+            title          = GetValue(lines, "Title");
+            titleUnicode   = GetValue(lines, "TitleUnicode") ?? title;
+            artist         = GetValue(lines, "Artist");
+            artistUnicode  = GetValue(lines, "ArtistUnicode") ?? artist;
 
-            creator    = GetValue(aLines, "Creator");
-            version    = GetValue(aLines, "Version");
-            source     = GetValue(aLines, "Source") ?? "";
-            tags       = GetValue(aLines, "Tags") ?? "";
+            creator    = GetValue(lines, "Creator");
+            version    = GetValue(lines, "Version");
+            source     = GetValue(lines, "Source") ?? "";
+            tags       = GetValue(lines, "Tags") ?? "";
 
             // check to see if the ids are even there (don't exist in lower osu file versions, and aren't set on non-published maps)
-            beatmapId       = (GetValue(aLines, "BeatmapID") ?? "0") == "0" ?
-                                (ulong?)null : ulong.Parse(GetValue(aLines, "BeatmapID"));
-            beatmapSetId    = (GetValue(aLines, "BeatmapSetID") ?? "-1") == "-1" ?
-                                (ulong?)null : ulong.Parse(GetValue(aLines, "BeatmapSetID"));
+            beatmapId       = (GetValue(lines, "BeatmapID") ?? "0") == "0" ?
+                                (ulong?)null : ulong.Parse(GetValue(lines, "BeatmapID"));
+            beatmapSetId    = (GetValue(lines, "BeatmapSetID") ?? "-1") == "-1" ?
+                                (ulong?)null : ulong.Parse(GetValue(lines, "BeatmapSetID"));
         }
 
-        private string GetValue(string[] aLines, string aKey)
+        private string GetValue(string[] lines, string key)
         {
-            string line = aLines.FirstOrDefault(aLine => aLine.StartsWith(aKey));
+            string line = lines.FirstOrDefault(otherLine => otherLine.StartsWith(key));
             if (line == null)
                 return null;
 
@@ -66,9 +66,8 @@ namespace MapsetParser.settings
         }
 
         /// <summary> Returns the same string lowercase and filtered from characters disabled in file names. </summary>
-        public string GetFileNameFiltered(string aString)
-        {
-            return aString
+        public string GetFileNameFiltered(string str) =>
+            str
                 .Replace("/", "")
                 .Replace("\\", "")
                 .Replace("?", "")
@@ -78,6 +77,5 @@ namespace MapsetParser.settings
                 .Replace("\"", "")
                 .Replace("<", "")
                 .Replace(">", "");
-        }
     }
 }
