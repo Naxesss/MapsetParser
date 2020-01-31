@@ -34,78 +34,69 @@ namespace MapsetParser.objects
             OmitBarLine = 8
         }
 
-        public TimingLine(string[] anArgs)
+        public TimingLine(string[] args)
         {
-            code = String.Join(",", anArgs);
+            code = String.Join(",", args);
             
-            offset       = GetOffset(anArgs);
-            meter        = GetMeter(anArgs);
-            sampleset    = GetSampleset(anArgs);
-            customIndex  = GetCustomIndex(anArgs);
-            volume       = GetVolume(anArgs);
-            uninherited  = IsUninherited(anArgs);
+            offset       = GetOffset(args);
+            meter        = GetMeter(args);
+            sampleset    = GetSampleset(args);
+            customIndex  = GetCustomIndex(args);
+            volume       = GetVolume(args);
+            uninherited  = IsUninherited(args);
 
-            type         = GetType(anArgs);
+            type         = GetType(args);
             kiai         = type.HasFlag(Type.Kiai);
             omitsBarLine = type.HasFlag(Type.OmitBarLine);
 
             // may not be explicit
-            svMult = GetSvMult(anArgs);
+            svMult = GetSvMult(args);
         }
 
-        // offset
-        private double GetOffset(string[] anArgs)
-        {
-            return double.Parse(anArgs[0], CultureInfo.InvariantCulture);
-        }
+        /// <summary> Returns the offset of the line. </summary>
+        private double GetOffset(string[] args) =>
+            double.Parse(args[0], CultureInfo.InvariantCulture);
 
-        // meter
-        private int GetMeter(string[] anArgs)
-        {
-            return int.Parse(anArgs[2]);
-        }
+        /// <summary> Returns the meter (i.e. timing signature) of the line. </summary>
+        private int GetMeter(string[] args) =>
+            int.Parse(args[2]);
 
-        // sampleset
-        private Beatmap.Sampleset GetSampleset(string[] anArgs)
-        {
-            return (Beatmap.Sampleset)int.Parse(anArgs[3]);
-        }
+        /// <summary> Returns the sampleset which this line applies to any sample set to Auto sampleset. </summary>
+        private Beatmap.Sampleset GetSampleset(string[] args) =>
+            (Beatmap.Sampleset)int.Parse(args[3]);
 
-        // customIndex
-        private int GetCustomIndex(string[] anArgs)
-        {
-            return int.Parse(anArgs[4]);
-        }
+        /// <summary> Returns the custom sample index of the line. </summary>
+        private int GetCustomIndex(string[] args) =>
+            int.Parse(args[4]);
 
-        // volume
-        private float GetVolume(string[] anArgs)
-        {
-            return float.Parse(anArgs[5], CultureInfo.InvariantCulture);
-        }
+        /// <summary> Returns the sample volume of the line. </summary>
+        private float GetVolume(string[] args) =>
+            float.Parse(args[5], CultureInfo.InvariantCulture);
         
         /// <summary> Returns whether a line of code representing a timing line is uninherited or inherited. </summary>
-        // inherited (does not exist in file version 5)
-        public static bool IsUninherited(string[] anArgs)
+        public static bool IsUninherited(string[] args)
         {
-            if (anArgs.Length > 6)
-                return anArgs[6] == "1";
+            // Does not exist in file version 5.
+            if (args.Length > 6)
+                return args[6] == "1";
             return true;
         }
 
-        // kiai (does not exist in file version 5)
-        private Type GetType(string[] anArgs)
+        /// <summary> Returns whether kiai is enabled for this line. </summary>
+        private Type GetType(string[] args)
         {
-            if(anArgs.Length > 7)
-                return (Type)int.Parse(anArgs[7]);
+            // Does not exist in file version 5.
+            if (args.Length > 7)
+                return (Type)int.Parse(args[7]);
             return 0;
         }
 
         /// <summary> Returns the slider velocity multiplier (1 for uninherited lines). Fit into range 0.1 - 10 before returning. </summary>
-        public float GetSvMult(string[] anArgs)
+        public float GetSvMult(string[] args)
         {
-            if (!IsUninherited(anArgs))
+            if (!IsUninherited(args))
             {
-                float svMult = 1 / (float.Parse(anArgs[1], CultureInfo.InvariantCulture) * -0.01f);
+                float svMult = 1 / (float.Parse(args[1], CultureInfo.InvariantCulture) * -0.01f);
 
                 // Min 0.1x, max 10x.
                 if (svMult > 10f)  svMult = 10f;
