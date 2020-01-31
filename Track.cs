@@ -9,10 +9,10 @@ namespace MapsetParser
     {
         private readonly string message;
 
-        public Track(string aMessage)
+        public Track(string message)
         {
-            message = aMessage;
-            EventStatic.OnLoadStart(message);
+            this.message = message;
+            EventStatic.OnLoadStart(this.message);
         }
 
         public void Complete()
