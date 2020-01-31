@@ -13,58 +13,58 @@ namespace MapsetParser.statics
         ///     change in future versions of the game to fix issues such as 1 ms rounding errors when
         ///     copying objects, however.
         /// </remarks>
-        public static int Round(double aTime) => (int)aTime;
+        public static int Round(double time) => (int)time;
 
         /// <summary> Returns the timestamp of a given time. If decimal, is rounded in the same way the game rounds. </summary>
-        public static string Get(double aTime) =>
-            GetTimestamp(aTime);
+        public static string Get(double time) =>
+            GetTimestamp(time);
 
         /// <summary> Returns the timestamp of given hit objects, so the timestamp includes the object(s). </summary>
-        public static string Get(params HitObject[] anObjects) =>
-            GetTimestamp(anObjects[0].beatmap, anObjects);
+        public static string Get(params HitObject[] hitObjects) =>
+            GetTimestamp(hitObjects[0].beatmap, hitObjects);
 
-        private static string GetTimestamp(double aTime)
+        private static string GetTimestamp(double time)
         {
-            double time = Round(aTime);
+            double miliseconds = Round(time);
 
             // For negative timestamps we simply post the raw offset (e.g. "-14 -").
-            if (time < 0)
-                return time.ToString() + " - ";
+            if (miliseconds < 0)
+                return miliseconds.ToString() + " - ";
 
             double minutes = 0;
-            while (time >= 60000)
+            while (miliseconds >= 60000)
             {
-                time -= 60000;
+                miliseconds -= 60000;
                 ++minutes;
             }
 
             double seconds = 0;
-            while (time >= 1000)
+            while (miliseconds >= 1000)
             {
-                time -= 1000;
+                miliseconds -= 1000;
                 ++seconds;
             }
 
             string minuteString = minutes >= 10 ? minutes.ToString() : "0" + minutes;
             string secondString = seconds >= 10 ? seconds.ToString() : "0" + seconds;
             string milisecondsString =
-                time >= 100 ? time.ToString() :
-                time >= 10 ? "0" + time :
-                "00" + time;
+                miliseconds >= 100 ? miliseconds.ToString() :
+                miliseconds >= 10 ? "0" + miliseconds :
+                "00" + miliseconds;
 
             return minuteString + ":" + secondString + ":" + milisecondsString + " - ";
         }
 
-        private static string GetTimestamp(Beatmap aMap, params HitObject[] aHitObjects)
+        private static string GetTimestamp(Beatmap beatmap, params HitObject[] hitObjects)
         {
-            string timestamp = GetTimestamp(aHitObjects[0].time);
+            string timestamp = GetTimestamp(hitObjects[0].time);
             timestamp = timestamp.Substring(0, timestamp.Length - 3);
 
             string objects = "";
-            foreach (HitObject hitObject in aHitObjects)
+            foreach (HitObject hitObject in hitObjects)
             {
                 string objectRef;
-                if (aMap.generalSettings.mode == Beatmap.Mode.Mania)
+                if (beatmap.generalSettings.mode == Beatmap.Mode.Mania)
                 {
                     int row =
                         hitObject.Position.X == 64 ? 0 :
@@ -76,7 +76,7 @@ namespace MapsetParser.statics
                     objectRef = hitObject.time + "|" + row;
                 }
                 else
-                    objectRef = aMap.GetCombo(hitObject).ToString();
+                    objectRef = beatmap.GetCombo(hitObject).ToString();
 
                 objects += (objects.Length > 0 ? "," : "") + objectRef;
             }
