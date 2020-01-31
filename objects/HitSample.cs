@@ -12,7 +12,8 @@ namespace MapsetParser.objects
         {
             Edge,
             Body,
-            Tick
+            Tick,
+            Unknown
         }
 
         public readonly int                customIndex;
@@ -31,6 +32,73 @@ namespace MapsetParser.objects
             hitSource = aHitSource;
 
             time = aTime;
+        }
+
+        public HitSample(string aFileName)
+        {
+            Regex regex = new Regex(@"(?i)^(taiko-)?(soft|normal|drum)-(hit(whistle|normal|finish)|slider(slide|whistle|tick))(\d+)?");
+            Match match = regex.Match(aFileName);
+            GroupCollection groups = match.Groups;
+
+            taiko = groups[1].Success;
+            sampleset = ParseSampleset(groups[2].Value);
+            hitSource = ParseHitSource(groups[3].Value);
+
+            // Can either be part of "hit/.../" or "slider/.../"
+            if (groups[4].Success)
+                hitSound = ParseHitSound(groups[4].Value);
+            else if (groups[5].Success)
+                hitSound = ParseHitSound(groups[5].Value);
+            else
+                hitSound = null;
+
+            customIndex = ParseCustomIndex(groups[6].Value);
+        }
+
+        /// <summary> Returns the sampleset corresponding to the given text representation, e.g. "drum" or "soft".
+        /// Unrecognized representation returns null. </summary>
+        private Beatmap.Sampleset? ParseSampleset(string aText)
+        {
+            string lowerText = aText.ToLower();
+            return
+                lowerText == "soft" ? Beatmap.Sampleset.Soft :
+                lowerText == "normal" ? Beatmap.Sampleset.Normal :
+                lowerText == "drum" ? Beatmap.Sampleset.Soft :
+                (Beatmap.Sampleset?)null;
+        }
+
+        /// <summary> Returns the hit source corresponding to the given text representation, e.g. "hitnormal" or "sliderslide".
+        /// Unrecognized representation returns a hit source of type unknown. </summary>
+        private HitSource ParseHitSource(string aText)
+        {
+            string lowerText = aText.ToLower();
+            return
+                lowerText.StartsWith("hit") ? HitSource.Edge :
+                lowerText.StartsWith("slidertick") ? HitSource.Tick :
+                lowerText.StartsWith("slider") ? HitSource.Body :
+                HitSource.Unknown;
+        }
+
+        /// <summary> Returns the hit sound corresponding to the given text representation, e.g. "whistle", "clap" or "finish".
+        /// Unrecognized representation, or N/A (e.g. sliderslide/tick), returns null. </summary>
+        private HitSound? ParseHitSound(string aText)
+        {
+            string lowerText = aText.ToLower();
+            return
+                lowerText == "normal" ? HitSound.Normal :
+                lowerText == "clap" ? HitSound.Clap :
+                lowerText == "whistle" ? HitSound.Whistle :
+                lowerText == "finish" ? HitSound.Finish :
+                (HitSound?)null;
+        }
+
+        /// <summary> Returns the given text as an integer if possible, else 1 (i.e. implicit custom index). </summary>
+        private int ParseCustomIndex(string aText)
+        {
+            try
+            { return int.Parse(aText); }
+            catch
+            { return 1; }
         }
 
         /// <summary> Returns the file name of this sample without extension, or null if no file is associated. </summary>
