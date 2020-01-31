@@ -15,29 +15,27 @@ namespace MapsetParser.objects.events
         /// <summary> The path in lowercase without extension or quotationmarks. </summary>
         public readonly string strippedPath;
 
-        public Background(string[] anArgs)
+        public Background(string[] args)
         {
-            path   = GetPath(anArgs);
-            offset = GetOffset(anArgs);
+            path   = GetPath(args);
+            offset = GetOffset(args);
 
             strippedPath = PathStatic.ParsePath(path, true);
         }
 
-        // filename
-        private string GetPath(string[] anArgs)
-        {
-            // remove quotes for consistency, no way to add quotes manually anyway
-            return PathStatic.ParsePath(anArgs[2], false, true);
-        }
+        /// <summary> Returns the file path which this background uses. Retains case and extension. </summary>
+        private string GetPath(string[] args) =>
+            PathStatic.ParsePath(args[2], retainCase: true);
 
-        // offset
-        private Vector2? GetOffset(string[] anArgs)
+        /// <summary> Returns the positional offset from the top left corner of the screen, if specified, otherwise null.
+        /// This value is currently unused by the game. </summary>
+        private Vector2? GetOffset(string[] args)
         {
-            // doesn't exist in file version 9, for example
-            if (anArgs.Length > 4)
+            // Does not exist in file version 9.
+            if (args.Length > 4)
                 return new Vector2(
-                    float.Parse(anArgs[3], CultureInfo.InvariantCulture),
-                    float.Parse(anArgs[4], CultureInfo.InvariantCulture));
+                    float.Parse(args[3], CultureInfo.InvariantCulture),
+                    float.Parse(args[4], CultureInfo.InvariantCulture));
             else
                 return null;
         }
