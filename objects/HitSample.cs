@@ -63,7 +63,7 @@ namespace MapsetParser.objects
             return
                 lowerText == "soft" ? Beatmap.Sampleset.Soft :
                 lowerText == "normal" ? Beatmap.Sampleset.Normal :
-                lowerText == "drum" ? Beatmap.Sampleset.Soft :
+                lowerText == "drum" ? Beatmap.Sampleset.Drum :
                 (Beatmap.Sampleset?)null;
         }
 
