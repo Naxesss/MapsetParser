@@ -21,7 +21,7 @@ namespace MapsetParser.objects
         // x, y, time, typeFlags, hitsound, (endTime,) extras                                                                    spinner
 
         public readonly Beatmap beatmap;
-        public readonly string  code;
+        public readonly string code;
 
         public virtual Vector2 Position { get; private set; }
 
@@ -69,8 +69,8 @@ namespace MapsetParser.objects
 
             Position = GetPosition(args);
 
-            time     = GetTime(args);
-            type     = GetTypeFlags(args);
+            time = GetTime(args);
+            type = GetTypeFlags(args);
             hitSound = GetHitSound(args);
 
             // extras
@@ -180,7 +180,7 @@ namespace MapsetParser.objects
         /*
          *  Utility
          */
-        
+
         /// <summary> Returns whether a hit object code has the given type. </summary>
         public static bool HasType(string[] args, Type type) =>
             ((Type)int.Parse(args[3])).HasFlag(type);
