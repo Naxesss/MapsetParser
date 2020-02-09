@@ -224,6 +224,15 @@ namespace MapsetParser.objects
                 yield return holdNote.endTime;
         }
 
+        /// <summary> Returns the custom index for the object, if any, otherwise for the line, if any, otherwise 1. </summary>
+        public int GetCustomIndex(TimingLine line = null)
+        {
+            if (line == null)
+                line = beatmap.GetTimingLine(time);
+
+            return customIndex ?? line?.customIndex ?? 1;
+        }
+
         /// <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
         public Beatmap.Sampleset GetSampleset(bool additionOverrides = false, double? specificTime = null)
         {
