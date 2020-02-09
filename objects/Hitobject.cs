@@ -296,8 +296,29 @@ namespace MapsetParser.objects
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
         public IEnumerable<HitSample> GetUsedHitSamples()
         {
+            Beatmap.Mode mode = beatmap.generalSettings.mode;
+
+            // Standard can be converted into taiko, so taiko samples could be used there too.
+            if (mode == Beatmap.Mode.Taiko ||
+                mode == Beatmap.Mode.Standard)
+            {
+                foreach (HitSample sample in GetUsedHitSamplesTaiko())
+                    yield return sample;
+            }
+            
+            if (mode != Beatmap.Mode.Taiko)
+            {
+                foreach (HitSample sample in GetUsedHitSamplesNonTaiko())
+                    yield return sample;
+            }
+        }
+
+        /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object.
+        /// This assumes the game mode is not taiko (special rules apply to taiko only). </summary>
+        private IEnumerable<HitSample> GetUsedHitSamplesNonTaiko()
+        {
             // Head
-            foreach(HitSound splitStartHitSound in SplitHitSound(GetStartHitSound().GetValueOrDefault()))
+            foreach (HitSound splitStartHitSound in SplitHitSound(GetStartHitSound().GetValueOrDefault()))
                 yield return GetEdgeSample(time, GetStartSampleset(true), splitStartHitSound);
             yield return GetEdgeSample(time, GetStartSampleset(false), HitSound.Normal);
 
@@ -309,7 +330,7 @@ namespace MapsetParser.objects
                     yield return GetEdgeSample(GetEndTime(), GetEndSampleset(true), splitEndHitSound);
                 yield return GetEdgeSample(GetEndTime(), GetEndSampleset(false), HitSound.Normal);
             }
-            
+
             if (this is Slider slider)
             {
                 // Reverse
@@ -386,6 +407,36 @@ namespace MapsetParser.objects
                     }
                 }
             }
+        }
+
+        /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object.
+        /// Assumes the game mode is taiko (special rules apply).
+        /// <br></br><br></br>
+        /// Special Rules:<br></br>
+        /// - taiko-hitwhistle plays on big kat <br></br>
+        /// - taiko-hitfinish plays on big don <br></br>
+        /// - taiko-hitclap and taiko-hitnormal are always used as they play whenever the user presses keys
+        /// </summary>
+        public IEnumerable<HitSample> GetUsedHitSamplesTaiko()
+        {
+            TimingLine line = beatmap.GetTimingLine(time, true);
+
+            yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Clap, HitSample.HitSource.Edge, line.offset);
+            yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Normal, HitSample.HitSource.Edge, line.offset);
+
+            bool isKat = HasHitSound(HitSound.Clap) || HasHitSound(HitSound.Whistle);
+            bool isBig = HasHitSound(HitSound.Finish);
+
+            HitSound hitSound;
+            if (isBig)
+                if (isKat)  hitSound = HitSound.Whistle;
+                else        hitSound = HitSound.Finish;
+            else
+                if (isKat)  hitSound = HitSound.Clap;
+                else        hitSound = HitSound.Normal;
+
+            // In case the hit object's custom index/sampleset/additions are different from the timing line's.
+            yield return new HitSample(GetCustomIndex(line), GetSampleset(true), hitSound, HitSample.HitSource.Edge, time);
         }
 
         /// <summary> Returns all potentially used hit sound file names (should they be
