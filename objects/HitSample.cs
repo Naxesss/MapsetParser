@@ -24,12 +24,14 @@ namespace MapsetParser.objects
 
         public readonly double time;
 
-        public HitSample(int aCustomIndex, Beatmap.Sampleset? aSampleset, HitSound? aHitSound, HitSource aHitSource, double aTime)
+        public HitSample(int aCustomIndex, Beatmap.Sampleset? aSampleset, HitSound? aHitSound, HitSource aHitSource, double aTime,
+            bool aTaiko = false)
         {
             customIndex = aCustomIndex;
             sampleset = aSampleset;
             hitSound = aHitSound;
             hitSource = aHitSource;
+            taiko = aTaiko;
 
             time = aTime;
         }
