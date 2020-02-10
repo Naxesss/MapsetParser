@@ -421,8 +421,8 @@ namespace MapsetParser.objects
         {
             TimingLine line = beatmap.GetTimingLine(time, true);
 
-            yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Clap, HitSample.HitSource.Edge, line.offset);
-            yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Normal, HitSample.HitSource.Edge, line.offset);
+            yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Clap, HitSample.HitSource.Edge, line.offset, true);
+            yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Normal, HitSample.HitSource.Edge, line.offset, true);
 
             bool isKat = HasHitSound(HitSound.Clap) || HasHitSound(HitSound.Whistle);
             bool isBig = HasHitSound(HitSound.Finish);
@@ -436,7 +436,7 @@ namespace MapsetParser.objects
                 else        hitSound = HitSound.Normal;
 
             // In case the hit object's custom index/sampleset/additions are different from the timing line's.
-            yield return new HitSample(GetCustomIndex(line), GetSampleset(true), hitSound, HitSample.HitSource.Edge, time);
+            yield return new HitSample(GetCustomIndex(line), GetSampleset(true), hitSound, HitSample.HitSource.Edge, time, true);
         }
 
         /// <summary> Returns all potentially used hit sound file names (should they be
