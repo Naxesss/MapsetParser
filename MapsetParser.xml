@@ -285,6 +285,9 @@
         <member name="M:MapsetParser.objects.HitObject.GetEdgeTimes">
             <summary> Returns the points in time where heads, tails or reverses exist (i.e. the start, end or reverses of any object). </summary>
         </member>
+        <member name="M:MapsetParser.objects.HitObject.GetCustomIndex(MapsetParser.objects.TimingLine)">
+            <summary> Returns the custom index for the object, if any, otherwise for the line, if any, otherwise 1. </summary>
+        </member>
         <member name="M:MapsetParser.objects.HitObject.GetSampleset(System.Boolean,System.Nullable{System.Double})">
             <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
         </member>
@@ -314,6 +317,20 @@
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetUsedHitSamples">
             <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.GetUsedHitSamplesNonTaiko">
+            <summary> Returns all used combinations of customs, samplesets and hit sounds for this object.
+            This assumes the game mode is not taiko (special rules apply to taiko only). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.GetUsedHitSamplesTaiko">
+            <summary> Returns all used combinations of customs, samplesets and hit sounds for this object.
+            Assumes the game mode is taiko (special rules apply).
+            <br></br><br></br>
+            Special Rules:<br></br>
+            - taiko-hitwhistle plays on big kat <br></br>
+            - taiko-hitfinish plays on big don <br></br>
+            - taiko-hitclap and taiko-hitnormal are always used as they play whenever the user presses keys
+            </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetUsedHitSoundFileNames">
             <summary> Returns all potentially used hit sound file names (should they be
