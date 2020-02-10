@@ -38,7 +38,7 @@
             (or slider over the head in case of slider and slider), but currently is not. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.MeetsStackTime(MapsetParser.objects.hitobjects.Stackable,MapsetParser.objects.hitobjects.Stackable)">
-            <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start Hitsoundtime. </summary>
+            <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start time. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.MeetsStackDistance(MapsetParser.objects.hitobjects.Stackable,MapsetParser.objects.hitobjects.Stackable)">
             <summary> Returns whether two stackable objects are close enough in space to be stacked. Measures from head to head. </summary>

@@ -232,9 +232,9 @@ namespace MapsetParser.objects
             return CanStackTail(slider, stackable) && !IsStackedTail(slider, stackable);
         }
 
-        /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from end to start Hitsoundtime. </summary>
+        /// <summary> Returns whether two stackable objects are close enough in time to be stacked. Measures from start to start time. </summary>
         private bool MeetsStackTime(Stackable stackable, Stackable otherStackable) =>
-            otherStackable.time - stackable.GetEndTime() <= StackTimeThreshold();
+            otherStackable.time - stackable.time <= StackTimeThreshold();
 
         /// <summary> Returns whether two stackable objects are close enough in space to be stacked. Measures from head to head. </summary>
         private bool MeetsStackDistance(Stackable stackable, Stackable otherStackable) =>
