@@ -378,13 +378,15 @@ namespace MapsetParser.objects.hitobjects
             // Not entierly sure if it's based on theoretical time and cast to int or something else.
             // It doesn't seem to be practical time and then rounded to closest at least.
             double theoreticalTime = time - beatmap.GetTheoreticalUnsnap(time);
-            
-            // Not a tick time if equal to where the slider tail is.
-            List<double> times = new List<double>();
-            for(int i = 0; i < Math.Floor((GetCurveDuration() - 1) / msPerBeat * tickRate); ++i)
-                times.Add(Timestamp.Round((i + 1) * msPerBeat / tickRate + theoreticalTime));
 
-            return times;
+            // Only duration during which ticks can be present (so not the same ms as the tail).
+            double duration = endTime - time - 1;
+            int ticks = (int)(duration / msPerBeat * tickRate);
+            List<double> tickTimes = new List<double>();
+            for (int i = 1; i <= ticks; ++i)
+                tickTimes.Add(Timestamp.Round(i * msPerBeat / tickRate + theoreticalTime));
+
+            return tickTimes;
         }
         
         /*
