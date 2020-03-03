@@ -10,6 +10,7 @@ using MapsetParser.objects.timinglines;
 using MapsetParser.starrating.standard;
 using System.Numerics;
 using MapsetParser.statics;
+using System.Text.RegularExpressions;
 
 namespace MapsetParser.objects
 {
@@ -403,12 +404,9 @@ namespace MapsetParser.objects
             string name = metadataSettings.version;
 
             foreach (var pair in nameDiffPairs)
-                if (pair.Value.Any(
-                    value =>
-                        name.ToLower() == value.ToLower() ||
-                        name.ToLower().StartsWith(value.ToLower() + " ") ||
-                        name.ToLower().EndsWith(" " + value.ToLower()) ||
-                        name.ToLower().Contains(" " + value.ToLower() + " ")))
+                // Allows difficulty names such as "Normal...!??" and ">{(__HARD;)}" to be detected,
+                // but still prevents "Normality" or similar inclusions.
+                if (pair.Value.Any(value => new Regex(@$"(?i)(^| )[!-@\[-`{{-~]*{value}[!-@\[-`{{-~]*( |$)").IsMatch(name)))
                     return pair.Key;
 
             return null;
