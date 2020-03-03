@@ -558,7 +558,7 @@ namespace MapsetParser.objects
             if (hitObjects.Count == 0 || hitObject.type.HasFlag(HitObject.Type.NewCombo))
                 return 1;
 
-            return GetCombo(hitObjects.IndexOf(hitObject));
+            return GetCombo(hitObjects.FindIndex(otherHitObject => otherHitObject.time == hitObject.time));
         }
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
