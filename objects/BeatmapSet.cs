@@ -160,6 +160,10 @@ namespace MapsetParser.objects
         /// <summary> Returns whichever of the given file names are unused. </summary>
         public List<string> GetUsedHitSoundFilesOf(IEnumerable<string> fileNames)
         {
+            // In case two files have the same file name but different extensions, the latter is always picked.
+            IEnumerable<string> directoryPaths = Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories);
+            fileNames = fileNames.Select(path => GetLastMatchingPath(path, directoryPaths)).ToList();
+
             List<string> usedFilesNames = new List<string>();
 
             foreach (Beatmap beatmap in beatmaps)
