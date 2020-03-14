@@ -152,7 +152,7 @@ namespace MapsetParser.objects
             string relativePath = PathStatic.RelativePath(filePath, songPath);
             string fileName     = relativePath.Split(new char[] { '/', '\\' }).Last().ToLower();
             string parsedPath   = PathStatic.ParsePath(relativePath);
-            string strippedPath = PathStatic.ParsePath(relativePath, true);
+            string strippedPath = PathStatic.ParsePath(relativePath, withoutExtension: true);
 
             if (beatmaps.Any(beatmap => beatmap.generalSettings.audioFileName.ToLower() == parsedPath))
                 return true;
