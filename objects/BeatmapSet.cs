@@ -130,6 +130,33 @@ namespace MapsetParser.objects
             return beatmaps.FirstOrDefault(beatmap => beatmap != null)?.generalSettings.audioFileName ?? null;
         }
 
+        /// <summary> Returns the last path matching all parts of the given path, apart from its extension.
+        /// If directory paths are not given, this also looks up all paths in the song folder. </summary>
+        private string GetLastMatchingPath(string relativePath, IEnumerable<string> directoryPaths = null)
+        {
+            string parsedPath = PathStatic.ParsePath(relativePath);
+            string strippedPath = PathStatic.ParsePath(relativePath, withoutExtension: true);
+
+            if (directoryPaths == null)
+                directoryPaths = Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories);
+
+            // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
+            // So we basically want to find the last path which matches the name.
+            string lastMatchingPath = null;
+            foreach (string path in directoryPaths)
+            {
+                string relPath = PathStatic.RelativePath(path, songPath).Replace("\\", "/");
+                if (relPath.StartsWith(strippedPath + ".", StringComparison.OrdinalIgnoreCase))
+                {
+                    lastMatchingPath = path.Substring(songPath.Length + 1);
+                    break;
+                }
+            }
+
+            // In case the given file doesn't exist, we assume there's no duplicate file names.
+            return lastMatchingPath ?? parsedPath;
+        }
+
         /// <summary> Returns whichever of the given file names are unused. </summary>
         public List<string> GetUsedHitSoundFilesOf(IEnumerable<string> fileNames)
         {
@@ -159,19 +186,7 @@ namespace MapsetParser.objects
 
             // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
             // So we basically want to find the last path which matches the name.
-            string lastMatchingPath = null;
-            foreach (string file in Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories))
-            {
-                string relPath = PathStatic.RelativePath(file, songPath).Replace("\\", "/");
-                if (relPath.StartsWith(strippedPath + ".", StringComparison.OrdinalIgnoreCase))
-                {
-                    lastMatchingPath = file.Substring(songPath.Length + 1);
-                    break;
-                }
-            }
-
-            if (lastMatchingPath == null)
-                return false;
+            string lastMatchingPath = GetLastMatchingPath(parsedPath);
 
             // These are always used, but you won't be able to update them unless they have the right format.
             if (fileName.EndsWith(".osu"))
