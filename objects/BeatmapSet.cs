@@ -159,18 +159,18 @@ namespace MapsetParser.objects
 
             // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
             // So we basically want to find the last path which matches the name.
-            string lastStripped = null;
+            string lastMatchingPath = null;
             foreach (string file in Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories))
             {
                 string relPath = PathStatic.RelativePath(file, songPath).Replace("\\", "/");
                 if (relPath.StartsWith(strippedPath + ".", StringComparison.OrdinalIgnoreCase))
                 {
-                    lastStripped = file.Substring(songPath.Length + 1);
+                    lastMatchingPath = file.Substring(songPath.Length + 1);
                     break;
                 }
             }
 
-            if (lastStripped == null)
+            if (lastMatchingPath == null)
                 return false;
 
             // These are always used, but you won't be able to update them unless they have the right format.
@@ -187,11 +187,11 @@ namespace MapsetParser.objects
 
             // animations cannot be stripped of their extension
             if (beatmaps.Any(beatmap =>
-                    beatmap.sprites     .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path)) ||
-                    beatmap.videos      .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path)) ||
-                    beatmap.backgrounds .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path)) ||
-                    beatmap.samples     .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path))) &&
-                    parsedPath == lastStripped)
+                    beatmap.sprites     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
+                    beatmap.videos      .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
+                    beatmap.backgrounds .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
+                    beatmap.samples     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path))) &&
+                    parsedPath == lastMatchingPath)
                 return true;
 
             if (osb != null && (
@@ -203,11 +203,11 @@ namespace MapsetParser.objects
                 return true;
 
             if (osb != null && (
-                    osb.sprites     .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path)) ||
-                    osb.videos      .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path)) ||
-                    osb.backgrounds .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path)) ||
-                    osb.samples     .Any(element => element.strippedPath == strippedPath && lastStripped.StartsWith(element.path))) &&
-                    parsedPath == lastStripped)
+                    osb.sprites     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
+                    osb.videos      .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
+                    osb.backgrounds .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
+                    osb.samples     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path))) &&
+                    parsedPath == lastMatchingPath)
                 return true;
 
             if (beatmaps.Any(beatmap => beatmap.hitObjects.Any(hitObject =>
