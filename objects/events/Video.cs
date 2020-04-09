@@ -18,7 +18,7 @@ namespace MapsetParser.objects.events
             offset = GetOffset(args);
             path   = GetPath(args);
 
-            strippedPath = PathStatic.ParsePath(path, true);
+            strippedPath = PathStatic.ParsePath(path, withoutExtension: true);
         }
 
         /// <summary> Returns the temporal offset of the video (i.e. when it should start playing). </summary>
