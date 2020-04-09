@@ -190,7 +190,7 @@ namespace MapsetParser.objects
 
             // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
             // So we basically want to find the last path which matches the name.
-            string lastMatchingPath = GetLastMatchingPath(parsedPath);
+            string lastMatchingPath = PathStatic.ParsePath(GetLastMatchingPath(parsedPath));
 
             // These are always used, but you won't be able to update them unless they have the right format.
             if (fileName.EndsWith(".osu"))
@@ -206,10 +206,10 @@ namespace MapsetParser.objects
 
             // animations cannot be stripped of their extension
             if (beatmaps.Any(beatmap =>
-                    beatmap.sprites     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
-                    beatmap.videos      .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
-                    beatmap.backgrounds .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
-                    beatmap.samples     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path))) &&
+                    beatmap.sprites     .Any(element => element.strippedPath == strippedPath) ||
+                    beatmap.videos      .Any(element => element.strippedPath == strippedPath) ||
+                    beatmap.backgrounds .Any(element => element.strippedPath == strippedPath) ||
+                    beatmap.samples     .Any(element => element.strippedPath == strippedPath)) &&
                     parsedPath == lastMatchingPath)
                 return true;
 
@@ -222,10 +222,10 @@ namespace MapsetParser.objects
                 return true;
 
             if (osb != null && (
-                    osb.sprites     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
-                    osb.videos      .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
-                    osb.backgrounds .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path)) ||
-                    osb.samples     .Any(element => element.strippedPath == strippedPath && lastMatchingPath.StartsWith(element.path))) &&
+                    osb.sprites     .Any(element => element.strippedPath == strippedPath) ||
+                    osb.videos      .Any(element => element.strippedPath == strippedPath) ||
+                    osb.backgrounds .Any(element => element.strippedPath == strippedPath) ||
+                    osb.samples     .Any(element => element.strippedPath == strippedPath)) &&
                     parsedPath == lastMatchingPath)
                 return true;
 
