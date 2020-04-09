@@ -476,7 +476,10 @@ namespace MapsetParser.objects.hitobjects
 
                 ++prevNodeIndex;
             }
-            
+
+            if (prevNodeIndex >= nodePositions.Count())
+                prevNodeIndex = nodePositions.Count() - 1;
+
             Vector2 startPoint    = nodePositions.ElementAt(prevNodeIndex <= 0 ? 0 : prevNodeIndex - 1);
             Vector2 endPoint      = nodePositions.ElementAt(prevNodeIndex);
             double pointDistance  = GetDistance(startPoint, endPoint);
