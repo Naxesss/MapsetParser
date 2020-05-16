@@ -130,11 +130,21 @@ namespace MapsetParser.objects.hitobjects
         private float GetPixelLength(string[] args) =>
             float.Parse(args[7], CultureInfo.InvariantCulture);
         
-        private Tuple<HitSound, HitSound, IEnumerable<HitSound>> GetEdgeHitSounds(string[] args)
+        private Tuple<HitSound, HitSound, List<HitSound>> GetEdgeHitSounds(string[] args)
         {
             HitSound edgeStartHitSound = 0;
             HitSound edgeEndHitSound = 0;
-            IEnumerable<HitSound> edgeReverseHitSounds = new List<HitSound>();
+            List<HitSound> edgeReverseHitSounds = new List<HitSound>();
+
+            // If an object has no complex hit sounding, it omits fields such as custom index
+            // and edge hit sounds. Instead, it simply uses one hit sound over everything.
+            if (customIndex == null)
+            {
+                edgeStartHitSound = hitSound;
+                edgeEndHitSound = hitSound;
+                for (int i = 0; i < edgeAmount; ++i)
+                    edgeReverseHitSounds.Add(hitSound);
+            }
 
             if (args.Count() > 8)
             {
@@ -152,7 +162,7 @@ namespace MapsetParser.objects.hitobjects
                             edgeEndHitSound = hitSound;
                         else
                             // Any not first or last are for the reverses.
-                            edgeReverseHitSounds = edgeReverseHitSounds.Concat(new HitSound[] { hitSound });
+                            edgeReverseHitSounds.Add(hitSound);
                     }
                 }
             }
@@ -161,7 +171,7 @@ namespace MapsetParser.objects.hitobjects
         }
         
         private Tuple<Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset, Beatmap.Sampleset,
-            IEnumerable<Beatmap.Sampleset>, IEnumerable<Beatmap.Sampleset>> GetEdgeAdditions(string[] args)
+            List<Beatmap.Sampleset>, List<Beatmap.Sampleset>> GetEdgeAdditions(string[] args)
         {
             Beatmap.Sampleset edgeStartSampleset = 0;
             Beatmap.Sampleset edgeStartAddition  = 0;
@@ -169,8 +179,23 @@ namespace MapsetParser.objects.hitobjects
             Beatmap.Sampleset edgeEndSampleset = 0;
             Beatmap.Sampleset edgeEndAddition  = 0;
 
-            IEnumerable<Beatmap.Sampleset> edgeReverseSamplesets = new List<Beatmap.Sampleset>();
-            IEnumerable<Beatmap.Sampleset> edgeReverseAdditions  = new List<Beatmap.Sampleset>();
+            List<Beatmap.Sampleset> edgeReverseSamplesets = new List<Beatmap.Sampleset>();
+            List<Beatmap.Sampleset> edgeReverseAdditions  = new List<Beatmap.Sampleset>();
+
+            // If an object has no complex hit sounding, it omits fields such as custom index
+            // and edge hit sounds. Instead, it simply uses one hit sound over everything.
+            if (customIndex == null)
+            {
+                edgeStartSampleset = sampleset;
+                edgeEndSampleset = sampleset;
+                for (int i = 0; i < edgeAmount; ++i)
+                    edgeReverseSamplesets.Add(sampleset);
+
+                edgeStartAddition = addition;
+                edgeEndAddition = addition;
+                for (int i = 0; i < edgeAmount; ++i)
+                    edgeReverseAdditions.Add(addition);
+            }
 
             if (args.Count() > 9)
             {
@@ -195,8 +220,8 @@ namespace MapsetParser.objects.hitobjects
                         }
                         else
                         {
-                            edgeReverseSamplesets = edgeReverseSamplesets.Concat(new Beatmap.Sampleset[] { sampleset });
-                            edgeReverseAdditions  = edgeReverseAdditions .Concat(new Beatmap.Sampleset[] { addition });
+                            edgeReverseSamplesets.Add(sampleset);
+                            edgeReverseAdditions.Add(addition);
                         }
                     }
                 }
