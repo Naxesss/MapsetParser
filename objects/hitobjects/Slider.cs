@@ -44,7 +44,9 @@ namespace MapsetParser.objects.hitobjects
         
         // Non-explicit
         private List<Vector2> bezierPoints;
-        private double? duration;
+        private double? curveDuration;
+        private double? sliderSpeed;
+        private double? curveLength;
 
         public readonly List<Vector2> pathPxPositions;
         public readonly List<Vector2> redAnchorPositions;
@@ -319,24 +321,24 @@ namespace MapsetParser.objects.hitobjects
         /// <summary> Returns the speed of any slider starting from the given time in px/ms. Caps SV within range 0.1-10. </summary>
         public double GetSliderSpeed(double time)
         {
+            if (sliderSpeed != null)
+                return sliderSpeed.GetValueOrDefault();
+
             double msPerBeat          = beatmap.GetTimingLine<UninheritedLine>(time).msPerBeat;
             double effectiveSVMult    = beatmap.GetTimingLine(base.time).svMult;
-            double sliderSpeed        = 100 * effectiveSVMult * beatmap.difficultySettings.sliderMultiplier / msPerBeat;
 
-            return sliderSpeed;
+            sliderSpeed = 100 * effectiveSVMult * beatmap.difficultySettings.sliderMultiplier / msPerBeat;
+            return sliderSpeed.GetValueOrDefault();
         }
 
         /// <summary> Returns the duration of the curve (i.e. from edge to edge), ignoring reverses. </summary>
         public double GetCurveDuration()
         {
-            if (duration != null)
-                return duration.GetValueOrDefault();
-            
-            double sliderSpeed = GetSliderSpeed(time);
-            double result = pixelLength / sliderSpeed;
+            if (curveDuration != null)
+                return curveDuration.GetValueOrDefault();
 
-            duration = result;
-            return result;
+            curveDuration = pixelLength / GetSliderSpeed(time);
+            return curveDuration.GetValueOrDefault();
         }
 
         /// <summary> Returns the sampleset on the head of the slider, optionally prioritizing the addition. </summary>
@@ -389,11 +391,11 @@ namespace MapsetParser.objects.hitobjects
         /// <summary> Returns the length of the curve in px. </summary>
         public double GetCurveLength()
         {
-            double totalTime      = GetCurveDuration();
-            double pixelsPerMs    = GetSliderSpeed(time);
-            double length         = totalTime * pixelsPerMs;
+            if (curveLength != null)
+                return curveLength.GetValueOrDefault();
 
-            return length;
+            curveLength = GetCurveDuration() * GetSliderSpeed(time);
+            return curveLength.GetValueOrDefault();
         }
 
         /// <summary> Returns the points in time for all ticks of the slider, with decimal accuracy. </summary>
