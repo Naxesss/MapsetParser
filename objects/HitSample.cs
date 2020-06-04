@@ -110,18 +110,12 @@ namespace MapsetParser.objects
             string samplesetString = sampleset?.ToString().ToLower();
             string hitSoundString = null;
 
-            if (hitSound != null)
+            if (hitSound is HitSound hs)
             {
-                foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
-                {
-                    if (hitSound.GetValueOrDefault().HasFlag(individualHitSound))
-                    {
-                        if (hitSource == HitSource.Edge && individualHitSound != HitSound.None)
-                            hitSoundString = "hit" + individualHitSound.ToString().ToLower();
-                        else if (hitSource == HitSource.Body)
-                            hitSoundString = "slider" + (individualHitSound == HitSound.Whistle ? "whistle" : "slide");
-                    }
-                }
+                if (hitSource == HitSource.Edge && hs != HitSound.None)
+                    hitSoundString = "hit" + hs.ToString().ToLower();
+                else if (hitSource == HitSource.Body)
+                    hitSoundString = "slider" + (hs == HitSound.Whistle ? "whistle" : "slide");
             }
 
             if (hitSource == HitSource.Tick)
