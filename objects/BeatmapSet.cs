@@ -68,16 +68,16 @@ namespace MapsetParser.objects
             string[] filePaths = Directory.GetFiles(beatmapSetPath, "*.*", SearchOption.AllDirectories);
 
             List<BeatmapFile> beatmapFiles = new List<BeatmapFile>();
-            for (int i = 0; i < filePaths.Length; ++i)
+            foreach (string filePath in filePaths)
             {
-                songFilePaths.Add(filePaths[i]);
-                if (filePaths[i].EndsWith(".osu"))
-                {
-                    string fileName = filePaths[i].Substring(songPath.Length + 1);
-                    string code = File.ReadAllText(filePaths[i]);
+                songFilePaths.Add(filePath);
+                if (!filePath.EndsWith(".osu"))
+                    continue;
 
-                    beatmapFiles.Add(new BeatmapFile(fileName, code));
-                }
+                string fileName = filePath.Substring(songPath.Length + 1);
+                string code = File.ReadAllText(filePath);
+
+                beatmapFiles.Add(new BeatmapFile(fileName, code));
             }
 
             ConcurrentBag<Beatmap> concurrentBeatmaps = new ConcurrentBag<Beatmap>();
@@ -92,13 +92,13 @@ namespace MapsetParser.objects
                 beatmaps.Add(beatmap);
 
             string expectedOsbFileName = GetOsbFileName()?.ToLower();
-            for (int i = 0; i < filePaths.Length; ++i)
+            foreach (string filePath in filePaths)
             {
-                string currentFileName = filePaths[i].Substring(songPath.Length + 1);
-                if (filePaths[i].EndsWith(".osb") && currentFileName.ToLower() == expectedOsbFileName)
+                string currentFileName = filePath.Substring(songPath.Length + 1);
+                if (filePath.EndsWith(".osb") && currentFileName.ToLower() == expectedOsbFileName)
                 {
                     Track osbTrack = new Track("Parsing " + currentFileName + "...");
-                    osb = new Osb(File.ReadAllText(filePaths[i]));
+                    osb = new Osb(File.ReadAllText(filePath));
                     osbTrack.Complete();
                 }
             }
