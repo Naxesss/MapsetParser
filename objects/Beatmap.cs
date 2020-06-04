@@ -430,12 +430,12 @@ namespace MapsetParser.objects
                     break;
 
                 // ignore spinners
-                if (!hitObject.type.HasFlag(HitObject.Type.Spinner))
+                if (!hitObject.HasType(HitObject.Type.Spinner))
                 {
                     int reverses = 0;
 
                     // has new combo
-                    if (hitObject.type.HasFlag(HitObject.Type.NewCombo))
+                    if (hitObject.HasType(HitObject.Type.NewCombo))
                         reverses += 1;
 
                     // accounts for the combo colour skips

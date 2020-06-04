@@ -88,7 +88,7 @@ namespace MapsetParser.objects
 
                 // hitsound filenames only apply to circles and hold notes
                 string hitSoundFile = extras.Item5;
-                if (hitSoundFile.Trim() != "" && (type.HasFlag(Type.Circle) || type.HasFlag(Type.ManiaHoldNote)))
+                if (hitSoundFile.Trim() != "" && (HasType(Type.Circle) || HasType(Type.ManiaHoldNote)))
                     filename = PathStatic.ParsePath(hitSoundFile, false, true);
             }
 
@@ -130,7 +130,7 @@ namespace MapsetParser.objects
             string extras = args.Last();
 
             // Hold notes have "endTime:extras" as format.
-            int index = type.HasFlag(Type.ManiaHoldNote) ? 1 : 0;
+            int index = HasType(Type.ManiaHoldNote) ? 1 : 0;
             if (extras.Contains(":"))
             {
                 Beatmap.Sampleset samplesetValue = (Beatmap.Sampleset)int.Parse(extras.Split(':')[index]);
@@ -234,13 +234,16 @@ namespace MapsetParser.objects
 
         /// <summary> Returns whether a hit object code has the given type. </summary>
         public static bool HasType(string[] args, Type type) =>
-            ((Type)int.Parse(args[3])).HasFlag(type);
+            ((Type)int.Parse(args[3]) & type) != 0;
+
+        public bool HasType(Type type) =>
+            (this.type & type) != 0;
 
         /// <summary> Returns whether the hit object has a hit sound, or optionally a certain type of hit sound. </summary>
         public bool HasHitSound(HitSound? hitSound = null) =>
             hitSound == null ?
                 this.hitSound > 0 :
-                this.hitSound.HasFlag(hitSound);
+                (this.hitSound & hitSound) != 0;
 
         /// <summary> Returns the difference in time between the start of this object and the end of the previous object. </summary>
         public double GetPrevDeltaTime() =>
@@ -328,7 +331,7 @@ namespace MapsetParser.objects
         private IEnumerable<HitSound> SplitHitSound(HitSound hitSound)
         {
             foreach (HitSound individualHitSound in Enum.GetValues(typeof(HitSound)))
-                if (hitSound.HasFlag(individualHitSound) && individualHitSound != HitSound.None)
+                if ((hitSound & individualHitSound) != 0 && individualHitSound != HitSound.None)
                     yield return individualHitSound;
         }
 
