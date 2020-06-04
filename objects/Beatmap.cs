@@ -656,34 +656,19 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object.
-        /// If you already have the index of the object, use <see cref="GetCombo(int)"/> for performance. </summary>
         public int GetCombo(HitObject hitObject)
-        {
-            if (hitObjects.Count == 0 || hitObject.type.HasFlag(HitObject.Type.NewCombo))
-                return 1;
-
-            return GetCombo(hitObjects.FindIndex(otherHitObject => otherHitObject.time == hitObject.time));
-        }
-
-        /// <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
-        /// This function is usually more performant than <see cref="GetCombo(HitObject)"/>. </summary>
-        public int GetCombo(int hitObjectIndex)
         {
             int combo = 1;
 
-            if (hitObjects.Count == 0 || hitObjects.Count <= hitObjectIndex)
-                return combo;
-
             // Adds a combo number for each object before this that isn't a new combo.
-            HitObject lastHitObject = hitObjects[hitObjectIndex];
             HitObject firstHitObject = hitObjects[0];
-            while (hitObjectIndex > 0)
+            while (hitObject != null)
             {
                 // The first object in the beatmap is always a new combo.
-                if (lastHitObject.type.HasFlag(HitObject.Type.NewCombo) || lastHitObject == firstHitObject)
+                if (hitObject.type.HasFlag(HitObject.Type.NewCombo) || hitObject == firstHitObject)
                     break;
 
-                lastHitObject = hitObjects[--hitObjectIndex];
+                hitObject = hitObject.Prev();
 
                 ++combo;
             }
@@ -743,25 +728,37 @@ namespace MapsetParser.objects
         private List<TimingLine> GetTimingLines(string[] lines)
         {
             // find the [TimingPoints] section and parse each timing line
-            return ParserStatic.ParseSection(lines, "TimingPoints", line =>
+            List<TimingLine> timingLines = ParserStatic.ParseSection(lines, "TimingPoints", line =>
             {
                 string[] args = line.Split(',');
-                return TimingLine.IsUninherited(args) ? new UninheritedLine(args) : (TimingLine)new InheritedLine(args);
+                return TimingLine.IsUninherited(args) ? new UninheritedLine(args, this) : (TimingLine)new InheritedLine(args, this);
             }).OrderBy(line => line.offset).ThenBy(line => line is InheritedLine).ToList();
+
+            // Initialize internal indicies for O(1) next/prev access.
+            for (int i = 0; i < timingLines.Count; ++i)
+                timingLines[i].SetTimingLineIndex(i);
+
+            return timingLines;
         }
 
         private List<HitObject> GetHitobjects(string[] lines)
         {
             // find the [Hitobjects] section and parse each hitobject until empty line or end of file
-            return ParserStatic.ParseSection(lines, "HitObjects", line =>
+            List<HitObject> hitObjects = ParserStatic.ParseSection(lines, "HitObjects", line =>
             {
                 string[] args = line.Split(',');
                 return
-                    HitObject.HasType(args, HitObject.Type.Circle)        ? new Circle(args, this) :
-                    HitObject.HasType(args, HitObject.Type.Slider)        ? new Slider(args, this) :
+                    HitObject.HasType(args, HitObject.Type.Circle) ? new Circle(args, this) :
+                    HitObject.HasType(args, HitObject.Type.Slider) ? new Slider(args, this) :
                     HitObject.HasType(args, HitObject.Type.ManiaHoldNote) ? new HoldNote(args, this) :
                     (HitObject)new Spinner(args, this);
             }).OrderBy(hitObject => hitObject.time).ToList();
+
+            // Initialize internal indicies for O(1) next/prev access.
+            for (int i = 0; i < hitObjects.Count; ++i)
+                hitObjects[i].SetHitObjectIndex(i);
+
+            return hitObjects;
         }
 
         /// <summary> Returns the beatmap as a string in the format "[Insane]", if the difficulty is called "Insane", for example. </summary>

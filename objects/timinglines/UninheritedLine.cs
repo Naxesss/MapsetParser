@@ -7,8 +7,8 @@ namespace MapsetParser.objects.timinglines
         public readonly double msPerBeat;
         public readonly double bpm;
 
-        public UninheritedLine(string[] args)
-            : base(args)
+        public UninheritedLine(string[] args, Beatmap beatmap)
+            : base(args, beatmap)
         {
             msPerBeat = GetMsPerBeat(args);
 

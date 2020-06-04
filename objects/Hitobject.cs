@@ -22,6 +22,7 @@ namespace MapsetParser.objects
 
         public readonly Beatmap beatmap;
         public readonly string code;
+        private int hitObjectIndex;
 
         public virtual Vector2 Position { get; private set; }
 
@@ -151,6 +152,51 @@ namespace MapsetParser.objects
         }
 
         /*
+         *  Next / Prev
+         */
+
+        /// <summary> Returns the index of this hit object in the beatmap's hit object list, O(1). </summary>
+        public int GetHitObjectIndex() => hitObjectIndex;
+        /// <summary> Sets the index of this hit object. This should reflect the index in the hit object list of the beatmap.
+        /// Only use this if you're changing the order of objects or adding new ones after parsing. </summary>
+        public void SetHitObjectIndex(int index) => hitObjectIndex = index;
+
+        /// <summary> Returns the next hit object in the hit objects list, if any,
+        /// otherwise null, O(1). Optionally skips concurrent objects. </summary>
+        public HitObject Next(bool skipConcurrent = false)
+        {
+            HitObject next = null;
+            for (int i = hitObjectIndex + 1; i < beatmap.hitObjects.Count; ++i)
+            {
+                next = beatmap.hitObjects[i];
+                if (!skipConcurrent || next.time != time)
+                    break;
+            }
+
+            return next;
+        }
+
+        /// <summary> Returns the previous hit object in the hit objects list, if any,
+        /// otherwise null, O(1). Optionally skips concurrent objects. </summary>
+        public HitObject Prev(bool skipConcurrent = false)
+        {
+            HitObject prev = null;
+            for (int i = hitObjectIndex - 1; i >= 0; --i)
+            {
+                prev = beatmap.hitObjects[i];
+                if (!skipConcurrent || prev.time != time)
+                    break;
+            }
+
+            return prev;
+        }
+
+        /// <summary> Returns the previous hit object in the hit objects list, if any,
+        /// otherwise the first, O(1). Optionally skips concurrent objects. </summary>
+        public HitObject PrevOrFirst(bool skipConcurrent = false) =>
+            Prev(skipConcurrent) ?? beatmap.hitObjects.FirstOrDefault();
+
+        /*
          *  Star Rating
          */
 
@@ -160,15 +206,13 @@ namespace MapsetParser.objects
         {
             // Smallest value is 50 ms for pp calc as a safety measure apparently,
             // it's equivalent to 375 BPM streaming speed.
-            return Math.Max(50, time - beatmap.GetPrevHitObject(time).time);
+            return Math.Max(50, time - PrevOrFirst().time);
         }
 
         /// <summary> <para>Returns the distance between the edges of the hit circles for the start of this object and the start of the previous object.</para>
         /// Note: This adds a bonus scaling factor for small circle sizes, to mimic the star rating algorithm.</summary>
         public double GetPrevStartDistance()
         {
-            HitObject prevObject = beatmap.GetPrevHitObject(time);
-
             double radius = beatmap.difficultySettings.GetCircleRadius();
 
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
@@ -178,7 +222,7 @@ namespace MapsetParser.objects
             if (radius < 30)
                 scalingFactor *= 1 + Math.Min(30 - radius, 5) / 50;
 
-            Vector2 prevPosition = prevObject.Position;
+            Vector2 prevPosition = PrevOrFirst().Position;
             double prevDistance = (Position - prevPosition).Length();
 
             return prevDistance * scalingFactor;

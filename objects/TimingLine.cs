@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace MapsetParser.objects
@@ -10,7 +11,9 @@ namespace MapsetParser.objects
         // 440,476.190476190476,4,2,1,40,1,0
         // offset, msPerBeat, meter, sampleset, customIndex, volume, inherited, kiai
 
+        public Beatmap beatmap;
         public string code;
+        private int timingLineIndex;
 
         public readonly double  offset;
         public readonly int     meter;         // this exists for both green and red lines but only red uses it
@@ -34,8 +37,9 @@ namespace MapsetParser.objects
             OmitBarLine = 8
         }
 
-        public TimingLine(string[] args)
+        public TimingLine(string[] args, Beatmap beatmap)
         {
+            this.beatmap = beatmap;
             code = String.Join(",", args);
             
             offset       = GetOffset(args);
@@ -107,5 +111,50 @@ namespace MapsetParser.objects
             else
                 return 1;
         }
+
+        /*
+         *  Next / Prev
+         */
+
+        /// <summary> Returns the index of this timing line in the beatmap's timing line list, O(1). </summary>
+        public int GetTimingLineIndex() => timingLineIndex;
+        /// <summary> Sets the index of this timing line. This should reflect the index in the timing line list of the beatmap.
+        /// Only use this if you're changing the order of lines or adding new ones after parsing. </summary>
+        public void SetTimingLineIndex(int index) => timingLineIndex = index;
+
+        /// <summary> Returns the next timing line in the timing line list, if any,
+        /// otherwise null, O(1). Optionally skips concurrent lines. </summary>
+        public TimingLine Next(bool skipConcurrent = false)
+        {
+            TimingLine next = null;
+            for (int i = timingLineIndex; i < beatmap.timingLines.Count; ++i)
+            {
+                next = beatmap.timingLines[i];
+                if (!skipConcurrent || next.offset != offset)
+                    break;
+            }
+
+            return next;
+        }
+
+        /// <summary> Returns the previous timing line in the timing line list, if any,
+        /// otherwise null, O(1). Optionally skips concurrent objects. </summary>
+        public TimingLine Prev(bool skipConcurrent = false)
+        {
+            TimingLine prev = null;
+            for (int i = timingLineIndex; i >= 0; --i)
+            {
+                prev = beatmap.timingLines[i];
+                if (!skipConcurrent || prev.offset != offset)
+                    break;
+            }
+
+            return prev;
+        }
+
+        /// <summary> Returns the previous timing line in the timing line list, if any,
+        /// otherwise the first, O(1). Optionally skips concurrent objects. </summary>
+        public TimingLine PrevOrFirst(bool skipConcurrent = false) =>
+            Prev(skipConcurrent) ?? beatmap.timingLines.FirstOrDefault();
     }
 }
