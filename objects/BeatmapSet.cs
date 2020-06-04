@@ -22,7 +22,7 @@ namespace MapsetParser.objects
         public List<string>         songFilePaths  = new List<string>();
 
         /// <summary> Used hit sound files' relative path from the song folder. </summary>
-        public IEnumerable<string> hitSoundFiles;
+        public List<string> hitSoundFiles;
 
         private struct BeatmapFile
         {
@@ -47,7 +47,7 @@ namespace MapsetParser.objects
             Initalize(beatmapSetPath);
 
             Track hsTrack = new Track("Finding hit sound files...");
-            hitSoundFiles = GetUsedHitSoundFiles().ToList();
+            hitSoundFiles = GetUsedHitSoundFiles();
             hsTrack.Complete();
 
             beatmaps =
@@ -264,7 +264,7 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns all used hit sound files in the folder. </summary>
-        private IEnumerable<string> GetUsedHitSoundFiles()
+        private List<string> GetUsedHitSoundFiles()
         {
             IEnumerable<string> hitSoundFilePaths =
                 songFilePaths.Select(path => path.Substring(songPath.Length + 1));
@@ -273,7 +273,7 @@ namespace MapsetParser.objects
             IEnumerable<string> usedHitSoundFiles =
                 GetUsedHitSoundFilesOf(hitSoundFilePaths);
 
-            return usedHitSoundFiles;
+            return usedHitSoundFiles.ToList();
         }
 
         /// <summary> Returns the beatmapset as a string in the format "Artist - Title (Creator)". </summary>
