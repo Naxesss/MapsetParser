@@ -337,7 +337,7 @@ namespace MapsetParser.objects
 
         private HitSample GetEdgeSample(double time, Beatmap.Sampleset? sampleset, HitSound? hitSound)
         {
-            TimingLine line = beatmap.GetTimingLine(time, true);
+            TimingLine line = beatmap.GetTimingLine(time, hitSoundLeniency: true);
             return
                 new HitSample(
                     line.customIndex,
@@ -404,7 +404,7 @@ namespace MapsetParser.objects
                     beatmap.timingLines.Where(line =>
                         line.offset > slider.time &&
                         line.offset <= slider.endTime).ToList();
-                lines.Add(beatmap.GetTimingLine(slider.time, true));
+                lines.Add(beatmap.GetTimingLine(slider.time, hitSoundLeniency: true));
 
                 // Body, only applies to standard. Catch has droplets instead of body. Taiko and mania have a body but play no background sound.
                 if (beatmap.generalSettings.mode == Beatmap.Mode.Standard)
@@ -473,7 +473,7 @@ namespace MapsetParser.objects
         /// </summary>
         public IEnumerable<HitSample> GetUsedHitSamplesTaiko()
         {
-            TimingLine line = beatmap.GetTimingLine(time, true);
+            TimingLine line = beatmap.GetTimingLine(time, hitSoundLeniency: true);
 
             yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Clap, HitSample.HitSource.Edge, line.offset, true);
             yield return new HitSample(line?.customIndex ?? 1, line.sampleset, HitSound.Normal, HitSample.HitSource.Edge, line.offset, true);
