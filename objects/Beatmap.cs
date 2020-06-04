@@ -11,6 +11,7 @@ using MapsetParser.starrating.standard;
 using System.Numerics;
 using MapsetParser.statics;
 using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 
 namespace MapsetParser.objects
 {
@@ -102,6 +103,24 @@ namespace MapsetParser.objects
 
                 this.starRating = starRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
             }
+        }
+
+        /*
+         *  Optimization Methods
+         */
+
+        private static class ThreadSafeCacheHelper<T>
+        {
+            // Works under the assumption that hit objects and timing lines are immutable per beatmap id, which is the case.
+            internal static readonly ConcurrentDictionary<(string, Type), List<T>> cache = new ConcurrentDictionary<(string, Type), List<T>>();
+        }
+
+        private List<T> GetOrAdd<T>(Type t, Func<List<T>> func)
+        {
+            (string, Type) key = (mapPath, t);
+            if (!ThreadSafeCacheHelper<T>.cache.ContainsKey(key))
+                ThreadSafeCacheHelper<T>.cache[key] = func();
+            return ThreadSafeCacheHelper<T>.cache[key];
         }
 
         /*
@@ -249,56 +268,140 @@ namespace MapsetParser.objects
          *  Helper Methods 
         */
 
-        /// <summary> Returns the timing line currently in effect at the given time, optionally with a 5 ms backward leniency. </summary>
+        /// <summary> Returns the element in the sorted list where the given time is greater
+        /// than the element time, but less than the next element time (e.g. the line in effect
+        /// at some point in time, if we give a list of timing lines).
+        /// <br></br><br></br>
+        /// Since the list is sorted, we can use the Binary Search algorithm here to get
+        /// O(logn) time complexity, instead of O(n), which we would get from linear searching. </summary>
+        private int BinaryTimeSearch<T>(List<T> sortedList, Func<T, double> Time, double time, int start=0, int end=int.MaxValue)
+        {
+            while (true)
+            {
+                if (start < 0)
+                    // Given time is before the list starts, so there is no current element.
+                    return -1;
+
+                if (end > sortedList.Count - 1)
+                    end = sortedList.Count - 1;
+                if (end < 0)
+                    end = 0;
+
+                if (start == end)
+                    // Given time is after the list ends, so the last element in the list must be the current.
+                    return end;
+
+                int i = start + (end - start) / 2;
+
+                T cur = sortedList[i];
+                T next = sortedList[i + 1];
+
+                if (time >= Time(cur) && time < Time(next))
+                    return i;
+
+                else if (time >= Time(next))
+                    // Element is too far back, move forward.
+                    start = i + 1;
+
+                else
+                    // Element is too far forward, move back.
+                    end = i - 1;
+            }
+        }
+
+        /// <summary> Returns the timing line currently in effect at the given time, if any, otherwise the first, O(logn).
+        /// Optionally with a 5 ms backward leniency for hit sounding. </summary>
         public TimingLine GetTimingLine(double time, bool hitSoundLeniency = false) => GetTimingLine<TimingLine>(time, hitSoundLeniency);
         /// <summary> Same as <see cref="GetTimingLine"/> except only considers objects of a given type. </summary>
         public T GetTimingLine<T>(double time, bool hitSoundLeniency = false) where T : TimingLine
         {
-            return
-                timingLines.OfType<T>()
-                    .Where(line =>
-                        line.offset <= time + (hitSoundLeniency ? 5 : 0))
-                    .LastOrDefault() ??
-                GetNextTimingLine<T>(time);
+            // Cache the results per generic type; timing line and hit object lists are immutable,
+            // meaning we always expect the same result from the same input.
+            List<T> list = GetOrAdd(typeof(T), () => timingLines.OfType<T>().ToList());
+            if (list.Count == 0)
+                return null;
+
+            int index = BinaryTimeSearch(list, line => line.offset - (hitSoundLeniency ? 5 : 0), time);
+            if (index < 0)
+                // Before any timing line starts, so return first line.
+                return list[0];
+
+            return list[index];
         }
 
-        /// <summary> Returns the next timing line after the current if any. </summary>
+        /// <summary> Returns the next timing line, if any, otherwise null, O(logn). </summary>
         public TimingLine GetNextTimingLine(double time) => GetNextTimingLine<TimingLine>(time);
         /// <summary> Same as <see cref="GetNextTimingLine"/> except only considers objects of a given type. </summary>
-        public T GetNextTimingLine<T>(double time) where T : TimingLine =>
-            timingLines.OfType<T>().Where(line => line.offset > time).FirstOrDefault();
+        public T GetNextTimingLine<T>(double time) where T : TimingLine
+        {
+            List<T> list = GetOrAdd(typeof(T), () => timingLines.OfType<T>().ToList());
+            if (list.Count == 0)
+                return null;
 
-        /// <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
+            int index = BinaryTimeSearch(list, line => line.offset, time);
+            if (index < 0)
+                // Before any timing line starts, so return first line.
+                return list[0];
+            if (index + 1 >= list.Count)
+                // After last timing line, so there's no next.
+                return null;
+
+            return list[index + 1];
+        }
+
+        /// <summary> Returns the current or previous hit object if any, otherwise the first, O(logn). </summary>
         public HitObject GetHitObject(double time) => GetHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetHitObject"/> except only considers objects of a given type. </summary>
         public T GetHitObject<T>(double time) where T : HitObject
         {
-            return
-                hitObjects.OfType<T>()
-                    .Where(hitObject =>
-                        hitObject.GetEndTime() <= time || hitObject.time == time)
-                    .LastOrDefault() ??
-                GetNextHitObject<T>(time);
+            List<T> list = GetOrAdd(typeof(T), () => hitObjects.OfType<T>().ToList());
+            if (list.Count == 0)
+                return null;
+
+            int index = BinaryTimeSearch(list, obj => obj.time, time);
+            if (index < 0)
+                // Before first hit object, so return first one.
+                return list[0];
+
+            return list[index];
         }
-        
-        /// <summary> Returns the previous hit object if any, otherwise the first. </summary>
+
+        /// <summary> Returns the previous hit object if any, otherwise the first, O(logn). </summary>
         public HitObject GetPrevHitObject(double time) => GetPrevHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetPrevHitObject"/> except only considers objects of a given type. </summary>
         public T GetPrevHitObject<T>(double time) where T : HitObject
         {
-            return
-                hitObjects.OfType<T>()
-                    .Where(hitObject =>
-                        hitObject.time < time)
-                    .LastOrDefault() ??
-                hitObjects.OfType<T>().FirstOrDefault();
+            List<T> list = GetOrAdd(typeof(T), () => hitObjects.OfType<T>().ToList());
+            if (list.Count == 0)
+                return null;
+
+            int index = BinaryTimeSearch(list, obj => obj.time, time);
+            if (index - 1 < 0)
+                // Before the first object, so return the first one.
+                return list[0];
+
+            return list[index - 1];
         }
 
-        /// <summary> Returns the next hit object after the current, if any, otherwise null. </summary>
+        /// <summary> Returns the next hit object after the current, if any, otherwise null, O(logn). </summary>
         public HitObject GetNextHitObject(double time) => GetNextHitObject<HitObject>(time);
         /// <summary> Same as <see cref="GetNextHitObject"/> except only considers objects of a given type. </summary>
-        public T GetNextHitObject<T>(double time) where T : HitObject =>
-            hitObjects.OfType<T>().Where(hitObject => hitObject.time > time).FirstOrDefault();
+        public T GetNextHitObject<T>(double time) where T : HitObject
+        {
+            List<T> list = GetOrAdd(typeof(T), () => hitObjects.OfType<T>().ToList());
+            if (list.Count == 0)
+                return null;
+
+            int index = BinaryTimeSearch(list, obj => obj.time, time);
+            if (index < 0)
+                // Before first hit object, so return first one.
+                return list[0];
+            if (index + 1 >= list.Count)
+                // After last hit object, so there is no next.
+                return null;
+
+            return list[index + 1];
+        }
 
         /// <summary> Returns the unsnap in ms of notes unsnapped by 2 ms or more, otherwise null. </summary>
         public double? GetUnsnapIssue(double time)
