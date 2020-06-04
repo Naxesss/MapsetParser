@@ -46,32 +46,41 @@
         <member name="M:MapsetParser.objects.Beatmap.StackTimeThreshold">
             <summary> Returns how far apart in time two objects can be and still be able to stack. </summary>
         </member>
+        <member name="M:MapsetParser.objects.Beatmap.BinaryTimeSearch``1(System.Collections.Generic.List{``0},System.Func{``0,System.Double},System.Double,System.Int32,System.Int32)">
+            <summary> Returns the element in the sorted list where the given time is greater
+            than the element time, but less than the next element time (e.g. the line in effect
+            at some point in time, if we give a list of timing lines).
+            <br></br><br></br>
+            Since the list is sorted, we can use the Binary Search algorithm here to get
+            O(logn) time complexity, instead of O(n), which we would get from linear searching. </summary>
+        </member>
         <member name="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean)">
-            <summary> Returns the timing line currently in effect at the given time, optionally with a 5 ms backward leniency. </summary>
+            <summary> Returns the timing line currently in effect at the given time, if any, otherwise the first, O(logn).
+            Optionally with a 5 ms backward leniency for hit sounding. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetTimingLine``1(System.Double,System.Boolean)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextTimingLine(System.Double)">
-            <summary> Returns the next timing line after the current if any. </summary>
+            <summary> Returns the next timing line, if any, otherwise the current, if any, else the first, O(logn). </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextTimingLine``1(System.Double)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetNextTimingLine(System.Double)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetHitObject(System.Double)">
-            <summary> Returns the current or previous hit object if any, otherwise the next hit object. </summary>
+            <summary> Returns the current or previous hit object if any, otherwise the first, O(logn). </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetHitObject``1(System.Double)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetHitObject(System.Double)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetPrevHitObject(System.Double)">
-            <summary> Returns the previous hit object if any, otherwise the first. </summary>
+            <summary> Returns the previous hit object if any, otherwise the first, O(logn). </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetPrevHitObject``1(System.Double)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetPrevHitObject(System.Double)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextHitObject(System.Double)">
-            <summary> Returns the next hit object after the current, if any, otherwise null. </summary>
+            <summary> Returns the next hit object after the current, if any, otherwise null, O(logn). </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextHitObject``1(System.Double)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetNextHitObject(System.Double)"/> except only considers objects of a given type. </summary>
@@ -124,14 +133,7 @@
             <summary> Returns the unsnap accounting for the way the game rounds (or more accurately doesn't round) snapping. <para/>
             The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
         </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)">
-            <summary> Returns the combo number (the number you see on the notes), of a given hit object.
-            If you already have the index of the object, use <see cref="M:MapsetParser.objects.Beatmap.GetCombo(System.Int32)"/> for performance. </summary>
-        </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetCombo(System.Int32)">
-            <summary> Returns the combo number (the number you see on the notes), of a given hit object index.
-            This function is usually more performant than <see cref="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)"/>. </summary>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)" -->
         <member name="M:MapsetParser.objects.Beatmap.GetObjectDensity">
             <summary> Returns the hit object count divided by the drain time. </summary>
         </member>
@@ -265,6 +267,25 @@
         </member>
         <member name="T:MapsetParser.objects.HitObject.Type">
             <summary> Determines the properties of the hit object (can be combined, bitflags). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.GetHitObjectIndex">
+            <summary> Returns the index of this hit object in the beatmap's hit object list, O(1). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.SetHitObjectIndex(System.Int32)">
+            <summary> Sets the index of this hit object. This should reflect the index in the hit object list of the beatmap.
+            Only use this if you're changing the order of objects or adding new ones after parsing. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.Next(System.Boolean)">
+            <summary> Returns the next hit object in the hit objects list, if any,
+            otherwise null, O(1). Optionally skips concurrent objects. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.Prev(System.Boolean)">
+            <summary> Returns the previous hit object in the hit objects list, if any,
+            otherwise null, O(1). Optionally skips concurrent objects. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.HitObject.PrevOrFirst(System.Boolean)">
+            <summary> Returns the previous hit object in the hit objects list, if any,
+            otherwise the first, O(1). Optionally skips concurrent objects. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetPrevDeltaStartTime">
             <summary> <para>Returns the difference in time between the start of this object and the start of the previous object.</para>
@@ -430,6 +451,25 @@
         </member>
         <member name="M:MapsetParser.objects.TimingLine.GetSvMult(System.String[])">
             <summary> Returns the slider velocity multiplier (1 for uninherited lines). Fit into range 0.1 - 10 before returning. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.GetTimingLineIndex">
+            <summary> Returns the index of this timing line in the beatmap's timing line list, O(1). </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.SetTimingLineIndex(System.Int32)">
+            <summary> Sets the index of this timing line. This should reflect the index in the timing line list of the beatmap.
+            Only use this if you're changing the order of lines or adding new ones after parsing. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.Next(System.Boolean)">
+            <summary> Returns the next timing line in the timing line list, if any,
+            otherwise null, O(1). Optionally skips concurrent lines. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.Prev(System.Boolean)">
+            <summary> Returns the previous timing line in the timing line list, if any,
+            otherwise null, O(1). Optionally skips concurrent objects. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.TimingLine.PrevOrFirst(System.Boolean)">
+            <summary> Returns the previous timing line in the timing line list, if any,
+            otherwise the first, O(1). Optionally skips concurrent objects. </summary>
         </member>
         <member name="M:MapsetParser.objects.timinglines.UninheritedLine.GetMsPerBeat(System.String[])">
             <summary> Returns the miliseconds per beat of the uninherited line. </summary>
