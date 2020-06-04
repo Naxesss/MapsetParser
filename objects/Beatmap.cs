@@ -136,12 +136,14 @@ namespace MapsetParser.objects
                 wasChanged = false;
 
                 // Only hit objects that can be stacked can cause other objects to be stacked.
-                List<Stackable> iteratedObjects = new List<Stackable>();
-                foreach (Stackable hitObject in hitObjects.OfType<Stackable>())
+                List<Stackable> stackableHitObjects = hitObjects.OfType<Stackable>().ToList();
+                for (int i = 0; i < stackableHitObjects.Count - 1; ++i)
                 {
-                    iteratedObjects.Add(hitObject);
-                    foreach (Stackable otherHitObject in hitObjects.OfType<Stackable>().Except(iteratedObjects))
+                    for (int j = i + 1; j < stackableHitObjects.Count; ++j)
                     {
+                        Stackable hitObject = stackableHitObjects[i];
+                        Stackable otherHitObject = stackableHitObjects[j];
+
                         if (!MeetsStackTime(hitObject, otherHitObject))
                             break;
 
@@ -186,6 +188,7 @@ namespace MapsetParser.objects
                                 }
                                 else
                                     otherHitObject.stackIndex = hitObject.stackIndex - 1;
+
                                 wasChanged = true;
                                 break;
                             }
