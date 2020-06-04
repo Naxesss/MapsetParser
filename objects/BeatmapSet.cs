@@ -15,11 +15,11 @@ namespace MapsetParser.objects
 {
     public class BeatmapSet
     {
-        public List<Beatmap>   beatmaps;
-        public Osb             osb;
+        public List<Beatmap> beatmaps;
+        public Osb           osb;
 
-        public string               songPath;
-        public List<string>         songFilePaths  = new List<string>();
+        public string       songPath;
+        public List<string> songFilePaths  = new List<string>();
 
         /// <summary> Used hit sound files' relative path from the song folder. </summary>
         public List<string> hitSoundFiles;
