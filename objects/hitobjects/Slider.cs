@@ -89,6 +89,8 @@ namespace MapsetParser.objects.hitobjects
 
                 UnstackedEndPosition = edgeAmount % 2 == 1 ? pathPxPositions.Last() : UnstackedPosition;
             }
+
+            usedHitSamples = GetUsedHitSamples().ToList();
         }
 
         /*

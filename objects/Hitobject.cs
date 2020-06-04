@@ -37,6 +37,8 @@ namespace MapsetParser.objects
         public readonly int?              volume;
         public readonly string            filename = null;
 
+        public List<HitSample> usedHitSamples = new List<HitSample>();
+
         /// <summary> Determines which sounds will be played as feedback (can be combined, bitflags). </summary>
         [Flags]
         public enum HitSound
@@ -88,6 +90,11 @@ namespace MapsetParser.objects
                 if (hitSoundFile.Trim() != "" && (type.HasFlag(Type.Circle) || type.HasFlag(Type.ManiaHoldNote)))
                     filename = PathStatic.ParsePath(hitSoundFile, false, true);
             }
+
+            // Sliders include additional edges which support hit sounding, so we
+            // should handle that after those edges are initialized in Slider instead.
+            if (!(this is Slider))
+                usedHitSamples = GetUsedHitSamples().ToList();
         }
 
         /*
@@ -294,7 +301,7 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
-        public IEnumerable<HitSample> GetUsedHitSamples()
+        protected IEnumerable<HitSample> GetUsedHitSamples()
         {
             Beatmap.Mode mode = beatmap.generalSettings.mode;
 
@@ -458,7 +465,7 @@ namespace MapsetParser.objects
                 return new List<string>() { specificHsFileName };
 
             IEnumerable<string> usedHitSoundFileNames =
-                GetUsedHitSamples()
+                usedHitSamples
                     .Select(sample => sample.GetFileName())
                     .Where(name => name != null)
                     .Distinct();
