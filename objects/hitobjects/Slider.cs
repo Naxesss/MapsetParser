@@ -140,16 +140,6 @@ namespace MapsetParser.objects.hitobjects
             HitSound edgeEndHitSound = 0;
             List<HitSound> edgeReverseHitSounds = new List<HitSound>();
 
-            // If an object has no complex hit sounding, it omits fields such as custom index
-            // and edge hit sounds. Instead, it simply uses one hit sound over everything.
-            if (customIndex == null)
-            {
-                edgeStartHitSound = hitSound;
-                edgeEndHitSound = hitSound;
-                for (int i = 0; i < edgeAmount; ++i)
-                    edgeReverseHitSounds.Add(hitSound);
-            }
-
             if (args.Count() > 8)
             {
                 // Not set in some situations (e.g. older file versions or no hit sounds).
@@ -170,6 +160,15 @@ namespace MapsetParser.objects.hitobjects
                     }
                 }
             }
+            else
+            {
+                // If an object has no complex hit sounding, it omits fields such as edge
+                // hit sounds. Instead, it simply uses one hit sound over everything.
+                edgeStartHitSound = hitSound;
+                edgeEndHitSound = hitSound;
+                for (int i = 0; i < edgeAmount; ++i)
+                    edgeReverseHitSounds.Add(hitSound);
+            }
 
             return Tuple.Create(edgeStartHitSound, edgeEndHitSound, edgeReverseHitSounds);
         }
@@ -186,21 +185,6 @@ namespace MapsetParser.objects.hitobjects
             List<Beatmap.Sampleset> edgeReverseSamplesets = new List<Beatmap.Sampleset>();
             List<Beatmap.Sampleset> edgeReverseAdditions  = new List<Beatmap.Sampleset>();
 
-            // If an object has no complex hit sounding, it omits fields such as custom index
-            // and edge hit sounds. Instead, it simply uses one hit sound over everything.
-            if (customIndex == null)
-            {
-                edgeStartSampleset = sampleset;
-                edgeEndSampleset = sampleset;
-                for (int i = 0; i < edgeAmount; ++i)
-                    edgeReverseSamplesets.Add(sampleset);
-
-                edgeStartAddition = addition;
-                edgeEndAddition = addition;
-                for (int i = 0; i < edgeAmount; ++i)
-                    edgeReverseAdditions.Add(addition);
-            }
-
             if (args.Count() > 9)
             {
                 // Not set in some situations (e.g. older file versions or no hit sounds).
@@ -211,7 +195,7 @@ namespace MapsetParser.objects.hitobjects
                     {
                         Beatmap.Sampleset sampleset = (Beatmap.Sampleset)int.Parse(edgeAdditions.Split('|')[i].Split(':')[0]);
                         Beatmap.Sampleset addition  = (Beatmap.Sampleset)int.Parse(edgeAdditions.Split('|')[i].Split(':')[1]);
-                        
+
                         if (i == 0)
                         {
                             edgeStartSampleset = sampleset;
@@ -229,6 +213,20 @@ namespace MapsetParser.objects.hitobjects
                         }
                     }
                 }
+            }
+            else
+            {
+                // If an object has no complex hit sounding, it omits fields such as edge
+                // hit sounds. Instead, it simply uses one hit sound over everything.
+                edgeStartSampleset = sampleset;
+                edgeEndSampleset = sampleset;
+                for (int i = 0; i < edgeAmount; ++i)
+                    edgeReverseSamplesets.Add(sampleset);
+
+                edgeStartAddition = addition;
+                edgeEndAddition = addition;
+                for (int i = 0; i < edgeAmount; ++i)
+                    edgeReverseAdditions.Add(addition);
             }
 
             return Tuple.Create(edgeStartSampleset, edgeStartAddition, edgeEndSampleset, edgeEndAddition, edgeReverseSamplesets, edgeReverseAdditions);
