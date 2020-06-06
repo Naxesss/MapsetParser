@@ -62,7 +62,7 @@
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextTimingLine(System.Double)">
-            <summary> Returns the next timing line, if any, otherwise the current, if any, else the first, O(logn). </summary>
+            <summary> Returns the next timing line, if any, otherwise null, O(logn). </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextTimingLine``1(System.Double)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetNextTimingLine(System.Double)"/> except only considers objects of a given type. </summary>
