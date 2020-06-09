@@ -534,6 +534,10 @@ namespace MapsetParser.objects.hitobjects
             double divisor = 2 * (UnstackedPosition.X * (secondPoint.Y - thirdPoint.Y) + secondPoint.X *
                 (thirdPoint.Y - UnstackedPosition.Y) + thirdPoint.X * (UnstackedPosition.Y - secondPoint.Y));
 
+            if (divisor == 0)
+                // Second point is somewhere straight between the first and third, making our path linear.
+                return GetLinearPathPosition(time);
+
             double centerX = ((UnstackedPosition.X * UnstackedPosition.X + UnstackedPosition.Y * UnstackedPosition.Y) *
                 (secondPoint.Y - thirdPoint.Y) + (secondPoint.X * secondPoint.X + secondPoint.Y * secondPoint.Y) *
                 (thirdPoint.Y - UnstackedPosition.Y) + (thirdPoint.X * thirdPoint.X + thirdPoint.Y * thirdPoint.Y) *
