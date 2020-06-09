@@ -350,6 +350,10 @@ namespace MapsetParser.objects
         /// <summary> Returns all used combinations of customs, samplesets and hit sounds for this object. </summary>
         protected IEnumerable<HitSample> GetUsedHitSamples()
         {
+            if (beatmap == null)
+                // Without a beatmap, we don't know which samples are going to be used, so leave this empty.
+                yield break;
+
             Beatmap.Mode mode = beatmap.generalSettings.mode;
 
             // Standard can be converted into taiko, so taiko samples could be used there too.
