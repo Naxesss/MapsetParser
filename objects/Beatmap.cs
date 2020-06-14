@@ -115,6 +115,21 @@ namespace MapsetParser.objects
             internal static readonly ConcurrentDictionary<(string, Type), List<T>> cache = new ConcurrentDictionary<(string, Type), List<T>>();
         }
 
+        public static void ClearCache()
+        {
+            // Includes all types that can be given to `GetTimingLine` methods.
+            ThreadSafeCacheHelper<TimingLine>.cache.Clear();
+            ThreadSafeCacheHelper<InheritedLine>.cache.Clear();
+            ThreadSafeCacheHelper<UninheritedLine>.cache.Clear();
+
+            // Includes all types that can be given to `GetHitObject` methods.
+            ThreadSafeCacheHelper<HitObject>.cache.Clear();
+            ThreadSafeCacheHelper<Circle>.cache.Clear();
+            ThreadSafeCacheHelper<Slider>.cache.Clear();
+            ThreadSafeCacheHelper<Spinner>.cache.Clear();
+            ThreadSafeCacheHelper<HoldNote>.cache.Clear();
+        }
+
         private List<T> GetOrAdd<T>(Type t, Func<List<T>> func)
         {
             (string, Type) key = (mapPath, t);

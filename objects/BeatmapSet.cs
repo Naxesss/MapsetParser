@@ -80,6 +80,7 @@ namespace MapsetParser.objects
                 beatmapFiles.Add(new BeatmapFile(fileName, code));
             }
 
+            Beatmap.ClearCache();
             ConcurrentBag<Beatmap> concurrentBeatmaps = new ConcurrentBag<Beatmap>();
             Parallel.ForEach(beatmapFiles, beatmapFile =>
             {
