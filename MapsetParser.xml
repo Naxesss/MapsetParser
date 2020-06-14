@@ -95,6 +95,10 @@
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetComboColourIndex(System.Double)"/>, except accounts for a bug which makes the last registered colour in
             the code the first number in the editor. Basically use for display purposes.</summary>
         </member>
+        <member name="M:MapsetParser.objects.Beatmap.AsDisplayedComboColourIndex(System.Int32)">
+            <summary> Accounts for a bug which makes the last registered colour in
+            the code the first number in the editor. Basically use for display purposes.</summary>
+        </member>
         <member name="M:MapsetParser.objects.Beatmap.HasDifficultySpecificStoryboard">
             <summary> Returns whether a difficulty-specific storyboard is present, does not care about .osb files. </summary>
         </member>

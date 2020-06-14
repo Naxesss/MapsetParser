@@ -457,14 +457,13 @@ namespace MapsetParser.objects
 
         /// <summary> Same as <see cref="GetComboColourIndex"/>, except accounts for a bug which makes the last registered colour in
         /// the code the first number in the editor. Basically use for display purposes.</summary>
-        public int GetDisplayedComboColourIndex(double time)
-        {
-            int colourIndex = GetComboColourIndex(time);
-            if (colourIndex == 0)
-                return colourSettings.combos.Count;
-            else
-                return colourIndex;
-        }
+        public int GetDisplayedComboColourIndex(double time) =>
+            AsDisplayedComboColourIndex(GetComboColourIndex(time));
+
+        /// <summary> Accounts for a bug which makes the last registered colour in
+        /// the code the first number in the editor. Basically use for display purposes.</summary>
+        public int AsDisplayedComboColourIndex(int zeroBasedIndex) =>
+            zeroBasedIndex == 0 ? colourSettings.combos.Count : zeroBasedIndex;
 
         /// <summary> Returns whether a difficulty-specific storyboard is present, does not care about .osb files. </summary>
         public bool HasDifficultySpecificStoryboard()
