@@ -509,21 +509,65 @@ namespace MapsetParser.objects
         }
 
         /// <summary> A list of aliases for difficulty levels. Can't be ambigious with named top diffs, so something
-        /// like "Lunatic", "Another", or "Special" which could be either Insane or top diff is no good.</summary>
-        private readonly Dictionary<Difficulty, IEnumerable<string>> nameDiffPairs = new Dictionary<Difficulty, IEnumerable<string>>()
+        /// like "Lunatic", "Another", or "Special" which could be either Insane or top diff is no good.
+        /// See https://osu.ppy.sh/help/wiki/Ranking_Criteria/Difficulty_Naming for reference. </summary>
+        private readonly Dictionary<Mode, Dictionary<Difficulty, IEnumerable<string>>> nameDiffPairs =
+            new Dictionary<Mode, Dictionary<Difficulty, IEnumerable<string>>>()
         {
-            { Difficulty.Easy,   new List<string>(){ "Easy", "Beginner", "Basic", "Kantan", "Cup", "EZ" } },
-            { Difficulty.Normal, new List<string>(){ "Normal", "Intermediate", "Medium", "Futsuu", "Salad", "NM" } },
-            { Difficulty.Hard,   new List<string>(){ "Hard", "Advanced", "Muzukashii", "Platter", "HD" } },
-            { Difficulty.Insane, new List<string>(){ "Insane", "Hyper", "Oni", "Rain", "MX" } },
-            { Difficulty.Expert, new List<string>(){ "Expert", "Extra", "Extreme", "Inner Oni", "Ura Oni", "Overdose", "SC" } }
+            {
+                Mode.Standard,
+                new Dictionary<Difficulty, IEnumerable<string>>(){
+                    //                                       osu!                         Common Variations
+                    { Difficulty.Easy,   new List<string>(){ "Beginner", "Easy",          "Novice"                 } },
+                    { Difficulty.Normal, new List<string>(){ "Basic", "Normal",           "Medium", "Intermediate" } },
+                    { Difficulty.Hard,   new List<string>(){ "Advanced", "Hard"                                    } },
+                    { Difficulty.Insane, new List<string>(){ "Hyper", "Insane"                                     } },
+                    { Difficulty.Expert, new List<string>(){ "Expert", "Extra", "Extreme"                          } }
+                }
+            },
+            {
+                Mode.Taiko,
+                new Dictionary<Difficulty, IEnumerable<string>>(){
+                    //                                       osu!taiko/Taiko no Tatsujin
+                    { Difficulty.Easy,   new List<string>(){ "Kantan"                    } },
+                    { Difficulty.Normal, new List<string>(){ "Futsuu"                    } },
+                    { Difficulty.Hard,   new List<string>(){ "Muzukashii"                } },
+                    { Difficulty.Insane, new List<string>(){ "Oni"                       } },
+                    { Difficulty.Expert, new List<string>(){ "Inner Oni", "Ura Oni"      } },
+                    { Difficulty.Ultra,  new List<string>(){ "Hell Oni"                  } }
+                }
+            },
+            {
+                Mode.Catch,
+                new Dictionary<Difficulty, IEnumerable<string>>(){
+                    //                                       osu!catch
+                    { Difficulty.Easy,   new List<string>(){ "Cup"                } },
+                    { Difficulty.Normal, new List<string>(){ "Salad"              } },
+                    { Difficulty.Hard,   new List<string>(){ "Platter"            } },
+                    { Difficulty.Insane, new List<string>(){ "Rain"               } },
+                    { Difficulty.Expert, new List<string>(){ "Overdose", "Deluge" } }
+                }
+            },
+            {
+                Mode.Mania,
+                new Dictionary<Difficulty, IEnumerable<string>>(){
+                    //                                       osu!mania/DJMAX (+EZ2DJ/AC)  Beatmania IIDX    SVDX
+                    { Difficulty.Easy,   new List<string>(){ "EZ",                        "Beginner",       "Basic"                           } },
+                    { Difficulty.Normal, new List<string>(){ "NM",                        "Normal",         "Novice"                          } },
+                    { Difficulty.Hard,   new List<string>(){ "HD",                        "Hyper",          "Advanced"                        } },
+                    { Difficulty.Insane, new List<string>(){ "MX",           "SHD",       "Another",        "Exhaust"                         } },
+                    { Difficulty.Expert, new List<string>(){ "SC",           "EX",        "Black Another",  "Infinite", "Gravity", "Heavenly" } }
+                }
+            }
         };
 
         public Difficulty? GetDifficultyFromName()
         {
             string name = metadataSettings.version;
 
-            foreach (var pair in nameDiffPairs)
+            // Reverse order allows e.g. "Inner Oni"/"Black Another" to be looked for separately from just "Oni"/"Another".
+            var pairs = nameDiffPairs[generalSettings.mode].Reverse();
+            foreach (var pair in pairs)
                 // Allows difficulty names such as "Normal...!??" and ">{(__HARD;)}" to be detected,
                 // but still prevents "Normality" or similar inclusions.
                 if (pair.Value.Any(value => new Regex(@$"(?i)(^| )[!-@\[-`{{-~]*{value}[!-@\[-`{{-~]*( |$)").IsMatch(name)))
