@@ -722,11 +722,14 @@ namespace MapsetParser.objects
             HitObject firstHitObject = hitObjects[0];
             while (hitObject != null)
             {
+                HitObject prevHitObject = hitObject.Prev();
+
                 // The first object in the beatmap is always a new combo.
-                if (hitObject.type.HasFlag(HitObject.Type.NewCombo) || hitObject == firstHitObject)
+                // Spinners and their following objects are also always new comboed.
+                if (hitObject.type.HasFlag(HitObject.Type.NewCombo) || hitObject is Spinner || prevHitObject is Spinner || hitObject == firstHitObject)
                     break;
 
-                hitObject = hitObject.Prev();
+                hitObject = prevHitObject;
 
                 ++combo;
             }
