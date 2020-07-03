@@ -108,7 +108,8 @@
         </member>
         <member name="F:MapsetParser.objects.Beatmap.nameDiffPairs">
             <summary> A list of aliases for difficulty levels. Can't be ambigious with named top diffs, so something
-            like "Lunatic", "Another", or "Special" which could be either Insane or top diff is no good.</summary>
+            like "Lunatic", "Another", or "Special" which could be either Insane or top diff is no good.
+            See https://osu.ppy.sh/help/wiki/Ranking_Criteria/Difficulty_Naming for reference. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetDifficultyName(System.Nullable{MapsetParser.objects.Beatmap.Difficulty})">
             <summary> Returns the name of the difficulty in a gramatically correct way, for example "an Easy" and "a Normal".
