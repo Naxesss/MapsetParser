@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Linq;
 
 namespace MapsetParser.objects.hitobjects
 {
@@ -10,6 +11,8 @@ namespace MapsetParser.objects.hitobjects
             : base(args, beatmap)
         {
             endTime = GetEndTime(args);
+
+            usedHitSamples = GetUsedHitSamples().ToList();
         }
 
         private double GetEndTime(string[] args) =>

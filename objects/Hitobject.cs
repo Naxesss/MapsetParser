@@ -92,9 +92,9 @@ namespace MapsetParser.objects
                     filename = PathStatic.ParsePath(hitSoundFile, false, true);
             }
 
-            // Sliders include additional edges which support hit sounding, so we
-            // should handle that after those edges are initialized in Slider instead.
-            if (!(this is Slider))
+            // Sliders and spinners include additional edges which support hit sounding, so we
+            // should handle that after those edges are initialized in Slider/Spinner instead.
+            if (!(this is Slider) && !(this is Spinner))
                 usedHitSamples = GetUsedHitSamples().ToList();
         }
 
@@ -375,10 +375,14 @@ namespace MapsetParser.objects
         /// This assumes the game mode is not taiko (special rules apply to taiko only). </summary>
         private IEnumerable<HitSample> GetUsedHitSamplesNonTaiko()
         {
-            // Head
-            foreach (HitSound splitStartHitSound in SplitHitSound(GetStartHitSound().GetValueOrDefault()))
-                yield return GetEdgeSample(time, GetStartSampleset(true), splitStartHitSound);
-            yield return GetEdgeSample(time, GetStartSampleset(false), HitSound.Normal);
+            // Spinners have no impact sound.
+            if (!(this is Spinner))
+            {
+                // Head
+                foreach (HitSound splitStartHitSound in SplitHitSound(GetStartHitSound().GetValueOrDefault()))
+                    yield return GetEdgeSample(time, GetStartSampleset(true), splitStartHitSound);
+                yield return GetEdgeSample(time, GetStartSampleset(false), HitSound.Normal);
+            }
 
             // Hold notes can not have a hit sounds on their tails.
             if (!(this is HoldNote))
