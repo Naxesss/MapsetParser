@@ -419,13 +419,12 @@ namespace MapsetParser.objects
                 {
                     foreach (TimingLine line in lines)
                     {
-                        // Priority: object addition > object sampleset > line sampleset
+                        // Priority: object sampleset > line sampleset
+                        // The addition is ignored for sliderslides, it seems.
                         Beatmap.Sampleset effectiveSampleset =
-                            addition != Beatmap.Sampleset.Auto ?
-                                addition :
-                                sampleset != Beatmap.Sampleset.Auto ?
-                                    sampleset :
-                                    line.sampleset;
+                            sampleset != Beatmap.Sampleset.Auto ?
+                                sampleset :
+                                line.sampleset;
 
                         // The regular sliderslide will always play regardless of using sliderwhistle.
                         yield return new HitSample(
