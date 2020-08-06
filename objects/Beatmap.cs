@@ -398,6 +398,10 @@ namespace MapsetParser.objects
                 // Before the first object, so return the first one.
                 return list[0];
 
+            if (list[index].GetEndTime() < time)
+                // Directly in front of the previous object.
+                return list[index];
+
             return list[index - 1];
         }
 
