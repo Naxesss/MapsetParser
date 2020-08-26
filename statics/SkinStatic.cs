@@ -114,6 +114,7 @@ namespace MapsetParser.statics
             "selection-mod-target.png", // currently only cutting edge
             // combo burst
             "comboburst.png",
+            "comboburst-{n}.png",
             // default numbers, used for combos
             "default-0.png",
             "default-1.png",
