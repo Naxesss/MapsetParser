@@ -292,17 +292,21 @@ namespace MapsetParser.statics
             // modes, doing or-gates on standard for everything because conversions
             AddElements(skinGeneral);
             AddElements(skinStandard, beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.generalSettings.mode == Beatmap.Mode.Standard));
+                beatmap => beatmap.generalSettings.mode == Beatmap.Mode.Standard
+            ));
             AddElements(skinCatch, beatmapSet => beatmapSet.beatmaps.Any(
                 beatmap =>
                     beatmap.generalSettings.mode == Beatmap.Mode.Catch ||
-                    beatmap.generalSettings.mode == Beatmap.Mode.Standard));
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard
+            ));
             AddElements(skinMania, beatmapSet => beatmapSet.beatmaps.Any(
                 beatmap =>
                     beatmap.generalSettings.mode == Beatmap.Mode.Mania ||
-                    beatmap.generalSettings.mode == Beatmap.Mode.Standard));
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard
+            ));
             AddElements(skinNotMania, beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.generalSettings.mode != Beatmap.Mode.Mania));
+                beatmap => beatmap.generalSettings.mode != Beatmap.Mode.Mania
+            ));
 
             // TODO: Taiko skin conversion, see issue #6
             /*AddElements(mSkinTaiko, beatmapSet => beatmapSet.mBeatmaps.Any(
@@ -311,15 +315,28 @@ namespace MapsetParser.statics
 
             // only used in specific cases
             AddElements(skinCountdown, beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.generalSettings.countdown > 0));
-            AddElements(skinStandardSlider, beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.hitObjects.Any(hitObject => hitObject is Slider)));
+                beatmap => beatmap.generalSettings.countdown > 0
+            ));
             AddElement("reversearrow.png", beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.hitObjects.Any(hitObject => (hitObject as Slider)?.edgeAmount > 1)));
-            AddElements(skinStandardSpinner, beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.hitObjects.Any(hitObject => hitObject is Spinner)));
+                beatmap => beatmap.hitObjects.Any(hitObject => (hitObject as Slider)?.edgeAmount > 1)
+            ));
             AddElements(skinBreak, beatmapSet => beatmapSet.beatmaps.Any(
-                beatmap => beatmap.breaks.Any()));
+                beatmap => beatmap.breaks.Any()
+            ));
+
+            // sliders
+            AddElements(skinStandardSlider, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard &&
+                    beatmap.hitObjects.Any(hitObject => hitObject is Slider)
+            ));
+
+            // spinners
+            AddElements(skinStandardSpinner, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard &&
+                    beatmap.hitObjects.Any(hitObject => hitObject is Spinner)
+            ));
 
             // depending on other skin elements
             AddElements(skinNotSliderb, beatmapSet => !beatmapSet.songFilePaths.Any(
