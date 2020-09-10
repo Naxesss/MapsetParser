@@ -229,6 +229,46 @@ namespace MapsetParser.statics
             // input overlay
             "inputoverlay-background.png",
             "inputoverlay-key.png"
+            // catcher
+            "fruit-catcher-idle.png",
+            "fruit-catcher-fail.png",
+            "fruit-catcher-kiai.png",
+            "fruit-ryuuta.png",
+            "fruit-catcher-idle-{n}.png",
+            "fruit-catcher-fail-{n}.png",
+            "fruit-catcher-kiai-{n}.png",
+            "fruit-ryuuta-{n}.png",
+            // comboburst
+            "comboburst-fruits.png",
+            "comboburst-fruits-{n}.png",
+            // fruits
+            "lighting.png",
+            "fruit-pear.png",
+            "fruit-pear-overlay.png",
+            "fruit-grapes.png",
+            "fruit-grapes-overlay.png",
+            "fruit-apple.png",
+            "fruit-apple-overlay.png",
+            "fruit-orange.png",
+            "fruit-orange-overlay.png",
+            "fruit-orange-0.png",  // can apparently be "animated", but only the first frame is actually used
+            "fruit-orange-overlay-0.png"
+        };
+
+        private static readonly string[] skinCatchSlider = new string[]
+        {
+            // according to my other note beatmap skins don't have an effect in the scoreboard
+            // this doesn't really matter, though, since they're part of a set with the main catch files
+            "fruit-drop.png",
+            "fruit-drop-overlay.png"
+        };
+
+        private static readonly string[] skinCatchSpinner = new string[]
+        {
+            // according to my other note beatmap skins don't have an effect in the scoreboard
+            // this doesn't really matter, though, since they're part of a set with the main catch files
+            "fruit-bananas.png",
+            "fruit-bananas-overlay.png"
         };
 
         private static readonly string[] skinNotMania = new string[]
@@ -392,6 +432,12 @@ namespace MapsetParser.statics
                     beatmap.generalSettings.mode == Beatmap.Mode.Standard) &&
                     beatmap.hitObjects.Any(hitObject => hitObject is Slider)
             ));
+            AddElements(skinCatchSlider, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    (beatmap.generalSettings.mode == Beatmap.Mode.Catch ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard) &&
+                    beatmap.hitObjects.Any(hitObject => hitObject is Slider)
+            ));
 
             // spinners
             AddElements(skinStandardSpinner, beatmapSet => beatmapSet.beatmaps.Any(
@@ -402,6 +448,12 @@ namespace MapsetParser.statics
             AddElements(skinTaikoSpinner, beatmapSet => beatmapSet.beatmaps.Any(
                 beatmap =>
                     (beatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard) &&
+                    beatmap.hitObjects.Any(hitObject => hitObject is Spinner)
+            ));
+            AddElements(skinCatchSpinner, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    (beatmap.generalSettings.mode == Beatmap.Mode.Catch ||
                     beatmap.generalSettings.mode == Beatmap.Mode.Standard) &&
                     beatmap.hitObjects.Any(hitObject => hitObject is Spinner)
             ));
