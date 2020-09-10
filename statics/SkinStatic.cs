@@ -170,6 +170,57 @@ namespace MapsetParser.statics
             "comboburst-mania-{n}.png"
         };
 
+        private static readonly string[] skinTaiko = new string[]
+        {
+            // pippidon
+            "pippidonclear.png",
+            "pippidonfail.png",
+            "pippidonidle.png",
+            "pippidonkiai.png",
+            "pippidonclear{n}.png",
+            "pippidonfail{n}.png",
+            "pippidonidle{n}.png",
+            "pippidonkiai{n}.png",
+            // hit bursts
+            "taiko-hit0.png",
+            "taiko-hit100.png",
+            "taiko-hit100k.png",
+            "taiko-hit300.png",
+            "taiko-hit300k.png",
+            "taiko-hit0-{n}.png",
+            "taiko-hit100-{n}.png",
+            "taiko-hit100k-{n}.png",
+            "taiko-hit300-{n}.png",
+            "taiko-hit300k-{n}.png",
+            // notes
+            "taikobigcircle.png",
+            "taikobigcircleoverlay.png",
+            "taikohitcircle.png",
+            "taikohitcircleoverlay.png",
+            "approachcircle.png",
+            "lighting.png",
+            "taikobigcircleoverlay-{n}.png",
+            "taikohitcircleoverlay-{n}.png",
+            // playfield (upper half)
+            "taiko-slider.png",  // beatmap skinnable, but "taiko-slider-fail.png" is not, so probably a bug
+            "taiko-flower-group.png",
+            "taiko-flower-group-{n}.png"
+        };
+
+        private static readonly string[] skinTaikoSlider = new string[]
+        {
+            // drumrolls
+            "taiko-roll-middle.png",
+            "taiko-roll-end.png",
+            "sliderscorepoint.png"
+        };
+
+        private static readonly string[] skinTaikoSpinner = new string[]
+        {
+            // shaker
+            "spinner-warning.png"
+        };
+
         private static readonly string[] skinCatch = new string[]
         {
             // hit burst exception, appears in both modes' result screens
@@ -304,6 +355,11 @@ namespace MapsetParser.statics
                     beatmap.generalSettings.mode == Beatmap.Mode.Mania ||
                     beatmap.generalSettings.mode == Beatmap.Mode.Standard
             ));
+            AddElements(skinTaiko, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    beatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard
+            ));
             AddElements(skinNotMania, beatmapSet => beatmapSet.beatmaps.Any(
                 beatmap => beatmap.generalSettings.mode != Beatmap.Mode.Mania
             ));
@@ -330,11 +386,23 @@ namespace MapsetParser.statics
                     beatmap.generalSettings.mode == Beatmap.Mode.Standard &&
                     beatmap.hitObjects.Any(hitObject => hitObject is Slider)
             ));
+            AddElements(skinTaikoSlider, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    (beatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard) &&
+                    beatmap.hitObjects.Any(hitObject => hitObject is Slider)
+            ));
 
             // spinners
             AddElements(skinStandardSpinner, beatmapSet => beatmapSet.beatmaps.Any(
                 beatmap =>
                     beatmap.generalSettings.mode == Beatmap.Mode.Standard &&
+                    beatmap.hitObjects.Any(hitObject => hitObject is Spinner)
+            ));
+            AddElements(skinTaikoSpinner, beatmapSet => beatmapSet.beatmaps.Any(
+                beatmap =>
+                    (beatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                    beatmap.generalSettings.mode == Beatmap.Mode.Standard) &&
                     beatmap.hitObjects.Any(hitObject => hitObject is Spinner)
             ));
 
