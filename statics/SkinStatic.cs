@@ -151,7 +151,23 @@ namespace MapsetParser.statics
             "selection-mod-key8.png",
             "selection-mod-key9.png",
             "selection-mod-keycoop.png",
-            "selection-mod-random.png"
+            "selection-mod-random.png",
+            // hit bursts
+            "mania-hit0.png",
+            "mania-hit50.png",
+            "mania-hit100.png",
+            "mania-hit200.png",
+            "mania-hit300.png",
+            "mania-hit300g.png",
+            "mania-hit0-{n}.png",
+            "mania-hit50-{n}.png",
+            "mania-hit100-{n}.png",
+            "mania-hit200-{n}.png",
+            "mania-hit300-{n}.png",
+            "mania-hit300g-{n}.png",
+            // combo bursts
+            "comboburst-mania.png",
+            "comboburst-mania-{n}.png"
         };
 
         private static readonly string[] skinCatch = new string[]
