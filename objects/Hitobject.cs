@@ -426,6 +426,10 @@ namespace MapsetParser.objects
                                 sampleset :
                                 line.sampleset;
 
+                        // Additions are not ignored for sliderwhistles, however.
+                        if (slider.hitSound == HitSound.Whistle)
+                            effectiveSampleset = addition != Beatmap.Sampleset.Auto ? addition : effectiveSampleset;
+
                         // The regular sliderslide will always play regardless of using sliderwhistle.
                         yield return new HitSample(
                             line.customIndex,
@@ -457,7 +461,7 @@ namespace MapsetParser.objects
                         // If no line exists, we use the default settings.
                         int customIndex = line?.customIndex ?? 1;
 
-                        // Unlike the slider body and edges, slider ticks are unaffected by additions.
+                        // Unlike the slider body (for sliderwhistles) and edges, slider ticks are unaffected by additions.
                         Beatmap.Sampleset sampleset = GetSampleset(false, tickTime);
 
                         // Defaults to normal if none is set (before any timing line).
