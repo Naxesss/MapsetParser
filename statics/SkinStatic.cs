@@ -228,7 +228,7 @@ namespace MapsetParser.statics
             // "hit0.png",
             // input overlay
             "inputoverlay-background.png",
-            "inputoverlay-key.png"
+            "inputoverlay-key.png",
             // catcher
             "fruit-catcher-idle.png",
             "fruit-catcher-fail.png",
