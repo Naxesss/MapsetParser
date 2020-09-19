@@ -247,12 +247,12 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the difference in time between the start of this object and the end of the previous object. </summary>
         public double GetPrevDeltaTime() =>
-            time - beatmap.GetPrevHitObject(time).GetEndTime();
+            time - Prev().GetEndTime();
 
         /// <summary> Returns the difference in distance between the start of this object and the end of the previous object. </summary>
         public double GetPrevDistance()
         {
-            HitObject prevObject = beatmap.GetPrevHitObject(time);
+            HitObject prevObject = Prev();
 
             Vector2 prevPosition = prevObject.Position;
             if (prevObject is Slider slider)
