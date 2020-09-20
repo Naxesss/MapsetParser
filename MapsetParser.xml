@@ -131,12 +131,25 @@
         <member name="M:MapsetParser.objects.Beatmap.GetLowestDivisor(System.Double)">
             <summary> Returns the lowest possible beat snap divisor to get to the given time with less than 2 ms of unsnap, 0 if unsnapped. </summary>
         </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetTheoreticalUnsnap(System.Double,System.Int32,System.Int32)">
-            <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. </summary>
+        <member name="M:MapsetParser.objects.Beatmap.GetTheoreticalUnsnap(System.Double)">
+            <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. Can be negative. </summary>
         </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetPracticalUnsnap(System.Double,System.Int32,System.Int32)">
+        <member name="M:MapsetParser.objects.Beatmap.GetTheoreticalUnsnap(System.Double,System.Int32,MapsetParser.objects.timinglines.UninheritedLine)">
+            <summary> Returns the unsnap, from the given snap divisor, ignoring all of the game's rounding and other approximations. 
+            Optionally supply the uninherited line, instead of the method looking this up itself. The value returned is in terms of
+            how much the object needs to be moved forwards in time to be snapped. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.Beatmap.GetPracticalUnsnap(System.Double)">
             <summary> Returns the unsnap accounting for the way the game rounds (or more accurately doesn't round) snapping. <para/>
             The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.Beatmap.GetPracticalUnsnap(System.Double,System.Int32,MapsetParser.objects.timinglines.UninheritedLine)">
+            <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetTheoreticalUnsnap(System.Double,System.Int32,MapsetParser.objects.timinglines.UninheritedLine)"/>, except accounts for the way
+            the game rounds ms times, like <see cref="M:MapsetParser.objects.Beatmap.GetPracticalUnsnap(System.Double)"/> does. </summary>
+        </member>
+        <member name="M:MapsetParser.objects.Beatmap.GetPracticalUnsnapFromTheoretical(System.Double,System.Double)">
+            <summary> Returns the practical unsnap for the given time and theoretical unsnap, by accounting for how the
+            game rounds (or more accurately casts to int) ms values. </summary>
         </member>
         <!-- Badly formed XML comment ignored for member "M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)" -->
         <member name="M:MapsetParser.objects.Beatmap.GetObjectDensity">

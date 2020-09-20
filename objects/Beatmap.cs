@@ -431,9 +431,7 @@ namespace MapsetParser.objects
             int thresholdUnrankable = 2;
 
             double unsnap = GetPracticalUnsnap(time);
-            double roundUnsnap = Math.Abs(unsnap);
-
-            if (roundUnsnap >= thresholdUnrankable)
+            if (Math.Abs(unsnap) >= thresholdUnrankable)
                 return unsnap;
 
             return null;
@@ -668,13 +666,14 @@ namespace MapsetParser.objects
             return beatOffset;
         }
 
-        private readonly int[] divisors = new int[] { 1, 2, 3, 4, 6, 8, 12, 16 };
+        private readonly int[] divisors = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16 };
         /// <summary> Returns the lowest possible beat snap divisor to get to the given time with less than 2 ms of unsnap, 0 if unsnapped. </summary>
         public int GetLowestDivisor(double time)
         {
+            UninheritedLine line = GetTimingLine<UninheritedLine>(time);
             foreach (int divisor in divisors)
             {
-                double unsnap = Math.Abs(GetPracticalUnsnap(time, divisor, 1));
+                double unsnap = Math.Abs(GetPracticalUnsnap(time, divisor, line));
                 if (unsnap < 2)
                     return divisor;
             }
@@ -682,40 +681,55 @@ namespace MapsetParser.objects
             return 0;
         }
 
-        /// <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. </summary>
-        public double GetTheoreticalUnsnap(double time, int twoDivisor = 16, int threeDivisor = 12)
+        /// <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. Can be negative. </summary>
+        public double GetTheoreticalUnsnap(double time)
         {
             UninheritedLine line = GetTimingLine<UninheritedLine>(time);
+            double[] theoreticalUnsnaps = {
+                GetTheoreticalUnsnap(time, 16, line),
+                GetTheoreticalUnsnap(time, 12, line),
+                GetTheoreticalUnsnap(time, 9, line),
+                GetTheoreticalUnsnap(time, 7, line),
+                GetTheoreticalUnsnap(time, 5, line),
+            };
+
+            // Assume the closest possible snapping & retain signed values.
+            double minUnsnap = theoreticalUnsnaps.Min(unsnap => Math.Abs(unsnap));
+            return theoreticalUnsnaps.First(unsnap => Math.Abs(unsnap) == minUnsnap);
+        }
+
+        /// <summary> Returns the unsnap, from the given snap divisor, ignoring all of the game's rounding and other approximations. 
+        /// Optionally supply the uninherited line, instead of the method looking this up itself. The value returned is in terms of
+        /// how much the object needs to be moved forwards in time to be snapped. </summary>
+        public double GetTheoreticalUnsnap(double time, int divisor, UninheritedLine line = null)
+        {
+            if (line == null)
+                line = GetTimingLine<UninheritedLine>(time);
 
             double beatOffset      = GetOffsetIntoBeat(time);
             double currentFraction = beatOffset / line.msPerBeat;
 
-            // 1/16
-            double desiredFractionSecond = Math.Round(currentFraction * twoDivisor) / twoDivisor;
-            double differenceFractionSecond = currentFraction - desiredFractionSecond;
-            double theoreticalUnsnapSecond = differenceFractionSecond * line.msPerBeat;
+            double desiredFraction    = Math.Round(currentFraction * divisor) / divisor;
+            double differenceFraction = currentFraction - desiredFraction;
+            double theoreticalUnsnap  = differenceFraction * line.msPerBeat;
 
-            // 1/12
-            double desiredFractionThird = Math.Round(currentFraction * threeDivisor) / threeDivisor;
-            double differenceFractionThird = currentFraction - desiredFractionThird;
-            double theoreticalUnsnapThird = differenceFractionThird * line.msPerBeat;
-
-            // picks the smaller of the two as unsnap
-            return Math.Abs(theoreticalUnsnapThird) > Math.Abs(theoreticalUnsnapSecond)
-                ? theoreticalUnsnapSecond : theoreticalUnsnapThird;
+            return theoreticalUnsnap;
         }
 
         /// <summary> Returns the unsnap accounting for the way the game rounds (or more accurately doesn't round) snapping. <para/>
         /// The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
-        public double GetPracticalUnsnap(double time, int twoDivisor = 16, int threeDivisor = 12)
-        {
-            double theoreticalUnsnap = GetTheoreticalUnsnap(time, twoDivisor, threeDivisor);
-            
-            double desiredTime = Timestamp.Round(time - theoreticalUnsnap);
-            double practicalUnsnap = desiredTime - time;
+        public double GetPracticalUnsnap(double time) =>
+            GetPracticalUnsnapFromTheoretical(time, GetTheoreticalUnsnap(time));
 
-            return practicalUnsnap;
-        }
+        /// <summary> Same as <see cref="GetTheoreticalUnsnap(double, int, UninheritedLine)"/>, except accounts for the way
+        /// the game rounds ms times, like <see cref="GetPracticalUnsnap(double)"/> does. </summary>
+        public double GetPracticalUnsnap(double time, int divisor, UninheritedLine line = null) =>
+            GetPracticalUnsnapFromTheoretical(time, GetTheoreticalUnsnap(time, divisor, line));
+
+        /// <summary> Returns the practical unsnap for the given time and theoretical unsnap, by accounting for how the
+        /// game rounds (or more accurately casts to int) ms values. </summary>
+        private double GetPracticalUnsnapFromTheoretical(double time, double theoreticalUnsnap) =>
+            Timestamp.Round(time - theoreticalUnsnap) - time;
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object.
         public int GetCombo(HitObject hitObject)
