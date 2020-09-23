@@ -456,13 +456,15 @@ namespace MapsetParser.objects
                 {
                     foreach (double tickTime in slider.sliderTickTimes)
                     {
-                        TimingLine line = beatmap.GetTimingLine(tickTime, true);
+                        // Our `sliderTickTimes` are approximate values, the game chooses sampleset based on precise tick times, so we should too.
+                        double preciseTickTime = tickTime + beatmap.GetTheoreticalUnsnap(tickTime);
+                        TimingLine line = beatmap.GetTimingLine(preciseTickTime, true);
 
                         // If no line exists, we use the default settings.
                         int customIndex = line?.customIndex ?? 1;
 
                         // Unlike the slider body (for sliderwhistles) and edges, slider ticks are unaffected by additions.
-                        Beatmap.Sampleset sampleset = GetSampleset(false, tickTime);
+                        Beatmap.Sampleset sampleset = GetSampleset(false, preciseTickTime);
 
                         // Defaults to normal if none is set (before any timing line).
                         if (sampleset == Beatmap.Sampleset.Auto)
