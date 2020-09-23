@@ -456,7 +456,7 @@ namespace MapsetParser.objects
                 {
                     foreach (double tickTime in slider.sliderTickTimes)
                     {
-                        TimingLine line = beatmap.GetTimingLine(tickTime);
+                        TimingLine line = beatmap.GetTimingLine(tickTime, true);
 
                         // If no line exists, we use the default settings.
                         int customIndex = line?.customIndex ?? 1;
