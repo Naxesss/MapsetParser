@@ -382,6 +382,9 @@
         <member name="M:MapsetParser.objects.HitObject.GetEndTime">
             <summary> Returns the end time of the hit object, or the start time if no end time exists. </summary>
         </member>
+        <member name="M:MapsetParser.objects.HitObject.GetLength">
+            <summary> Returns the length of the hit object, if it has one, otherwise 0. </summary>
+        </member>
         <member name="M:MapsetParser.objects.HitObject.GetPartName(System.Double)">
             <summary> Returns the name of the object part at the given time, for example "Slider head", "Slider reverse", "Circle" or "Spinner tail". </summary>
         </member>

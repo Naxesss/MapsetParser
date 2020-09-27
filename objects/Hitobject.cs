@@ -544,6 +544,10 @@ namespace MapsetParser.objects
                 time;
         }
 
+        /// <summary> Returns the length of the hit object, if it has one, otherwise 0. </summary>
+        public double GetLength() =>
+            GetEndTime() - time;
+
         /// <summary> Returns the name of the object part at the given time, for example "Slider head", "Slider reverse", "Circle" or "Spinner tail". </summary>
         public string GetPartName(double time)
         {
