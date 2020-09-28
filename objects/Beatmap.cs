@@ -731,7 +731,7 @@ namespace MapsetParser.objects
         private double GetPracticalUnsnapFromTheoretical(double time, double theoreticalUnsnap) =>
             Timestamp.Round(time - theoreticalUnsnap) - time;
 
-        /// <summary> Returns the combo number (the number you see on the notes), of a given hit object.
+        /// <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
         public int GetCombo(HitObject hitObject)
         {
             int combo = 1;
