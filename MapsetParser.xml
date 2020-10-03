@@ -151,7 +151,9 @@
             <summary> Returns the practical unsnap for the given time and theoretical unsnap, by accounting for how the
             game rounds (or more accurately casts to int) ms values. </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)" -->
+        <member name="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)">
+            <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
+        </member>
         <member name="M:MapsetParser.objects.Beatmap.GetObjectDensity">
             <summary> Returns the hit object count divided by the drain time. </summary>
         </member>
