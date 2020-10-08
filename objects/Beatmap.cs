@@ -671,14 +671,13 @@ namespace MapsetParser.objects
         public int GetLowestDivisor(double time)
         {
             UninheritedLine line = GetTimingLine<UninheritedLine>(time);
-            foreach (int divisor in divisors)
-            {
-                double unsnap = Math.Abs(GetPracticalUnsnap(time, divisor, line));
-                if (unsnap < 2)
-                    return divisor;
-            }
-            
-            return 0;
+            double GetAbsoluteUnsnap(int divisor) => Math.Abs(GetPracticalUnsnap(time, divisor, line));
+
+            double minUnsnap = divisors.Min(GetAbsoluteUnsnap);
+            if (minUnsnap > 2)
+                return 0;
+
+            return divisors.First(divisor => GetAbsoluteUnsnap(divisor) == minUnsnap);
         }
 
         /// <summary> Returns the unsnap ignoring all of the game's rounding and other approximations. Can be negative. </summary>
