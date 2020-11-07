@@ -77,5 +77,35 @@ namespace MapsetParser.settings
                 .Replace("\"", "")
                 .Replace("<", "")
                 .Replace(">", "");
+
+        /// <summary> Returns the tag which covers the given word, if any, otherwise null. </summary>
+        /// <param name="searchWord"> The search word which we want a tag covering, cannot contain spaces. </param>
+        public string GetCoveringTag(string searchWord)
+        {
+            if (searchWord.Contains(" "))
+                throw new ArgumentException($"`searchWord` cannot contain whitespace characters, was given \"{searchWord}\".");
+
+            foreach (string tagWord in tags.ToLower().Split(" "))
+                if (tagWord.Contains(searchWord.ToLower()))
+                    return tagWord;
+
+            return null;
+        }
+
+        /// <summary> Returns all space-separated strings from the given search term which are not covered by tags
+        /// (e.g. "One two" with tags "oneth" would return `{ "two" }`). </summary>
+        /// <param name="searchTerm"> The search term which we want tags covering. </param>
+        public IEnumerable<string> GetMissingWordsFromTags(string searchTerm)
+        {
+            foreach (string searchWord in searchTerm.Split(" "))
+                if (GetCoveringTag(searchWord) == null)
+                    yield return searchWord;
+        }
+
+        /// <summary> Returns whether all space-separated parts of the given search term is covered by tags
+        /// (e.g. "Skull Kid" would be covered by "skull_kid"). </summary>
+        /// <param name="searchTerm"> The search term which we want tags covering. </param>
+        public bool IsCoveredByTags(string searchTerm) =>
+            !GetMissingWordsFromTags(searchTerm).Any();
     }
 }

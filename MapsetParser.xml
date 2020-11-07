@@ -518,6 +518,20 @@
         <member name="M:MapsetParser.settings.MetadataSettings.GetFileNameFiltered(System.String)">
             <summary> Returns the same string lowercase and filtered from characters disabled in file names. </summary>
         </member>
+        <member name="M:MapsetParser.settings.MetadataSettings.GetCoveringTag(System.String)">
+            <summary> Returns the tag which covers the given word, if any, otherwise null. </summary>
+            <param name="searchWord"> The search word which we want a tag covering, cannot contain spaces. </param>
+        </member>
+        <member name="M:MapsetParser.settings.MetadataSettings.GetMissingWordsFromTags(System.String)">
+            <summary> Returns all space-separated strings from the given search term which are not covered by tags
+            (e.g. "One two" with tags "oneth" would return `{ "two" }`). </summary>
+            <param name="searchTerm"> The search term which we want tags covering. </param>
+        </member>
+        <member name="M:MapsetParser.settings.MetadataSettings.IsCoveredByTags(System.String)">
+            <summary> Returns whether all space-separated parts of the given search term is covered by tags
+            (e.g. "Skull Kid" would be covered by "skull_kid"). </summary>
+            <param name="searchTerm"> The search term which we want tags covering. </param>
+        </member>
         <member name="M:MapsetParser.starrating.standard.Skill.GetStrainDecay(System.Double)">
             <summary> Returns how much to decay the strain over a given delta time in ms. </summary>
         </member>
