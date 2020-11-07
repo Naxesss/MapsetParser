@@ -38,21 +38,21 @@ namespace MapsetParser.settings
         public MetadataSettings(string[] lines)
         {
             // unlike hitobjects metadata settings gets the whole section and not line by line as code
-            
-            title          = GetValue(lines, "Title");
-            titleUnicode   = GetValue(lines, "TitleUnicode") ?? title;
-            artist         = GetValue(lines, "Artist");
-            artistUnicode  = GetValue(lines, "ArtistUnicode") ?? artist;
 
-            creator    = GetValue(lines, "Creator");
-            version    = GetValue(lines, "Version");
-            source     = GetValue(lines, "Source") ?? "";
-            tags       = GetValue(lines, "Tags") ?? "";
+            title         = GetValue(lines, "Title");
+            titleUnicode  = GetValue(lines, "TitleUnicode") ?? title;
+            artist        = GetValue(lines, "Artist");
+            artistUnicode = GetValue(lines, "ArtistUnicode") ?? artist;
+
+            creator = GetValue(lines, "Creator");
+            version = GetValue(lines, "Version");
+            source  = GetValue(lines, "Source") ?? "";
+            tags    = GetValue(lines, "Tags") ?? "";
 
             // check to see if the ids are even there (don't exist in lower osu file versions, and aren't set on non-published maps)
-            beatmapId       = (GetValue(lines, "BeatmapID") ?? "0") == "0" ?
+            beatmapId    = (GetValue(lines, "BeatmapID") ?? "0") == "0" ?
                                 (ulong?)null : ulong.Parse(GetValue(lines, "BeatmapID"));
-            beatmapSetId    = (GetValue(lines, "BeatmapSetID") ?? "-1") == "-1" ?
+            beatmapSetId = (GetValue(lines, "BeatmapSetID") ?? "-1") == "-1" ?
                                 (ulong?)null : ulong.Parse(GetValue(lines, "BeatmapSetID"));
         }
 
