@@ -301,19 +301,14 @@ namespace MapsetParser.objects.hitobjects
         /// <summary> Returns the position on the curve at a given point in time (intensive, consider using mPathPxPositions). </summary>
         public Vector2 GetPathPosition(double time)
         {
-            switch (curveType)
+            return curveType switch
             {
-                case CurveType.Linear:
-                    return GetLinearPathPosition(time);
-                case CurveType.Passthrough:
-                    return GetPassthroughPathPosition(time);
-                case CurveType.Bezier:
-                    return GetBezierPathPosition(time);
-                case CurveType.Catmull:
-                    return GetCatmullPathPosition(time);
-                default:
-                    return new Vector2(0, 0);
-            }
+                CurveType.Linear => GetLinearPathPosition(time),
+                CurveType.Passthrough => GetPassthroughPathPosition(time),
+                CurveType.Bezier => GetBezierPathPosition(time),
+                CurveType.Catmull => GetCatmullPathPosition(time),
+                _ => new Vector2(0, 0),
+            };
         }
 
         /// <summary> Returns the speed of any slider starting from the given time in px/ms. Caps SV within range 0.1-10. </summary>
