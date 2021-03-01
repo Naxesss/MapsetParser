@@ -511,10 +511,16 @@ namespace MapsetParser.objects.hitobjects
             Vector2 endPoint      = nodePositions.ElementAt(prevNodeIndex);
             double pointDistance  = GetDistance(startPoint, endPoint);
             double microFraction  = fractionDistance / pointDistance;
-            
+
+            if (pointDistance == 0)
+                // With no distance between points, we will simply end up with the start point.
+                // Note that `microFraction` is NaN in this case, so without this we would return {NaN, NaN}.
+                return startPoint;
+
             return startPoint + new Vector2(
                 (endPoint - startPoint).X * (float)microFraction,
-                (endPoint - startPoint).Y * (float)microFraction);
+                (endPoint - startPoint).Y * (float)microFraction
+            );
         }
 
         private Vector2 GetPassthroughPathPosition(double time)
