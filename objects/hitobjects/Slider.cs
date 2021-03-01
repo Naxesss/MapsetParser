@@ -491,12 +491,12 @@ namespace MapsetParser.objects.hitobjects
             int prevNodeIndex = 0;
             foreach(double pathLength in pathLengths)
             {
+                ++prevNodeIndex;
+
                 if (fractionDistance > pathLength)
                     fractionDistance -= pathLength;
                 else
                     break;
-
-                ++prevNodeIndex;
             }
 
             if (prevNodeIndex >= nodePositions.Count())
@@ -506,11 +506,6 @@ namespace MapsetParser.objects.hitobjects
             Vector2 endPoint      = nodePositions.ElementAt(prevNodeIndex);
             double pointDistance  = GetDistance(startPoint, endPoint);
             double microFraction  = fractionDistance / pointDistance;
-
-            if (pointDistance == 0)
-                // With no distance between points, we will simply end up with the start point.
-                // Note that `microFraction` is NaN in this case, so without this we would return {NaN, NaN}.
-                return startPoint;
 
             return startPoint + new Vector2(
                 (endPoint - startPoint).X * (float)microFraction,
