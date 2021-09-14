@@ -96,10 +96,11 @@ namespace MapsetParser.objects
             timingLines = GetTimingLines(lines);
             hitObjects  = GetHitobjects(lines);
 
-            if (generalSettings.mode == Mode.Standard)
-            {
-                // Stacking is standard-only.
-                ApplyStacking();
+            if (generalSettings.mode != Mode.Standard)
+                return;
+
+            // Stacking is standard-only.
+            ApplyStacking();
 
                 this.starRating = starRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
             }
