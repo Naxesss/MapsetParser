@@ -33,6 +33,7 @@ namespace MapsetParser.statics
             // scorebar
             "scorebar-bg.png",
             "scorebar-colour.png",
+            "scorebar-colour-{n}.png",
             // score numbers
             "score-0.png",
             "score-1.png",
@@ -89,6 +90,7 @@ namespace MapsetParser.statics
             "selection-mod-nofail.png",
             "selection-mod-perfect.png",
             "selection-mod-suddendeath.png",
+            "selection-mod-scorev2.png",
             // sounds in gameplay
             "applause.wav", "applause.mp3", "applause.ogg",
             "comboburst.wav", "comboburst.mp3", "comboburst.ogg",
