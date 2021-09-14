@@ -507,10 +507,10 @@
             <summary> Returns the radius of a circle or slider from the circle size. </summary>
         </member>
         <member name="M:MapsetParser.settings.DifficultySettings.GetFadeInTime">
-            <summary> Returns the time from where the object begins fading in to where it is fully opaque.  </summary>
+            <summary> Returns the time from where the object begins fading in to where it is fully opaque. </summary>
         </member>
         <member name="M:MapsetParser.settings.DifficultySettings.GetPreemptTime">
-            <summary> Returns the time from where the object is fully opaque to where it is on the timeline.  </summary>
+            <summary> Returns the time from where the object is fully opaque to where it is on the timeline. </summary>
         </member>
         <member name="T:MapsetParser.settings.GeneralSettings.Countdown">
             <summary> The speed at which countdown occurs, if any. Normal is 1 per beat. </summary>
@@ -532,23 +532,216 @@
             (e.g. "Skull Kid" would be covered by "skull_kid"). </summary>
             <param name="searchTerm"> The search term which we want tags covering. </param>
         </member>
-        <member name="M:MapsetParser.starrating.standard.Skill.GetStrainDecay(System.Double)">
-            <summary> Returns how much to decay the strain over a given delta time in ms. </summary>
+        <member name="P:MapsetParser.starrating.DifficultyCalculator.SectionLength">
+            <summary>
+            The length of each strain section.
+            </summary>
         </member>
-        <member name="M:MapsetParser.starrating.standard.Skill.Process(MapsetParser.objects.HitObject)">
-            <summary> Covers base mechanics for strain, like decaying over time and increasing for each given object. </summary>
+        <member name="M:MapsetParser.starrating.DifficultyCalculator.Calculate">
+            <summary>
+            Calculates the difficulty of the beatmap using a specific mod combination.
+            </summary>
+            <param name="mods">The mods that should be applied to the beatmap.</param>
+            <returns>A structure describing the difficulty of the beatmap.</returns>
         </member>
-        <member name="M:MapsetParser.starrating.standard.Skill.SaveCurrentPeak">
-            <summary> Adds the current strain peak to a list, but only if at least one object was processed in total. </summary>
+        <member name="M:MapsetParser.starrating.DifficultyCalculator.CalculateAll">
+            <summary>
+            Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
+            </summary>
+            <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
         </member>
-        <member name="M:MapsetParser.starrating.standard.Skill.StartNewSectionFrom(System.Double)">
-            <summary> Decays the current strain peak based on the given offset and time since last object. </summary>
+        <member name="M:MapsetParser.starrating.DifficultyCalculator.SortObjects(System.Collections.Generic.IEnumerable{MapsetParser.starrating.preprocessing.DifficultyHitObject})">
+            <summary>
+            Sorts a given set of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.
+            </summary>
+            <param name="input">The <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s to sort.</param>
+            <returns>The sorted <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.</returns>
         </member>
-        <member name="M:MapsetParser.starrating.standard.Skill.DifficultyValue">
-            <summary> Returns the weighted total of peaks, where each is weighed 90% of the previous, starting from the highest. </summary>
+        <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateDifficultyAttributes(MapsetParser.objects.Beatmap,MapsetParser.starrating.skills.Skill[])">
+            <summary>
+            Creates <see cref="T:MapsetParser.starrating.DifficultyAttributes"/> to describe beatmap's calculated difficulty.
+            </summary>
+            <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty was calculated.</param>
+            <param name="mods">The <see cref="!:Mod"/>s that difficulty was calculated with.</param>
+            <param name="skills">The skills which processed the beatmap.</param>
+            <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         </member>
-        <member name="M:MapsetParser.starrating.standard.StandardDifficultyCalculator.Calculate(MapsetParser.objects.Beatmap)">
-            <summary> Returns a tuple of aim rating, speed rating, and star rating (calculated from the other two) respectively. </summary>
+        <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateDifficultyHitObjects(MapsetParser.objects.Beatmap)">
+            <summary>
+            Enumerates <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s to be processed from <see cref="T:MapsetParser.objects.HitObject"/>s in the <see cref="!:IBeatmap"/>.
+            </summary>
+            <param name="beatmap">The <see cref="!:IBeatmap"/> providing the <see cref="T:MapsetParser.objects.HitObject"/>s to enumerate.</param>
+            <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+            <returns>The enumerated <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.</returns>
+        </member>
+        <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateSkills(MapsetParser.objects.Beatmap)">
+            <summary>
+            Creates the <see cref="T:MapsetParser.starrating.skills.Skill"/>s to calculate the difficulty of an <see cref="!:IBeatmap"/>.
+            </summary>
+            <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty will be calculated.</param>
+            <returns>The <see cref="T:MapsetParser.starrating.skills.Skill"/>s.</returns>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.JumpDistance">
+            <summary>
+            Normalized distance from the end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> to the start position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelDistance">
+            <summary>
+            Normalized distance between the start and end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.Angle">
+            <summary>
+            Angle the player has to take to hit this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            Calculated as the angle between the circles (current-2, current-1, current).
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.StrainTime">
+            <summary>
+            Milliseconds elapsed since the start time of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>, with a minimum of 50ms.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.osu.skills.Aim">
+            <summary>
+            Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.osu.skills.Speed">
+            <summary>
+            Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.preprocessing.DifficultyHitObject">
+            <summary>
+            Wraps a <see cref="T:MapsetParser.objects.HitObject"/> and provides additional information to be used for difficulty calculation.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject">
+            <summary>
+            The <see cref="T:MapsetParser.objects.HitObject"/> this <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> wraps.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.LastObject">
+            <summary>
+            The last <see cref="T:MapsetParser.objects.HitObject"/> which occurs before <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.DeltaTime">
+            <summary>
+            Amount of time elapsed between <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject"/> and <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.LastObject"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.preprocessing.DifficultyHitObject.#ctor(MapsetParser.objects.HitObject,MapsetParser.objects.HitObject)">
+            <summary>
+            Creates a new <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>.
+            </summary>
+            <param name="hitObject">The <see cref="T:MapsetParser.objects.HitObject"/> which this <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> wraps.</param>
+            <param name="lastObject">The last <see cref="T:MapsetParser.objects.HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
+            <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        </member>
+        <member name="T:MapsetParser.starrating.skills.Skill">
+            <summary>
+            Used to processes strain values of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
+            and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.Skill.StrainPeaks">
+            <summary>
+            The peak strain for each <see cref="P:MapsetParser.starrating.DifficultyCalculator.SectionLength"/> section of the beatmap.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.Skill.SkillMultiplier">
+            <summary>
+            Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.Skill.StrainDecayBase">
+            <summary>
+            Determines how quickly strain decays for the given skill.
+            For example a value of 0.15 indicates that strain decays to 15% of its original value in one second.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.Skill.DecayWeight">
+            <summary>
+            The weight by which each strain value decays.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.skills.Skill.Previous">
+            <summary>
+            <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.Skill.CurrentStrain">
+            <summary>
+            The current strain level.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.Process(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Process a <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> and update current strain values accordingly.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.SaveCurrentPeak">
+            <summary>
+            Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.StartNewSectionFrom(System.Double)">
+            <summary>
+            Sets the initial strain level for a new section.
+            </summary>
+            <param name="time">The beginning of the new section in milliseconds.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.GetPeakStrain(System.Double)">
+            <summary>
+            Retrieves the peak strain at a point in time.
+            </summary>
+            <param name="time">The time to retrieve the peak strain at.</param>
+            <returns>The peak strain.</returns>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.DifficultyValue">
+            <summary>
+            Returns the calculated difficulty value representing all processed <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.StrainValueOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Calculates the strain value of a <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>. This value is affected by previously processed objects.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.utils.LimitedCapacityStack`1">
+            <summary>
+            An indexed stack with limited depth. Indexing starts at the top of the stack.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.utils.LimitedCapacityStack`1.Count">
+            <summary>
+            The number of elements in the stack.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityStack`1.#ctor(System.Int32)">
+            <summary>
+            Constructs a new <see cref="T:MapsetParser.starrating.utils.LimitedCapacityStack`1"/>.
+            </summary>
+            <param name="capacity">The number of items the stack can hold.</param>
+        </member>
+        <member name="P:MapsetParser.starrating.utils.LimitedCapacityStack`1.Item(System.Int32)">
+            <summary>
+            Retrieves the item at an index in the stack.
+            </summary>
+            <param name="i">The index of the item to retrieve. The top of the stack is returned at index 0.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityStack`1.Push(`0)">
+            <summary>
+            Pushes an item to this <see cref="T:MapsetParser.starrating.utils.LimitedCapacityStack`1"/>.
+            </summary>
+            <param name="item">The item to push.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityStack`1.GetEnumerator">
+            <summary>
+            Returns an enumerator which enumerates items in the history starting from the most recently added one.
+            </summary>
         </member>
         <member name="P:MapsetParser.statics.EventStatic.OnLoadStart">
             <summary> Called whenever loading of something is started. </summary>
