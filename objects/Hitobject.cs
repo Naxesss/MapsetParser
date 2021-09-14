@@ -426,10 +426,6 @@ namespace MapsetParser.objects
                                 sampleset :
                                 line.sampleset;
 
-                        // Additions are not ignored for sliderwhistles, however.
-                        if (slider.hitSound == HitSound.Whistle)
-                            effectiveSampleset = addition != Beatmap.Sampleset.Auto ? addition : effectiveSampleset;
-
                         // The regular sliderslide will always play regardless of using sliderwhistle.
                         yield return new HitSample(
                             line.customIndex,
@@ -437,6 +433,10 @@ namespace MapsetParser.objects
                             HitSound.None,
                             HitSample.HitSource.Body,
                             line.offset);
+
+                        // Additions are not ignored for sliderwhistles, however.
+                        if (slider.hitSound == HitSound.Whistle)
+                            effectiveSampleset = addition != Beatmap.Sampleset.Auto ? addition : effectiveSampleset;
 
                         if (hitSound != HitSound.None)
                         {
