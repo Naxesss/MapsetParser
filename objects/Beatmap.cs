@@ -7,11 +7,12 @@ using MapsetParser.settings;
 using MapsetParser.objects.events;
 using MapsetParser.objects.hitobjects;
 using MapsetParser.objects.timinglines;
-using MapsetParser.starrating.standard;
 using System.Numerics;
 using MapsetParser.statics;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
+using MapsetParser.starrating.osu;
+using MapsetParser.starrating;
 
 namespace MapsetParser.objects
 {
@@ -22,7 +23,8 @@ namespace MapsetParser.objects
         public string mapPath;
 
         // star rating
-        public float? starRating;
+        public double starRating;
+        public DifficultyAttributes difficultyAttributes;
 
         // settings
         public GeneralSettings      generalSettings;
@@ -71,7 +73,7 @@ namespace MapsetParser.objects
             Ultra
         }
 
-        public Beatmap(string code, float? starRating = null, string songPath = null, string mapPath = null)
+        public Beatmap(string code, double? starRating = null, string songPath = null, string mapPath = null)
         {
             this.code       = code;
             this.songPath   = songPath;
@@ -102,7 +104,13 @@ namespace MapsetParser.objects
             // Stacking is standard-only.
             ApplyStacking();
 
-                this.starRating = starRating ?? (float)StandardDifficultyCalculator.Calculate(this).Item3;
+            if (starRating != null)
+                this.starRating = starRating.Value;
+            else
+            {
+                DifficultyAttributes attributes = new OsuDifficultyCalculator(this).Calculate();
+                difficultyAttributes = attributes;
+                this.starRating      = attributes.StarRating;
             }
         }
 

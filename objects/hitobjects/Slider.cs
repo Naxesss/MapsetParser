@@ -57,6 +57,9 @@ namespace MapsetParser.objects.hitobjects
         public Vector2 UnstackedEndPosition { get; private set; }
         public Vector2 EndPosition => UnstackedEndPosition + Position - UnstackedPosition;
 
+        public Vector2 LazyEndPosition { get; set; }
+        public double  LazyTravelDistance { get; set; }
+
         public Slider(string[] args, Beatmap beatmap)
             : base(args, beatmap)
         {
@@ -90,6 +93,10 @@ namespace MapsetParser.objects.hitobjects
                 sliderTickTimes = GetSliderTickTimes();
 
                 UnstackedEndPosition = edgeAmount % 2 == 1 ? pathPxPositions.Last() : UnstackedPosition;
+
+                // Difficulty
+                LazyEndPosition = Position;
+                LazyTravelDistance = 0;
             }
 
             usedHitSamples = GetUsedHitSamples().ToList();
