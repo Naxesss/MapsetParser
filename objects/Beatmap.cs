@@ -718,7 +718,7 @@ namespace MapsetParser.objects
             double currentFraction = beatOffset / line.msPerBeat;
 
             double desiredFraction    = Math.Round(currentFraction * divisor) / divisor;
-            double differenceFraction = currentFraction - desiredFraction;
+            double differenceFraction = desiredFraction - currentFraction;
             double theoreticalUnsnap  = differenceFraction * line.msPerBeat;
 
             return theoreticalUnsnap;
