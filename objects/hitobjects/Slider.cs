@@ -476,7 +476,7 @@ namespace MapsetParser.objects.hitobjects
             
             List<double> pathLengths = new List<double>();
             Vector2 previousPosition = Position;
-            for(int i = 0; i < nodePositions.Count; ++i)
+            for(int i = 1; i < nodePositions.Count; ++i)
             {
                 // Since every node is interpreted as an anchor, we only need to worry about the last node.
                 // Rest will be perfectly followed by just going straight to the node,
