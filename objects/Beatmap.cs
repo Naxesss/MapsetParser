@@ -718,7 +718,7 @@ namespace MapsetParser.objects
             double currentFraction = beatOffset / line.msPerBeat;
 
             double desiredFraction    = Math.Round(currentFraction * divisor) / divisor;
-            double differenceFraction = desiredFraction - currentFraction;
+            double differenceFraction = currentFraction - desiredFraction;
             double theoreticalUnsnap  = differenceFraction * line.msPerBeat;
 
             return theoreticalUnsnap;
@@ -737,7 +737,7 @@ namespace MapsetParser.objects
         /// <summary> Returns the practical unsnap for the given time and theoretical unsnap, by accounting for how the
         /// game rounds (or more accurately casts to int) ms values. </summary>
         private double GetPracticalUnsnapFromTheoretical(double time, double theoreticalUnsnap) =>
-            Timestamp.Round(time - theoreticalUnsnap) - time;
+            time - Timestamp.Round(time - theoreticalUnsnap);
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
         public int GetCombo(HitObject hitObject)
