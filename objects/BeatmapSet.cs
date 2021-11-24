@@ -47,7 +47,7 @@ namespace MapsetParser.objects
             Initalize(beatmapSetPath);
 
             Track hsTrack = new Track("Finding hit sound files...");
-            hitSoundFiles = GetUsedHitSoundFiles();
+            hitSoundFiles = GetUsedHitSoundFiles().ToList();
             hsTrack.Complete();
 
             beatmaps =
@@ -131,51 +131,30 @@ namespace MapsetParser.objects
             return beatmaps.FirstOrDefault(beatmap => beatmap != null)?.generalSettings.audioFileName ?? null;
         }
 
-        /// <summary> Returns the last path matching all parts of the given path, apart from its extension.
-        /// If directory paths are not given, this also looks up all paths in the song folder. </summary>
-        private string GetLastMatchingPath(string relativePath, IEnumerable<string> directoryPaths = null)
+        /// <summary> Returns the last file path matching the given search pattern, relative to the song folder.
+        /// The search pattern allows two wildcards: * = 0 or more, ? = 0 or 1. </summary>
+        private string GetLastMatchingFilePath(string searchPattern)
         {
-            string parsedPath = PathStatic.ParsePath(relativePath);
-            string strippedPath = PathStatic.ParsePath(relativePath, withoutExtension: true);
+            var lastMatchingPath = Directory.EnumerateFiles(songPath, searchPattern, SearchOption.AllDirectories).LastOrDefault();
+            if (lastMatchingPath == null)
+                return null;
 
-            if (directoryPaths == null)
-                directoryPaths = Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories);
-
-            // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
-            // So we basically want to find the last path which matches the name.
-            string lastMatchingPath = null;
-            foreach (string path in directoryPaths)
-            {
-                string relPath = PathStatic.RelativePath(path, songPath).Replace("\\", "/");
-                if (relPath.StartsWith(strippedPath + ".", StringComparison.OrdinalIgnoreCase))
-                {
-                    lastMatchingPath = path.Substring(songPath.Length + 1);
-                    break;
-                }
-            }
-
-            // In case the given file doesn't exist, we assume there's no duplicate file names.
-            return lastMatchingPath ?? parsedPath;
+            return PathStatic.RelativePath(lastMatchingPath, songPath).Replace("\\", "/");
         }
 
-        /// <summary> Returns whichever of the given file names are unused. </summary>
-        public List<string> GetUsedHitSoundFilesOf(IEnumerable<string> fileNames)
+        /// <summary> Returns all used hit sound files in the folder. </summary>
+        public IEnumerable<string> GetUsedHitSoundFiles()
         {
-            // In case two files have the same file name but different extensions, the latter is always picked.
-            IEnumerable<string> directoryPaths = Directory.EnumerateFiles(songPath, "*", SearchOption.AllDirectories);
-            fileNames = fileNames.Select(path => GetLastMatchingPath(path, directoryPaths)).ToList();
+            IEnumerable<string> hsFileNames = beatmaps.SelectMany(beatmap => beatmap.hitObjects.SelectMany(hitObject => hitObject.GetUsedHitSoundFileNames())).Distinct();
 
-            List<string> usedFilesNames = new List<string>();
+            foreach (string hsFileName in hsFileNames)
+            {
+                var path = GetLastMatchingFilePath($"*{hsFileName}.*");
+                if (path == null)
+                    continue;
 
-            foreach (Beatmap beatmap in beatmaps)
-                foreach (HitObject hitObject in beatmap.hitObjects)
-                    foreach (string usedFileName in hitObject.GetUsedHitSoundFileNames())
-                        foreach (string fileName in fileNames)
-                            if (fileName.ToLower().StartsWith(usedFileName.ToLower() + ".") &&
-                                    !usedFilesNames.Any(name => name.ToLower() == fileName.ToLower()))
-                                usedFilesNames.Add(fileName);
-
-            return usedFilesNames;
+                yield return path;
+            }
         }
 
         /// <summary> Returns whether the given full file path is used by the beatmapset. </summary>
@@ -191,7 +170,7 @@ namespace MapsetParser.objects
 
             // When the path is "go", and "go.png" is over "go.jpg" in order, then "go.jpg" will be the one used.
             // So we basically want to find the last path which matches the name.
-            string lastMatchingPath = PathStatic.ParsePath(GetLastMatchingPath(parsedPath));
+            string lastMatchingPath = PathStatic.ParsePath(GetLastMatchingFilePath(parsedPath));
 
             // These are always used, but you won't be able to update them unless they have the right format.
             if (fileName.EndsWith(".osu"))
@@ -262,19 +241,6 @@ namespace MapsetParser.objects
                         return true;
 
             return false;
-        }
-
-        /// <summary> Returns all used hit sound files in the folder. </summary>
-        private List<string> GetUsedHitSoundFiles()
-        {
-            IEnumerable<string> hitSoundFilePaths =
-                songFilePaths.Select(path => path.Substring(songPath.Length + 1));
-
-            // If we input a path here, like "sb/c.ogg", it won't be found since we only check for the name itself.
-            IEnumerable<string> usedHitSoundFiles =
-                GetUsedHitSoundFilesOf(hitSoundFilePaths);
-
-            return usedHitSoundFiles.ToList();
         }
 
         /// <summary> Returns the beatmapset as a string in the format "Artist - Title (Creator)". </summary>

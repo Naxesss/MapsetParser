@@ -178,21 +178,18 @@
         <member name="M:MapsetParser.objects.BeatmapSet.GetAudioFileName">
             <summary> Returns the audio file name of the first beatmap in the set if one exists, otherwise null. </summary>
         </member>
-        <member name="M:MapsetParser.objects.BeatmapSet.GetLastMatchingPath(System.String,System.Collections.Generic.IEnumerable{System.String})">
-            <summary> Returns the last path matching all parts of the given path, apart from its extension.
-            If directory paths are not given, this also looks up all paths in the song folder. </summary>
+        <member name="M:MapsetParser.objects.BeatmapSet.GetLastMatchingFilePath(System.String)">
+            <summary> Returns the last file path matching the given search pattern, relative to the song folder.
+            The search pattern allows two wildcards: * = 0 or more, ? = 0 or 1. </summary>
         </member>
-        <member name="M:MapsetParser.objects.BeatmapSet.GetUsedHitSoundFilesOf(System.Collections.Generic.IEnumerable{System.String})">
-            <summary> Returns whichever of the given file names are unused. </summary>
+        <member name="M:MapsetParser.objects.BeatmapSet.GetUsedHitSoundFiles">
+            <summary> Returns all used hit sound files in the folder. </summary>
         </member>
         <member name="M:MapsetParser.objects.BeatmapSet.IsFileUsed(System.String)">
             <summary> Returns whether the given full file path is used by the beatmapset. </summary>
         </member>
         <member name="M:MapsetParser.objects.BeatmapSet.IsAnimationPathUsed(System.String,System.Collections.Generic.List{MapsetParser.objects.events.Animation})">
             <summary> Returns whether the given path (case insensitive) is used by any of the given animations. </summary>
-        </member>
-        <member name="M:MapsetParser.objects.BeatmapSet.GetUsedHitSoundFiles">
-            <summary> Returns all used hit sound files in the folder. </summary>
         </member>
         <member name="M:MapsetParser.objects.BeatmapSet.ToString">
             <summary> Returns the beatmapset as a string in the format "Artist - Title (Creator)". </summary>
