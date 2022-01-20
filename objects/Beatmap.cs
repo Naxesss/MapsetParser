@@ -726,18 +726,31 @@ namespace MapsetParser.objects
 
         /// <summary> Returns the unsnap accounting for the way the game rounds (or more accurately doesn't round) snapping. <para/>
         /// The value returned is in terms of how much the object needs to be moved forwards in time to be snapped. </summary>
-        public double GetPracticalUnsnap(double time) =>
-            GetPracticalUnsnapFromTheoretical(time, GetTheoreticalUnsnap(time));
+        public double GetPracticalUnsnap(double time)
+        {
+            UninheritedLine line = GetTimingLine<UninheritedLine>(time);
+
+            // We cannot simply round the closest theoretical snap, because while e.g.
+            // abs(1.23) < abs(-1.70),
+            // 35601 - (int)(35601 - 1.23) > 35601 - (int)(35601 - (-1.70)).
+            // (Giving unsnaps of 2 ms and 1 ms respectively).
+            double[] practicalUnsnaps = {
+                GetPracticalUnsnap(time, 16, line),
+                GetPracticalUnsnap(time, 12, line),
+                GetPracticalUnsnap(time, 9, line),
+                GetPracticalUnsnap(time, 7, line),
+                GetPracticalUnsnap(time, 5, line),
+            };
+
+            // Assume the closest possible snapping & retain signed values.
+            double minUnsnap = practicalUnsnaps.Min(unsnap => Math.Abs(unsnap));
+            return practicalUnsnaps.First(unsnap => Math.Abs(unsnap) == minUnsnap);
+        }
 
         /// <summary> Same as <see cref="GetTheoreticalUnsnap(double, int, UninheritedLine)"/>, except accounts for the way
-        /// the game rounds ms times, like <see cref="GetPracticalUnsnap(double)"/> does. </summary>
+        /// the game rounds ms times. </summary>
         public double GetPracticalUnsnap(double time, int divisor, UninheritedLine line = null) =>
-            GetPracticalUnsnapFromTheoretical(time, GetTheoreticalUnsnap(time, divisor, line));
-
-        /// <summary> Returns the practical unsnap for the given time and theoretical unsnap, by accounting for how the
-        /// game rounds (or more accurately casts to int) ms values. </summary>
-        private double GetPracticalUnsnapFromTheoretical(double time, double theoreticalUnsnap) =>
-            time - Timestamp.Round(time - theoreticalUnsnap);
+            time - Timestamp.Round(time - GetTheoreticalUnsnap(time, divisor, line));
 
         /// <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
         public int GetCombo(HitObject hitObject)

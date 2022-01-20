@@ -145,11 +145,7 @@
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetPracticalUnsnap(System.Double,System.Int32,MapsetParser.objects.timinglines.UninheritedLine)">
             <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetTheoreticalUnsnap(System.Double,System.Int32,MapsetParser.objects.timinglines.UninheritedLine)"/>, except accounts for the way
-            the game rounds ms times, like <see cref="M:MapsetParser.objects.Beatmap.GetPracticalUnsnap(System.Double)"/> does. </summary>
-        </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetPracticalUnsnapFromTheoretical(System.Double,System.Double)">
-            <summary> Returns the practical unsnap for the given time and theoretical unsnap, by accounting for how the
-            game rounds (or more accurately casts to int) ms values. </summary>
+            the game rounds ms times. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetCombo(MapsetParser.objects.HitObject)">
             <summary> Returns the combo number (the number you see on the notes), of a given hit object. </summary>
