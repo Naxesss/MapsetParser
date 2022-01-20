@@ -59,6 +59,7 @@ namespace MapsetParser.objects.hitobjects
 
         public Vector2 LazyEndPosition { get; set; }
         public double  LazyTravelDistance { get; set; }
+        public double  LazyTravelTime { get; set; }
 
         public Slider(string[] args, Beatmap beatmap)
             : base(args, beatmap)
@@ -97,6 +98,7 @@ namespace MapsetParser.objects.hitobjects
                 // Difficulty
                 LazyEndPosition = Position;
                 LazyTravelDistance = 0;
+                LazyTravelTime = 0;
             }
 
             usedHitSamples = GetUsedHitSamples().ToList();
