@@ -86,7 +86,7 @@ namespace MapsetParser.objects.hitobjects
             reverseAdditions    = edgeAdditions.Item6.ToList();
 
             // Non-explicit
-            if (base.beatmap != null)
+            if (beatmap != null)
             {
                 redAnchorPositions = GetRedAnchors().ToList();
                 pathPxPositions = GetPathPxPositions();
