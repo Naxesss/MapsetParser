@@ -54,12 +54,12 @@
             Since the list is sorted, we can use the Binary Search algorithm here to get
             O(logn) time complexity, instead of O(n), which we would get from linear searching. </summary>
         </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean)">
+        <member name="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean,System.Boolean)">
             <summary> Returns the timing line currently in effect at the given time, if any, otherwise the first, O(logn).
-            Optionally with a 5 ms backward leniency for hit sounding. </summary>
+            Optionally with a 5 ms backward leniency for hit sounding, or 2 ms for slider ticks. </summary>
         </member>
-        <member name="M:MapsetParser.objects.Beatmap.GetTimingLine``1(System.Double,System.Boolean)">
-            <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean)"/> except only considers objects of a given type. </summary>
+        <member name="M:MapsetParser.objects.Beatmap.GetTimingLine``1(System.Double,System.Boolean,System.Boolean)">
+            <summary> Same as <see cref="M:MapsetParser.objects.Beatmap.GetTimingLine(System.Double,System.Boolean,System.Boolean)"/> except only considers objects of a given type. </summary>
         </member>
         <member name="M:MapsetParser.objects.Beatmap.GetNextTimingLine(System.Double)">
             <summary> Returns the next timing line, if any, otherwise null, O(logn). </summary>
@@ -326,7 +326,7 @@
         <member name="M:MapsetParser.objects.HitObject.GetCustomIndex(MapsetParser.objects.TimingLine)">
             <summary> Returns the custom index for the object, if any, otherwise for the line, if any, otherwise 1. </summary>
         </member>
-        <member name="M:MapsetParser.objects.HitObject.GetSampleset(System.Boolean,System.Nullable{System.Double})">
+        <member name="M:MapsetParser.objects.HitObject.GetSampleset(System.Boolean,System.Nullable{System.Double},System.Boolean)">
             <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
         </member>
         <member name="M:MapsetParser.objects.HitObject.GetStartSampleset(System.Boolean)">
