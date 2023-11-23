@@ -6,12 +6,14 @@ using System.Text;
 using MapsetParser.settings;
 using MapsetParser.objects.events;
 using MapsetParser.objects.hitobjects;
+using MapsetParser.objects.taiko;
 using MapsetParser.objects.timinglines;
 using System.Numerics;
 using MapsetParser.statics;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
 using MapsetParser.starrating.osu;
+using MapsetParser.starrating.taiko;
 using MapsetParser.starrating;
 
 namespace MapsetParser.objects
@@ -97,20 +99,34 @@ namespace MapsetParser.objects
             
             timingLines = GetTimingLines(lines);
             hitObjects  = GetHitobjects(lines);
-
-            if (generalSettings.mode != Mode.Standard)
-                return;
-
-            // Stacking is standard-only.
-            ApplyStacking();
-
-            if (starRating != null)
-                this.starRating = starRating.Value;
-            else
+            
+            switch (generalSettings.mode)
             {
-                DifficultyAttributes attributes = new OsuDifficultyCalculator(this).Calculate();
-                difficultyAttributes = attributes;
-                this.starRating      = attributes.StarRating;
+                case Mode.Standard:
+                    // Stacking is standard-only.
+                    ApplyStacking();
+
+                    if (starRating != null)
+                        this.starRating = starRating.Value;
+                    else
+                    {
+                        DifficultyAttributes attributes = new OsuDifficultyCalculator(this).Calculate();
+                        difficultyAttributes = attributes;
+                        this.starRating = attributes.StarRating;
+                    }
+                    break;
+                case Mode.Taiko:
+                    if (starRating != null)
+                        this.starRating = starRating.Value;
+                    else
+                    {
+                        DifficultyAttributes attributes = new TaikoDifficultyCalculator(this).Calculate();
+                        difficultyAttributes = attributes;
+                        this.starRating = attributes.StarRating;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -847,6 +863,14 @@ namespace MapsetParser.objects
             List<HitObject> hitObjects = ParserStatic.ParseSection(lines, "HitObjects", line =>
             {
                 string[] args = line.Split(',');
+                if (generalSettings.mode == Mode.Taiko)
+                {
+                    return
+                        HitObject.HasType(args, HitObject.Type.Circle) ? new Hit(args, this) :
+                        HitObject.HasType(args, HitObject.Type.Slider) ? new Slider(args, this) :
+                        HitObject.HasType(args, HitObject.Type.ManiaHoldNote) ? new HoldNote(args, this) :
+                        (HitObject)new Spinner(args, this);
+                }
                 return
                     HitObject.HasType(args, HitObject.Type.Circle) ? new Circle(args, this) :
                     HitObject.HasType(args, HitObject.Type.Slider) ? new Slider(args, this) :

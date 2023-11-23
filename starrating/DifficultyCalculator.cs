@@ -64,8 +64,8 @@ namespace MapsetParser.starrating
                 {
                     foreach (Skill s in skills)
                     {
-                        s.SaveCurrentPeak();
-                        s.StartNewSectionFrom(currentSectionEnd);
+                        (s as StrainSkill)?.saveCurrentPeak();
+                        (s as StrainSkill)?.startNewSectionFrom(currentSectionEnd, h);
                     }
 
                     currentSectionEnd += sectionLength;
@@ -77,7 +77,7 @@ namespace MapsetParser.starrating
 
             // The peak strain will not be saved for the last section in the above loop
             foreach (Skill s in skills)
-                s.SaveCurrentPeak();
+                (s as StrainSkill)?.saveCurrentPeak();
 
             return CreateDifficultyAttributes(beatmap, skills);
         }
@@ -96,14 +96,12 @@ namespace MapsetParser.starrating
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
         /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         protected abstract DifficultyAttributes CreateDifficultyAttributes(Beatmap beatmap, Skill[] skills);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
         protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(Beatmap beatmap);
 
