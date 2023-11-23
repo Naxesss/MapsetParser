@@ -353,10 +353,10 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the timing line currently in effect at the given time, if any, otherwise the first, O(logn).
-        /// Optionally with a 5 ms backward leniency for hit sounding. </summary>
-        public TimingLine GetTimingLine(double time, bool hitSoundLeniency = false) => GetTimingLine<TimingLine>(time, hitSoundLeniency);
+        /// Optionally with a 5 ms backward leniency for hit sounding, or 2 ms for slider ticks. </summary>
+        public TimingLine GetTimingLine(double time, bool hitSoundLeniency = false, bool isLeniencyForSliderTick = false) => GetTimingLine<TimingLine>(time, hitSoundLeniency, isLeniencyForSliderTick);
         /// <summary> Same as <see cref="GetTimingLine"/> except only considers objects of a given type. </summary>
-        public T GetTimingLine<T>(double time, bool hitSoundLeniency = false) where T : TimingLine
+        public T GetTimingLine<T>(double time, bool hitSoundLeniency = false, bool isLeniencyForSliderTick = false) where T : TimingLine
         {
             // Cache the results per generic type; timing line and hit object lists are immutable,
             // meaning we always expect the same result from the same input.
@@ -364,7 +364,7 @@ namespace MapsetParser.objects
             if (list.Count == 0)
                 return null;
 
-            int index = BinaryTimeSearch(list, line => line.offset - (hitSoundLeniency ? 5 : 0), time);
+            int index = BinaryTimeSearch(list, line => line.offset - (hitSoundLeniency ? isLeniencyForSliderTick ? 2 : 5 : 0), time);
             if (index < 0)
                 // Before any timing line starts, so return first line.
                 return list[0];

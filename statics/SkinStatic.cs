@@ -169,7 +169,10 @@ namespace MapsetParser.statics
             "mania-hit300g-{n}.png",
             // combo bursts
             "comboburst-mania.png",
-            "comboburst-mania-{n}.png"
+            "comboburst-mania-{n}.png",
+            // stages
+            "mania-stage-left.png",
+            "mania-stage-right.png"
         };
 
         private static readonly string[] skinTaiko = new string[]

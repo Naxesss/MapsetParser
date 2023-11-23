@@ -288,14 +288,14 @@ namespace MapsetParser.objects
         }
 
         /// <summary> Returns the effective sampleset of the hit object (body for sliders), optionally prioritizing the addition. </summary>
-        public Beatmap.Sampleset GetSampleset(bool additionOverrides = false, double? specificTime = null)
+        public Beatmap.Sampleset GetSampleset(bool additionOverrides = false, double? specificTime = null, bool isSliderTick = false)
         {
             if (additionOverrides && addition != Beatmap.Sampleset.Auto)
                 return addition;
 
             // Inherits from timing line if auto.
             return sampleset == Beatmap.Sampleset.Auto ?
-                beatmap.GetTimingLine(specificTime ?? time, true).sampleset : sampleset;
+                beatmap.GetTimingLine(specificTime ?? time, true, isSliderTick).sampleset : sampleset;
         }
 
         /// <summary> Returns the effective sampleset of the head of the object, if applicable, otherwise null, optionally prioritizing the addition.
@@ -457,14 +457,15 @@ namespace MapsetParser.objects
                     foreach (double tickTime in slider.sliderTickTimes)
                     {
                         // Our `sliderTickTimes` are approximate values, the game chooses sampleset based on precise tick times, so we should too.
+                        // Also, slider ticks have 2 ms of hit sound leniency, unlike the 5 ms for circles and other objects.
                         double preciseTickTime = tickTime + beatmap.GetTheoreticalUnsnap(tickTime);
-                        TimingLine line = beatmap.GetTimingLine(preciseTickTime, true);
+                        TimingLine line = beatmap.GetTimingLine(preciseTickTime, true, true);
 
                         // If no line exists, we use the default settings.
                         int customIndex = line?.customIndex ?? 1;
 
                         // Unlike the slider body (for sliderwhistles) and edges, slider ticks are unaffected by additions.
-                        Beatmap.Sampleset sampleset = GetSampleset(false, preciseTickTime);
+                        Beatmap.Sampleset sampleset = GetSampleset(false, preciseTickTime, true);
 
                         // Defaults to normal if none is set (before any timing line).
                         if (sampleset == Beatmap.Sampleset.Auto)
