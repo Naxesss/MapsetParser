@@ -4,7 +4,7 @@
     {
         public static bool IsDon(this Circle circle)
         {
-            return circle.hitSound == HitObject.HitSound.Clap || circle.hitSound == HitObject.HitSound.Whistle;
+            return circle.hitSound != HitObject.HitSound.Clap && circle.hitSound != HitObject.HitSound.Whistle;
         }
 
         public static bool IsFinisher(this HitObject hitObject)
