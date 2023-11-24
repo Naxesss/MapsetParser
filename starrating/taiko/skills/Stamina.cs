@@ -20,7 +20,6 @@ namespace MapsetParser.starrating.taiko.skills
         /// <summary>
         /// Creates a <see cref="Stamina"/> skill.
         /// </summary>
-        /// <param name="mods">Mods for use in skill calculations.</param>
         public Stamina()
             : base()
         {

@@ -165,11 +165,11 @@ namespace MapsetParser.scoring
         }
 
         /// <summary>
-        /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
+        /// Given a time offset, whether the <see cref="objects.HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
         /// This happens if <paramref name="timeOffset"/> is less than what is required for <see cref="LowestSuccessfulHitResult"/>.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
-        /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
+        /// <returns>Whether the <see cref="objects.HitObject"/> can be hit at any point in the future from this time offset.</returns>
         public bool CanBeHit(double timeOffset) => timeOffset <= WindowFor(LowestSuccessfulHitResult());
 
         /// <summary>

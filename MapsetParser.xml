@@ -624,11 +624,11 @@
         </member>
         <member name="M:MapsetParser.scoring.HitWindows.CanBeHit(System.Double)">
             <summary>
-            Given a time offset, whether the <see cref="!:HitObject"/> can ever be hit in the future with a non-<see cref="F:MapsetParser.scoring.HitResult.Miss"/> result.
+            Given a time offset, whether the <see cref="T:MapsetParser.objects.HitObject"/> can ever be hit in the future with a non-<see cref="F:MapsetParser.scoring.HitResult.Miss"/> result.
             This happens if <paramref name="timeOffset"/> is less than what is required for <see cref="M:MapsetParser.scoring.HitWindows.LowestSuccessfulHitResult"/>.
             </summary>
             <param name="timeOffset">The time offset.</param>
-            <returns>Whether the <see cref="!:HitObject"/> can be hit at any point in the future from this time offset.</returns>
+            <returns>Whether the <see cref="T:MapsetParser.objects.HitObject"/> can be hit at any point in the future from this time offset.</returns>
         </member>
         <member name="M:MapsetParser.scoring.HitWindows.GetRanges">
             <summary>
@@ -679,16 +679,9 @@
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.Calculate">
             <summary>
-            Calculates the difficulty of the beatmap using a specific mod combination.
+            Calculates the difficulty of the beatmap.
             </summary>
-            <param name="mods">The mods that should be applied to the beatmap.</param>
             <returns>A structure describing the difficulty of the beatmap.</returns>
-        </member>
-        <member name="M:MapsetParser.starrating.DifficultyCalculator.CalculateAll">
-            <summary>
-            Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
-            </summary>
-            <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.SortObjects(System.Collections.Generic.IEnumerable{MapsetParser.starrating.preprocessing.DifficultyHitObject})">
             <summary>
@@ -701,22 +694,21 @@
             <summary>
             Creates <see cref="T:MapsetParser.starrating.DifficultyAttributes"/> to describe beatmap's calculated difficulty.
             </summary>
-            <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty was calculated.</param>
-            <param name="mods">The <see cref="!:Mod"/>s that difficulty was calculated with.</param>
+            <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> whose difficulty was calculated.</param>
             <param name="skills">The skills which processed the beatmap.</param>
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateDifficultyHitObjects(MapsetParser.objects.Beatmap)">
             <summary>
-            Enumerates <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s to be processed from <see cref="T:MapsetParser.objects.HitObject"/>s in the <see cref="!:IBeatmap"/>.
+            Enumerates <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s to be processed from <see cref="T:MapsetParser.objects.HitObject"/>s in the <see cref="T:MapsetParser.objects.Beatmap"/>.
             </summary>
-            <param name="beatmap">The <see cref="!:IBeatmap"/> providing the <see cref="T:MapsetParser.objects.HitObject"/>s to enumerate.</param>
+            <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> providing the <see cref="T:MapsetParser.objects.HitObject"/>s to enumerate.</param>
             <returns>The enumerated <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.</returns>
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateSkills(MapsetParser.objects.Beatmap)">
             <summary>
-            Creates the <see cref="T:MapsetParser.starrating.skills.Skill"/>s to calculate the difficulty of an <see cref="!:IBeatmap"/>.
+            Creates the <see cref="T:MapsetParser.starrating.skills.Skill"/>s to calculate the difficulty of an <see cref="T:MapsetParser.objects.Beatmap"/>.
             </summary>
-            <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty will be calculated.</param>
+            <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> whose difficulty will be calculated.</param>
             <returns>The <see cref="T:MapsetParser.starrating.skills.Skill"/>s.</returns>
         </member>
         <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.JumpDistance">
@@ -986,7 +978,7 @@
         <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak">
             <summary>
             Encode colour information for a sequence of <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s. Consecutive <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s
-            of the same <see cref="!:DifficultySettings.HitType"/> are encoded within the same <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            of the same colour are encoded within the same <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.HitObjects">
@@ -1147,8 +1139,8 @@
         </member>
         <member name="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio">
             <summary>
-            The ratio of current <see cref="!:osu.Game.Rulesets.Difficulty.Preprocessing.DifficultyHitObject.DeltaTime"/>
-            to previous <see cref="!:osu.Game.Rulesets.Difficulty.Preprocessing.DifficultyHitObject.DeltaTime"/> for the rhythm change.
+            The ratio of current <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.DeltaTime"/>
+            to previous <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.DeltaTime"/> for the rhythm change.
             A <see cref="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio"/> above 1 indicates a slow-down; a <see cref="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio"/> below 1 indicates a speed-up.
             </summary>
         </member>
@@ -1331,7 +1323,6 @@
             <summary>
             Creates a <see cref="T:MapsetParser.starrating.taiko.skills.Stamina"/> skill.
             </summary>
-            <param name="mods">Mods for use in skill calculations.</param>
         </member>
         <member name="F:MapsetParser.starrating.taiko.TaikoDifficultyAttributes.StaminaDifficulty">
             <summary>
