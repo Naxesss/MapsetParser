@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using MapsetParser.starrating.preprocessing;
 using MapsetParser.starrating.utils;
 
@@ -33,6 +34,11 @@ namespace MapsetParser.starrating.skills
                 return false;
 
             return skill.SkillName() == this.SkillName();
+        }
+
+        public override int GetHashCode()
+        {
+            return SkillName().GetHashCode();
         }
 
         /// <summary>
