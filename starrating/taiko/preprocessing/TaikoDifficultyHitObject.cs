@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using MapsetParser.objects;
-using MapsetParser.objects.taiko;
 using MapsetParser.starrating.preprocessing;
 using MapsetParser.starrating.taiko.preprocessing.Colour;
 using MapsetParser.starrating.taiko.preprocessing.Rhythm;
@@ -10,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using MapsetParser.objects.hitobjects;
+using MapsetParser.objects.hitobjects.taiko;
+using MapsetParser.settings;
 
 namespace MapsetParser.starrating.taiko.preprocessing
 {
@@ -73,23 +75,21 @@ namespace MapsetParser.starrating.taiko.preprocessing
             Colour = new TaikoDifficultyHitObjectColour();
             Rhythm = getClosestRhythm(lastObject, lastLastObject);
 
-            switch ((hitObject as Hit)?.Type)
+            if (hitObject is Circle circle)
             {
-                case HitType.Centre:
+                if (circle.IsDon())
+                {
                     MonoIndex = centreHitObjects.Count;
                     centreHitObjects.Add(this);
                     monoDifficultyHitObjects = centreHitObjects;
-                    break;
-
-                case HitType.Rim:
+                }
+                else
+                {
                     MonoIndex = rimHitObjects.Count;
                     rimHitObjects.Add(this);
                     monoDifficultyHitObjects = rimHitObjects;
-                    break;
-            }
+                }
 
-            if (hitObject is Hit)
-            {
                 NoteIndex = noteObjects.Count;
                 noteObjects.Add(this);
             }

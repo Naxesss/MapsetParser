@@ -3,7 +3,6 @@
 
 using MapsetParser.objects;
 using MapsetParser.objects.hitobjects;
-using MapsetParser.objects.taiko;
 using MapsetParser.scoring;
 using MapsetParser.starrating.preprocessing;
 using MapsetParser.starrating.skills;
@@ -80,7 +79,7 @@ namespace MapsetParser.starrating.taiko
                 ColourDifficulty = colourRating,
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great),
-                MaxCombo = beatmap.hitObjects.Count(h => h is Hit),
+                MaxCombo = beatmap.hitObjects.Count(h => h is Circle),
             };
 
             return attributes;

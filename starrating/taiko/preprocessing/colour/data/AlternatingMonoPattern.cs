@@ -39,7 +39,8 @@ namespace MapsetParser.starrating.taiko.preprocessing.Colour.Data
         {
             return HasIdenticalMonoLength(other) &&
                    other.MonoStreaks.Count == MonoStreaks.Count &&
-                   other.MonoStreaks[0].HitType == MonoStreaks[0].HitType;
+                   other.MonoStreaks[0].AreCircles == MonoStreaks[0].AreCircles &&
+                   other.MonoStreaks[0].AreDons == MonoStreaks[0].AreDons;
         }
 
         /// <summary>

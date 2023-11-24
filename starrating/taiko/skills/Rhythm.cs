@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using MapsetParser.objects.taiko;
+using MapsetParser.objects.hitobjects;
 using MapsetParser.starrating.preprocessing;
 using MapsetParser.starrating.skills;
 using MapsetParser.starrating.taiko.preprocessing;
@@ -57,7 +57,7 @@ namespace MapsetParser.starrating.taiko.skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             // drum rolls and swells are exempt.
-            if (!(current.BaseObject is Hit))
+            if (!(current.BaseObject is Circle))
             {
                 resetRhythmAndStrain();
                 return 0.0;

@@ -2,13 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using MapsetParser.objects.taiko;
+using MapsetParser.objects.hitobjects;
+using MapsetParser.objects.hitobjects.taiko;
+using MapsetParser.settings;
+using MapsetParser.starrating.preprocessing;
 
 namespace MapsetParser.starrating.taiko.preprocessing.Colour.Data
 {
     /// <summary>
     /// Encode colour information for a sequence of <see cref="TaikoDifficultyHitObject"/>s. Consecutive <see cref="TaikoDifficultyHitObject"/>s
-    /// of the same <see cref="Objects.HitType"/> are encoded within the same <see cref="MonoStreak"/>.
+    /// of the same colour are encoded within the same <see cref="MonoStreak"/>.
     /// </summary>
     public class MonoStreak
     {
@@ -36,11 +39,17 @@ namespace MapsetParser.starrating.taiko.preprocessing.Colour.Data
         /// The last <see cref="TaikoDifficultyHitObject"/> in this <see cref="MonoStreak"/>.
         /// </summary>
         public TaikoDifficultyHitObject LastHitObject => HitObjects[^1];
-
+        
         /// <summary>
-        /// The hit type of all objects encoded within this <see cref="MonoStreak"/>
+        /// Whether all objects encoded within this <see cref="MonoStreak"/> are circles.
         /// </summary>
-        public HitType? HitType => (HitObjects[0].BaseObject as Hit)?.Type;
+        public bool AreCircles => HitObjects[0].BaseObject is Circle;
+        
+        /// <summary>
+        /// Whether all objects encoded within this <see cref="MonoStreak"/> are don hits.
+        /// Returns false if not a circle.
+        /// </summary>
+        public bool AreDons => (HitObjects[0].BaseObject as Circle)?.IsDon() ?? false;
 
         /// <summary>
         /// How long the mono pattern encoded within is

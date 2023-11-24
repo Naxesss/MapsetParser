@@ -2,7 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using MapsetParser.objects.taiko;
+using MapsetParser.objects.hitobjects;
+using MapsetParser.objects.hitobjects.taiko;
 using MapsetParser.starrating.preprocessing;
 using MapsetParser.starrating.taiko.preprocessing.Colour.Data;
 
@@ -78,7 +79,7 @@ namespace MapsetParser.starrating.taiko.preprocessing.Colour
                 TaikoDifficultyHitObject? previousObject = taikoObject.PreviousNote(0);
 
                 // If this is the first object in the list or the colour changed, create a new mono streak
-                if (currentMonoStreak == null || previousObject == null || (taikoObject.BaseObject as Hit)?.Type != (previousObject.BaseObject as Hit)?.Type)
+                if (currentMonoStreak == null || previousObject == null || (taikoObject.BaseObject as Circle)?.IsDon() != (previousObject.BaseObject as Circle)?.IsDon())
                 {
                     currentMonoStreak = new MonoStreak();
                     monoStreaks.Add(currentMonoStreak);
