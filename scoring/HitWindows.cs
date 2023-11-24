@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using MapsetParser.settings;
 using MapsetParser.starrating;
 
 namespace MapsetParser.scoring
@@ -81,7 +82,7 @@ namespace MapsetParser.scoring
         {
             foreach (var range in GetRanges())
             {
-                double value = IBeatmapDifficultyInfo.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
+                double value = DifficultySettings.DifficultyRange(difficulty, (range.Min, range.Average, range.Max));
 
                 switch (range.Result)
                 {
