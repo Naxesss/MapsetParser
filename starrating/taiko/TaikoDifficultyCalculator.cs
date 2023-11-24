@@ -80,6 +80,7 @@ namespace MapsetParser.starrating.taiko
                 PeakDifficulty = combinedRating,
                 GreatHitWindow = hitWindows.WindowFor(HitResult.Great),
                 MaxCombo = beatmap.hitObjects.Count(h => h is Circle),
+                Skills = skills
             };
 
             return attributes;
