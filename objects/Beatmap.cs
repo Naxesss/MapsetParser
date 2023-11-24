@@ -6,7 +6,6 @@ using System.Text;
 using MapsetParser.settings;
 using MapsetParser.objects.events;
 using MapsetParser.objects.hitobjects;
-using MapsetParser.objects.taiko;
 using MapsetParser.objects.timinglines;
 using System.Numerics;
 using MapsetParser.statics;
@@ -100,34 +99,28 @@ namespace MapsetParser.objects
             timingLines = GetTimingLines(lines);
             hitObjects  = GetHitobjects(lines);
             
-            switch (generalSettings.mode)
-            {
-                case Mode.Standard:
-                    // Stacking is standard-only.
-                    ApplyStacking();
+            if (generalSettings.mode == Mode.Standard)
+                // Stacking is standard-only.
+                ApplyStacking();
 
-                    if (starRating != null)
-                        this.starRating = starRating.Value;
-                    else
-                    {
-                        DifficultyAttributes attributes = new OsuDifficultyCalculator(this).Calculate();
-                        difficultyAttributes = attributes;
-                        this.starRating = attributes.StarRating;
-                    }
-                    break;
-                case Mode.Taiko:
-                    if (starRating != null)
-                        this.starRating = starRating.Value;
-                    else
-                    {
-                        DifficultyAttributes attributes = new TaikoDifficultyCalculator(this).Calculate();
-                        difficultyAttributes = attributes;
-                        this.starRating = attributes.StarRating;
-                    }
-                    break;
-                default:
-                    break;
+            if (starRating != null)
+            {
+                this.starRating = starRating.Value;
+                return;
             }
+
+            DifficultyAttributes attributes = generalSettings.mode switch
+            {
+                Mode.Standard => new OsuDifficultyCalculator(this).Calculate(),
+                Mode.Taiko    => new TaikoDifficultyCalculator(this).Calculate(),
+                _             => null
+            };
+
+            if (attributes == null)
+                return;
+            
+            difficultyAttributes = attributes;
+            this.starRating = attributes.StarRating;
         }
 
         /*
@@ -863,14 +856,6 @@ namespace MapsetParser.objects
             List<HitObject> hitObjects = ParserStatic.ParseSection(lines, "HitObjects", line =>
             {
                 string[] args = line.Split(',');
-                if (generalSettings.mode == Mode.Taiko)
-                {
-                    return
-                        HitObject.HasType(args, HitObject.Type.Circle) ? new Hit(args, this) :
-                        HitObject.HasType(args, HitObject.Type.Slider) ? new Slider(args, this) :
-                        HitObject.HasType(args, HitObject.Type.ManiaHoldNote) ? new HoldNote(args, this) :
-                        (HitObject)new Spinner(args, this);
-                }
                 return
                     HitObject.HasType(args, HitObject.Type.Circle) ? new Circle(args, this) :
                     HitObject.HasType(args, HitObject.Type.Slider) ? new Slider(args, this) :
