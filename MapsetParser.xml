@@ -444,26 +444,6 @@
         <member name="M:MapsetParser.objects.Osb.IsUsed">
             <summary> Returns whether the .osb file is actually used as a storyboard (or if it's just empty). </summary>
         </member>
-        <member name="F:MapsetParser.objects.taiko.Hit.Type">
-            <summary>
-            The <see cref="T:MapsetParser.objects.taiko.HitType"/> that actuates this <see cref="T:MapsetParser.objects.taiko.Hit"/>.
-            </summary>
-        </member>
-        <member name="T:MapsetParser.objects.taiko.HitType">
-            <summary>
-            The type of a <see cref="T:MapsetParser.objects.taiko.Hit"/>.
-            </summary>
-        </member>
-        <member name="F:MapsetParser.objects.taiko.HitType.Centre">
-            <summary>
-            A <see cref="T:MapsetParser.objects.taiko.Hit"/> that can be hit by the centre portion of the drum.
-            </summary>
-        </member>
-        <member name="F:MapsetParser.objects.taiko.HitType.Rim">
-            <summary>
-            A <see cref="T:MapsetParser.objects.taiko.Hit"/> that can be hit by the rim portion of the drum.
-            </summary>
-        </member>
         <member name="M:MapsetParser.objects.TimingLine.GetOffset(System.String[])">
             <summary> Returns the offset of the line. </summary>
         </member>
@@ -662,6 +642,10 @@
         <member name="M:MapsetParser.settings.DifficultySettings.GetCircleRadius">
             <summary> Returns the radius of a circle or slider from the circle size. </summary>
         </member>
+        <member name="M:MapsetParser.settings.DifficultySettings.DifficultyRange(System.Double,System.ValueTuple{System.Double,System.Double,System.Double})">
+            <summary> Returns a value between the upper, middle, and lower ranges,
+            based on the given difficulty value (0-10). </summary>
+        </member>
         <member name="M:MapsetParser.settings.DifficultySettings.GetFadeInTime">
             <summary> Returns the time from where the object begins fading in to where it is fully opaque. </summary>
         </member>
@@ -735,87 +719,6 @@
             <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty will be calculated.</param>
             <returns>The <see cref="T:MapsetParser.starrating.skills.Skill"/>s.</returns>
         </member>
-        <member name="T:MapsetParser.starrating.IBeatmapDifficultyInfo">
-            <summary>
-            A representation of all top-level difficulty settings for a beatmap.
-            </summary>
-        </member>
-        <member name="F:MapsetParser.starrating.IBeatmapDifficultyInfo.DEFAULT_DIFFICULTY">
-            <summary>
-            The default value used for all difficulty settings except <see cref="P:MapsetParser.starrating.IBeatmapDifficultyInfo.SliderMultiplier"/> and <see cref="P:MapsetParser.starrating.IBeatmapDifficultyInfo.SliderTickRate"/>.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.IBeatmapDifficultyInfo.DrainRate">
-            <summary>
-            The drain rate of the associated beatmap.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.IBeatmapDifficultyInfo.CircleSize">
-            <summary>
-            The circle size of the associated beatmap.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.IBeatmapDifficultyInfo.OverallDifficulty">
-            <summary>
-            The overall difficulty of the associated beatmap.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.IBeatmapDifficultyInfo.ApproachRate">
-            <summary>
-            The approach rate of the associated beatmap.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.IBeatmapDifficultyInfo.SliderMultiplier">
-            <summary>
-            The base slider velocity of the associated beatmap.
-            This was known as "SliderMultiplier" in the .osu format and stable editor.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.IBeatmapDifficultyInfo.SliderTickRate">
-            <summary>
-            The slider tick rate of the associated beatmap.
-            </summary>
-        </member>
-        <member name="M:MapsetParser.starrating.IBeatmapDifficultyInfo.DifficultyRange(System.Double,System.Double,System.Double,System.Double)">
-            <summary>
-            Maps a difficulty value [0, 10] to a two-piece linear range of values.
-            </summary>
-            <param name="difficulty">The difficulty value to be mapped.</param>
-            <param name="min">Minimum of the resulting range which will be achieved by a difficulty value of 0.</param>
-            <param name="mid">Midpoint of the resulting range which will be achieved by a difficulty value of 5.</param>
-            <param name="max">Maximum of the resulting range which will be achieved by a difficulty value of 10.</param>
-            <returns>Value to which the difficulty value maps in the specified range.</returns>
-        </member>
-        <member name="M:MapsetParser.starrating.IBeatmapDifficultyInfo.DifficultyRange(System.Double)">
-            <summary>
-            Maps a difficulty value [0, 10] to a linear range of [-1, 1].
-            </summary>
-            <param name="difficulty">The difficulty value to be mapped.</param>
-            <returns>Value to which the difficulty value maps in the specified range.</returns>
-        </member>
-        <member name="M:MapsetParser.starrating.IBeatmapDifficultyInfo.DifficultyRange(System.Double,System.ValueTuple{System.Double,System.Double,System.Double})">
-            <summary>
-            Maps a difficulty value [0, 10] to a two-piece linear range of values.
-            </summary>
-            <param name="difficulty">The difficulty value to be mapped.</param>
-            <param name="range">The values that define the two linear ranges.
-            <list type="table">
-              <item>
-                <term>od0</term>
-                <description>Minimum of the resulting range which will be achieved by a difficulty value of 0.</description>
-              </item>
-              <item>
-                <term>od5</term>
-                <description>Midpoint of the resulting range which will be achieved by a difficulty value of 5.</description>
-              </item>
-              <item>
-                <term>od10</term>
-                <description>Maximum of the resulting range which will be achieved by a difficulty value of 10.</description>
-              </item>
-            </list>
-            </param>
-            <returns>Value to which the difficulty value maps in the specified range.</returns>
-        </member>
         <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.JumpDistance">
             <summary>
             Normalized distance from the end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> to the start position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
@@ -835,6 +738,11 @@
         <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.StrainTime">
             <summary>
             Milliseconds elapsed since the start time of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>, with a minimum of 50ms.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.scoring.OsuHitWindows.MISS_WINDOW">
+            <summary>
+            osu! ruleset has a fixed miss window regardless of difficulty settings.
             </summary>
         </member>
         <member name="T:MapsetParser.starrating.osu.skills.Aim">
@@ -1078,12 +986,12 @@
         <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak">
             <summary>
             Encode colour information for a sequence of <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s. Consecutive <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s
-            of the same <see cref="!:Objects.HitType"/> are encoded within the same <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            of the same <see cref="!:DifficultySettings.HitType"/> are encoded within the same <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.HitObjects">
             <summary>
-            List of <see cref="!:DifficultyHitObject"/>s that are encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            List of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that are encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
             </summary>
         </member>
         <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.Parent">
@@ -1106,9 +1014,15 @@
             The last <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
             </summary>
         </member>
-        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.HitType">
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.AreCircles">
             <summary>
-            The hit type of all objects encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>
+            Whether all objects encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/> are circles.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.AreDons">
+            <summary>
+            Whether all objects encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/> are don hits.
+            Returns false if not a circle.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.RunLength">
