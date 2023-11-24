@@ -33,15 +33,6 @@ namespace MapsetParser.starrating
             return Calculate(beatmap);
         }
 
-        /// <summary>
-        /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
-        /// </summary>
-        /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<DifficultyAttributes> CalculateAll()
-        {
-            yield return Calculate();
-        }
-
         private DifficultyAttributes Calculate(Beatmap beatmap)
         {
             var skills = CreateSkills(beatmap);
