@@ -9,7 +9,7 @@ using MapsetParser.starrating.skills;
 
 namespace MapsetParser.starrating.taiko.skills
 {
-    public class Peaks : Skill
+    public class Peaks : StrainSkill
     {
         private const double rhythm_skill_multiplier = 0.2 * final_multiplier;
         private const double colour_skill_multiplier = 0.375 * final_multiplier;
@@ -89,6 +89,38 @@ namespace MapsetParser.starrating.taiko.skills
             }
 
             return difficulty;
+        }
+
+        public override double CalculateInitialStrain(double time, DifficultyHitObject current)
+        {
+            var colourRaw = colour.CalculateInitialStrain(time, current);
+            var rhythmRaw = colour.CalculateInitialStrain(time, current);
+            var staminaRaw = colour.CalculateInitialStrain(time, current);
+
+            var colourWeighted = colourRaw * colour_skill_multiplier;
+            var rhythmWeighted = rhythmRaw * rhythm_skill_multiplier;
+            var staminaWeighted = staminaRaw * stamina_skill_multiplier;
+
+            var initialStrain = norm(1.5, colourWeighted, staminaWeighted);
+            initialStrain = norm(2, initialStrain, rhythmWeighted);
+
+            return initialStrain;
+        }
+
+        public override double StrainValueAt(DifficultyHitObject current)
+        {
+            var colourRaw = colour.StrainValueAt(current);
+            var rhythmRaw = colour.StrainValueAt(current);
+            var staminaRaw = colour.StrainValueAt(current);
+
+            var colourWeighted = colourRaw * colour_skill_multiplier;
+            var rhythmWeighted = rhythmRaw * rhythm_skill_multiplier;
+            var staminaWeighted = staminaRaw * stamina_skill_multiplier;
+
+            var currentStrain = norm(1.5, colourWeighted, staminaWeighted);
+            currentStrain = norm(2, currentStrain, rhythmWeighted);
+
+            return currentStrain;
         }
     }
 }

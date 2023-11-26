@@ -33,7 +33,7 @@ namespace MapsetParser.starrating.skills
         {
         }
 
-        protected override double CalculateInitialStrain(double time, DifficultyHitObject current) {
+        public override double CalculateInitialStrain(double time, DifficultyHitObject current) {
             if (current.Index == 0)
             {
                 return CurrentStrain;
@@ -41,7 +41,7 @@ namespace MapsetParser.starrating.skills
             return CurrentStrain * strainDecay(time - current.Previous(0).StartTime);
         }
 
-        protected override double StrainValueAt(DifficultyHitObject current)
+        public override double StrainValueAt(DifficultyHitObject current)
         {
             CurrentStrain *= strainDecay(current.DeltaTime);
             CurrentStrain += StrainValueOf(current) * SkillMultiplier;

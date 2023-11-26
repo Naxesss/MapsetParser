@@ -38,12 +38,12 @@ namespace MapsetParser.starrating.skills
         /// <summary>
         /// Returns the strain value at <see cref="DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
         /// </summary>
-        protected abstract double StrainValueAt(DifficultyHitObject current);
+        public abstract double StrainValueAt(DifficultyHitObject current);
 
         /// <summary>
         /// Process a <see cref="DifficultyHitObject"/> and update current strain values accordingly.
         /// </summary>
-        public sealed override void Process(DifficultyHitObject current)
+        public override void Process(DifficultyHitObject current)
         {
             // The first object doesn't generate a strain, so we begin with an incremented section end
             if (current.Index == 0)
@@ -85,7 +85,7 @@ namespace MapsetParser.starrating.skills
         /// <param name="time">The time to retrieve the peak strain at.</param>
         /// <param name="current">The current hit object.</param>
         /// <returns>The peak strain.</returns>
-        protected abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
+        public abstract double CalculateInitialStrain(double time, DifficultyHitObject current);
 
         /// <summary>
         /// Returns a live enumerable of the peak strains for each <see cref="SectionLength"/> section of the beatmap,
