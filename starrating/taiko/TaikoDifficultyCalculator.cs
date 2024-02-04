@@ -29,7 +29,8 @@ namespace MapsetParser.starrating.taiko
         {
             return new Skill[]
             {
-                new Peaks()
+                new Peaks(),
+                new ScrollSpeed(),
             };
         }
 

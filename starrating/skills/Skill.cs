@@ -28,6 +28,8 @@ namespace MapsetParser.starrating.skills
         public abstract string SkillName();
         public override string ToString() => SkillName();
 
+        public virtual bool useInStarRating => true;
+
         public override bool Equals(object obj)
         {
             if (!(obj is Skill skill))
