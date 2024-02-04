@@ -14,6 +14,8 @@ namespace MapsetParser.starrating.taiko.skills
         public override bool useInStarRating => false;
         public override string SkillName() => "Scroll Speed";
 
+        private const double DEFAULT_BASE_SV = 1.4;
+
         public ScrollSpeed()
             : base()
         {
@@ -34,7 +36,7 @@ namespace MapsetParser.starrating.taiko.skills
             var beatmap = hitObject.beatmap;
             var bpm = beatmap.GetTimingLine<UninheritedLine>(hitObject.time).bpm;
             var svMult = beatmap.GetTimingLine(hitObject.time).svMult;
-            var baseSvMult = beatmap.difficultySettings.sliderMultiplier / 1.4;
+            var baseSvMult = beatmap.difficultySettings.sliderMultiplier / DEFAULT_BASE_SV;
             return bpm * svMult * baseSvMult;
         }
     }
