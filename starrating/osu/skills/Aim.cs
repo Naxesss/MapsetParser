@@ -12,7 +12,7 @@ namespace MapsetParser.starrating.osu.skills
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : Skill
+    public class Aim : StrainDecaySkill
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
@@ -31,9 +31,9 @@ namespace MapsetParser.starrating.osu.skills
 
             double result = 0;
 
-            if (Previous.Count > 0)
+            if (current.Index >= 1)
             {
-                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+                var osuPrevious = (OsuDifficultyHitObject)current.Previous(0);
 
                 if (osuCurrent.Angle != null && osuCurrent.Angle.Value > angle_bonus_begin)
                 {

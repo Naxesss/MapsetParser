@@ -41,7 +41,7 @@ namespace MapsetParser.starrating.osu.preprocessing
         private readonly HitObject lastObject;
 
         public OsuDifficultyHitObject(HitObject hitObject, HitObject lastLastObject, HitObject lastObject)
-            : base(hitObject, lastObject)
+            : base(hitObject, lastObject, null, 0)
         {
             this.lastLastObject = lastLastObject;
             this.lastObject = lastObject;
