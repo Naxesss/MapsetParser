@@ -47,6 +47,7 @@ namespace MapsetParser.starrating.taiko.skills
             rhythm.Process(current);
             colour.Process(current);
             stamina.Process(current);
+            base.Process(current);
         }
 
         /// <summary>
@@ -109,18 +110,7 @@ namespace MapsetParser.starrating.taiko.skills
 
         public override double StrainValueAt(DifficultyHitObject current)
         {
-            var colourRaw = colour.StrainValueAt(current);
-            var rhythmRaw = colour.StrainValueAt(current);
-            var staminaRaw = colour.StrainValueAt(current);
-
-            var colourWeighted = colourRaw * colour_skill_multiplier;
-            var rhythmWeighted = rhythmRaw * rhythm_skill_multiplier;
-            var staminaWeighted = staminaRaw * stamina_skill_multiplier;
-
-            var currentStrain = norm(1.5, colourWeighted, staminaWeighted);
-            currentStrain = norm(2, currentStrain, rhythmWeighted);
-
-            return currentStrain;
+            return CalculateInitialStrain(current.StartTime, current);
         }
     }
 }
