@@ -94,8 +94,8 @@ namespace MapsetParser.starrating.taiko.skills
         public override double CalculateInitialStrain(double time, DifficultyHitObject current)
         {
             var colourRaw = colour.CalculateInitialStrain(time, current);
-            var rhythmRaw = colour.CalculateInitialStrain(time, current);
-            var staminaRaw = colour.CalculateInitialStrain(time, current);
+            var rhythmRaw = rhythm.CalculateInitialStrain(time, current);
+            var staminaRaw = stamina.CalculateInitialStrain(time, current);
 
             var colourWeighted = colourRaw * colour_skill_multiplier;
             var rhythmWeighted = rhythmRaw * rhythm_skill_multiplier;
