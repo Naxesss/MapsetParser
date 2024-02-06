@@ -42,11 +42,6 @@ namespace MapsetParser.starrating
 
             var difficultyHitObjects = SortObjects(CreateDifficultyHitObjects(beatmap)).ToList();
 
-            double sectionLength = SectionLength;
-
-            // The first object doesn't generate a strain, so we begin with an incremented section end
-            double currentSectionEnd = Math.Ceiling(beatmap.hitObjects.First().time / sectionLength) * sectionLength;
-
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {
                 foreach (Skill s in skills)
