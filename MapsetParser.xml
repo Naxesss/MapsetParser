@@ -711,14 +711,140 @@
             <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> whose difficulty will be calculated.</param>
             <returns>The <see cref="T:MapsetParser.starrating.skills.Skill"/>s.</returns>
         </member>
-        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.JumpDistance">
+        <member name="M:MapsetParser.starrating.osu.evaluators.AimEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject,System.Boolean)">
             <summary>
-            Normalized distance from the end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> to the start position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            Evaluates the difficulty of aiming the current object, based on:
+            <list type="bullet">
+            <item><description>cursor velocity to the current object,</description></item>
+            <item><description>angle difficulty,</description></item>
+            <item><description>sharp velocity increases,</description></item>
+            <item><description>and slider difficulty.</description></item>
+            </list>
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.osu.evaluators.RhythmEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.osu.evaluators.SpeedEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Evaluates the difficulty of tapping the current object, based on:
+            <list type="bullet">
+            <item><description>time between pressing the previous and current object,</description></item>
+            <item><description>distance between those objects,</description></item>
+            <item><description>and how easily they can be cheesed.</description></item>
+            </list>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty">
+            <summary>
+            The difficulty corresponding to the aim skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpeedDifficulty">
+            <summary>
+            The difficulty corresponding to the speed skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpeedNoteCount">
+            <summary>
+            The number of clickable objects weighted by difficulty.
+            Related to <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpeedDifficulty"/>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SliderFactor">
+            <summary>
+            Describes how much of <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty"/> is contributed to by hitcircles or sliders.
+            A value closer to 1.0 indicates most of <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty"/> is contributed by hitcircles.
+            A value closer to 0.0 indicates most of <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty"/> is contributed by sliders.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.ApproachRate">
+            <summary>
+            The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
+            </summary>
+            <remarks>
+            Rate-adjusting mods don't directly affect the approach rate difficulty value, but have a perceived effect as a result of adjusting audio timing.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.OverallDifficulty">
+            <summary>
+            The perceived overall difficulty inclusive of rate-adjusting mods (DT/HT/etc).
+            </summary>
+            <remarks>
+            Rate-adjusting mods don't directly affect the overall difficulty value, but have a perceived effect as a result of adjusting audio timing.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.DrainRate">
+            <summary>
+            The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.HitCircleCount">
+            <summary>
+            The number of hitcircles in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SliderCount">
+            <summary>
+            The number of sliders in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpinnerCount">
+            <summary>
+            The number of spinners in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.NORMALISED_RADIUS">
+            <summary>
+            A distance by which all distances should be scaled in order to assume a uniform circle size.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.StrainTime">
+            <summary>
+            Milliseconds elapsed since the start time of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>, with a minimum of 25ms.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance">
+            <summary>
+            Normalised distance from the "lazy" end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> to the start position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            <para>
+            The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
+            </para>
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.MinimumJumpDistance">
+            <summary>
+            Normalised shortest distance to consider for a jump between the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> and this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+            <remarks>
+            This is bounded from above by <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance"/>, and is smaller than the former if a more natural path is able to be taken through the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </remarks>
+            <example>
+            Suppose a linear slider - circle pattern.
+            <br />
+            Following the slider lazily (see: <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance"/>) will result in underestimating the true end position of the slider as being closer towards the start position.
+            As a result, <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance"/> overestimates the jump distance because the player is able to take a more natural path by following through the slider to its end,
+            such that the jump is felt as only starting from the slider's true end position.
+            <br />
+            Now consider a slider - circle pattern where the circle is stacked along the path inside the slider.
+            In this case, the lazy end position correctly estimates the true end position of the slider and provides the more natural movement path.
+            </example>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.MinimumJumpTime">
+            <summary>
+            The time taken to travel through <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.MinimumJumpDistance"/>, with a minimum value of 25ms.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelDistance">
             <summary>
-            Normalized distance between the start and end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            Normalised distance between the start and end position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelTime">
+            <summary>
+            The time taken to travel through <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelDistance"/>, with a minimum value of 25ms for <see cref="T:MapsetParser.objects.hitobjects.Slider"/> objects.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.Angle">
@@ -727,9 +853,9 @@
             Calculated as the angle between the circles (current-2, current-1, current).
             </summary>
         </member>
-        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.StrainTime">
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.HitWindowGreat">
             <summary>
-            Milliseconds elapsed since the start time of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>, with a minimum of 50ms.
+            Retrieves the full hit window for a Great <see cref="T:MapsetParser.scoring.HitResult"/>.
             </summary>
         </member>
         <member name="F:MapsetParser.starrating.osu.scoring.OsuHitWindows.MISS_WINDOW">
@@ -740,6 +866,28 @@
         <member name="T:MapsetParser.starrating.osu.skills.Aim">
             <summary>
             Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.skills.OsuStrainSkill.DEFAULT_DIFFICULTY_MULTIPLIER">
+            <summary>
+            The default multiplier applied by <see cref="T:MapsetParser.starrating.osu.skills.OsuStrainSkill"/> to the final difficulty value after all other calculations.
+            May be overridden via <see cref="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.DifficultyMultiplier"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.ReducedSectionCount">
+            <summary>
+            The number of sections with the highest strains, which the peak strain reductions will apply to.
+            This is done in order to decrease their impact on the overall difficulty of the map for this skill.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.ReducedStrainBaseline">
+            <summary>
+            The baseline multiplier applied to the section with the biggest strain.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.DifficultyMultiplier">
+            <summary>
+            The final multiplier to be applied to <see cref="M:MapsetParser.starrating.osu.skills.OsuStrainSkill.DifficultyValue"/> after all other calculations.
             </summary>
         </member>
         <member name="T:MapsetParser.starrating.osu.skills.Speed">

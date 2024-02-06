@@ -49,25 +49,10 @@ namespace MapsetParser.starrating
 
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {
-                while (h.BaseObject.time > currentSectionEnd)
-                {
-                    foreach (Skill s in skills)
-                    {
-                        (s as StrainSkill)?.saveCurrentPeak();
-                        (s as StrainSkill)?.startNewSectionFrom(currentSectionEnd, h);
-                    }
-
-                    currentSectionEnd += sectionLength;
-                }
-
                 foreach (Skill s in skills)
                     s.Process(h);
             }
-
-            // The peak strain will not be saved for the last section in the above loop
-            foreach (Skill s in skills)
-                (s as StrainSkill)?.saveCurrentPeak();
-
+            
             return CreateDifficultyAttributes(beatmap, skills);
         }
 
