@@ -493,11 +493,158 @@
         <member name="M:MapsetParser.objects.timinglines.UninheritedLine.GetBPM">
             <summary> Returns the beats per minute (BPM) of the uninherited line. </summary>
         </member>
+        <member name="F:MapsetParser.scoring.HitResult.None">
+            <summary>
+            Indicates that the object has not been judged yet.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.Miss">
+            <summary>
+            Indicates that the object has been judged as a miss.
+            </summary>
+            <remarks>
+            This miss window should determine how early a hit can be before it is considered for judgement (as opposed to being ignored as
+            "too far in the future). It should also define when a forced miss should be triggered (as a result of no user input in time).
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.Perfect">
+            <summary>
+            This is an optional timing window tighter than <see cref="F:MapsetParser.scoring.HitResult.Great"/>.
+            </summary>
+            <remarks>
+            By default, this does not give any bonus accuracy or score.
+            To have it affect scoring, consider adding a nested bonus object.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.SmallTickMiss">
+            <summary>
+            Indicates small tick miss.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.SmallTickHit">
+            <summary>
+            Indicates a small tick hit.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.LargeTickMiss">
+            <summary>
+            Indicates a large tick miss.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.LargeTickHit">
+            <summary>
+            Indicates a large tick hit.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.SmallBonus">
+            <summary>
+            Indicates a small bonus.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.LargeBonus">
+            <summary>
+            Indicates a large bonus.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.IgnoreMiss">
+            <summary>
+            Indicates a miss that should be ignored for scoring purposes.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.IgnoreHit">
+            <summary>
+            Indicates a hit that should be ignored for scoring purposes.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.ComboBreak">
+            <summary>
+            Indicates that a combo break should occur, but does not otherwise affect score.
+            </summary>
+            <remarks>
+            May be paired with <see cref="F:MapsetParser.scoring.HitResult.IgnoreHit"/>.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.scoring.HitResult.LegacyComboIncrease">
+            <summary>
+            A special result used as a padding value for legacy rulesets. It is a hit type and affects combo, but does not affect the base score (does not affect accuracy).
+            </summary>
+            <remarks>
+            DO NOT USE.
+            </remarks>
+        </member>
+        <member name="T:MapsetParser.scoring.HitWindows">
+            <summary>
+            A structure containing timing data for hit window based gameplay.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.scoring.HitWindows.Empty">
+            <summary>
+            An empty <see cref="T:MapsetParser.scoring.HitWindows"/> with only <see cref="F:MapsetParser.scoring.HitResult.Miss"/> and <see cref="F:MapsetParser.scoring.HitResult.Perfect"/>.
+            No time values are provided (meaning instantaneous hit or miss).
+            </summary>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.LowestSuccessfulHitResult">
+            <summary>
+            Retrieves the <see cref="T:MapsetParser.scoring.HitResult"/> with the largest hit window that produces a successful hit.
+            </summary>
+            <returns>The lowest allowed successful <see cref="T:MapsetParser.scoring.HitResult"/>.</returns>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.GetAllAvailableWindows">
+            <summary>
+            Retrieves a mapping of <see cref="T:MapsetParser.scoring.HitResult"/>s to their timing windows for all allowed <see cref="T:MapsetParser.scoring.HitResult"/>s.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.IsHitResultAllowed(MapsetParser.scoring.HitResult)">
+            <summary>
+            Check whether it is possible to achieve the provided <see cref="T:MapsetParser.scoring.HitResult"/>.
+            </summary>
+            <param name="result">The result type to check.</param>
+            <returns>Whether the <see cref="T:MapsetParser.scoring.HitResult"/> can be achieved.</returns>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.SetDifficulty(System.Double)">
+            <summary>
+            Sets hit windows with values that correspond to a difficulty parameter.
+            </summary>
+            <param name="difficulty">The parameter.</param>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.ResultFor(System.Double)">
+            <summary>
+            Retrieves the <see cref="T:MapsetParser.scoring.HitResult"/> for a time offset.
+            </summary>
+            <param name="timeOffset">The time offset.</param>
+            <returns>The hit result, or <see cref="F:MapsetParser.scoring.HitResult.None"/> if <paramref name="timeOffset"/> doesn't result in a judgement.</returns>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.WindowFor(MapsetParser.scoring.HitResult)">
+            <summary>
+            Retrieves the hit window for a <see cref="T:MapsetParser.scoring.HitResult"/>.
+            This is the number of +/- milliseconds allowed for the requested result (so the actual hittable range is double this).
+            </summary>
+            <param name="result">The expected <see cref="T:MapsetParser.scoring.HitResult"/>.</param>
+            <returns>One half of the hit window for <paramref name="result"/>.</returns>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.CanBeHit(System.Double)">
+            <summary>
+            Given a time offset, whether the <see cref="T:MapsetParser.objects.HitObject"/> can ever be hit in the future with a non-<see cref="F:MapsetParser.scoring.HitResult.Miss"/> result.
+            This happens if <paramref name="timeOffset"/> is less than what is required for <see cref="M:MapsetParser.scoring.HitWindows.LowestSuccessfulHitResult"/>.
+            </summary>
+            <param name="timeOffset">The time offset.</param>
+            <returns>Whether the <see cref="T:MapsetParser.objects.HitObject"/> can be hit at any point in the future from this time offset.</returns>
+        </member>
+        <member name="M:MapsetParser.scoring.HitWindows.GetRanges">
+            <summary>
+            Retrieve a valid list of <see cref="T:MapsetParser.scoring.DifficultyRange"/>s representing hit windows.
+            Defaults are provided but can be overridden to customise for a ruleset.
+            </summary>
+        </member>
         <member name="F:MapsetParser.settings.ColourSettings.combos">
             <summary> Starts at index 0, so combo colour 1 is the 0th element in the list. </summary>
         </member>
         <member name="M:MapsetParser.settings.DifficultySettings.GetCircleRadius">
             <summary> Returns the radius of a circle or slider from the circle size. </summary>
+        </member>
+        <member name="M:MapsetParser.settings.DifficultySettings.DifficultyRange(System.Double,System.ValueTuple{System.Double,System.Double,System.Double})">
+            <summary> Returns a value between the upper, middle, and lower ranges,
+            based on the given difficulty value (0-10). </summary>
         </member>
         <member name="M:MapsetParser.settings.DifficultySettings.GetFadeInTime">
             <summary> Returns the time from where the object begins fading in to where it is fully opaque. </summary>
@@ -532,16 +679,9 @@
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.Calculate">
             <summary>
-            Calculates the difficulty of the beatmap using a specific mod combination.
+            Calculates the difficulty of the beatmap.
             </summary>
-            <param name="mods">The mods that should be applied to the beatmap.</param>
             <returns>A structure describing the difficulty of the beatmap.</returns>
-        </member>
-        <member name="M:MapsetParser.starrating.DifficultyCalculator.CalculateAll">
-            <summary>
-            Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
-            </summary>
-            <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.SortObjects(System.Collections.Generic.IEnumerable{MapsetParser.starrating.preprocessing.DifficultyHitObject})">
             <summary>
@@ -554,34 +694,157 @@
             <summary>
             Creates <see cref="T:MapsetParser.starrating.DifficultyAttributes"/> to describe beatmap's calculated difficulty.
             </summary>
-            <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty was calculated.</param>
-            <param name="mods">The <see cref="!:Mod"/>s that difficulty was calculated with.</param>
+            <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> whose difficulty was calculated.</param>
             <param name="skills">The skills which processed the beatmap.</param>
-            <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateDifficultyHitObjects(MapsetParser.objects.Beatmap)">
             <summary>
-            Enumerates <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s to be processed from <see cref="T:MapsetParser.objects.HitObject"/>s in the <see cref="!:IBeatmap"/>.
+            Enumerates <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s to be processed from <see cref="T:MapsetParser.objects.HitObject"/>s in the <see cref="T:MapsetParser.objects.Beatmap"/>.
             </summary>
-            <param name="beatmap">The <see cref="!:IBeatmap"/> providing the <see cref="T:MapsetParser.objects.HitObject"/>s to enumerate.</param>
-            <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+            <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> providing the <see cref="T:MapsetParser.objects.HitObject"/>s to enumerate.</param>
             <returns>The enumerated <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.</returns>
         </member>
         <member name="M:MapsetParser.starrating.DifficultyCalculator.CreateSkills(MapsetParser.objects.Beatmap)">
             <summary>
-            Creates the <see cref="T:MapsetParser.starrating.skills.Skill"/>s to calculate the difficulty of an <see cref="!:IBeatmap"/>.
+            Creates the <see cref="T:MapsetParser.starrating.skills.Skill"/>s to calculate the difficulty of an <see cref="T:MapsetParser.objects.Beatmap"/>.
             </summary>
-            <param name="beatmap">The <see cref="!:IBeatmap"/> whose difficulty will be calculated.</param>
+            <param name="beatmap">The <see cref="T:MapsetParser.objects.Beatmap"/> whose difficulty will be calculated.</param>
             <returns>The <see cref="T:MapsetParser.starrating.skills.Skill"/>s.</returns>
         </member>
-        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.JumpDistance">
+        <member name="M:MapsetParser.starrating.osu.evaluators.AimEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject,System.Boolean)">
             <summary>
-            Normalized distance from the end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> to the start position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            Evaluates the difficulty of aiming the current object, based on:
+            <list type="bullet">
+            <item><description>cursor velocity to the current object,</description></item>
+            <item><description>angle difficulty,</description></item>
+            <item><description>sharp velocity increases,</description></item>
+            <item><description>and slider difficulty.</description></item>
+            </list>
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.osu.evaluators.RhythmEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Calculates a rhythm multiplier for the difficulty of the tap associated with historic data of the current <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.osu.evaluators.SpeedEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Evaluates the difficulty of tapping the current object, based on:
+            <list type="bullet">
+            <item><description>time between pressing the previous and current object,</description></item>
+            <item><description>distance between those objects,</description></item>
+            <item><description>and how easily they can be cheesed.</description></item>
+            </list>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty">
+            <summary>
+            The difficulty corresponding to the aim skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpeedDifficulty">
+            <summary>
+            The difficulty corresponding to the speed skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpeedNoteCount">
+            <summary>
+            The number of clickable objects weighted by difficulty.
+            Related to <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpeedDifficulty"/>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SliderFactor">
+            <summary>
+            Describes how much of <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty"/> is contributed to by hitcircles or sliders.
+            A value closer to 1.0 indicates most of <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty"/> is contributed by hitcircles.
+            A value closer to 0.0 indicates most of <see cref="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.AimDifficulty"/> is contributed by sliders.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.ApproachRate">
+            <summary>
+            The perceived approach rate inclusive of rate-adjusting mods (DT/HT/etc).
+            </summary>
+            <remarks>
+            Rate-adjusting mods don't directly affect the approach rate difficulty value, but have a perceived effect as a result of adjusting audio timing.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.OverallDifficulty">
+            <summary>
+            The perceived overall difficulty inclusive of rate-adjusting mods (DT/HT/etc).
+            </summary>
+            <remarks>
+            Rate-adjusting mods don't directly affect the overall difficulty value, but have a perceived effect as a result of adjusting audio timing.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.DrainRate">
+            <summary>
+            The beatmap's drain rate. This doesn't scale with rate-adjusting mods.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.HitCircleCount">
+            <summary>
+            The number of hitcircles in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SliderCount">
+            <summary>
+            The number of sliders in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.OsuDifficultyAttributes.SpinnerCount">
+            <summary>
+            The number of spinners in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.NORMALISED_RADIUS">
+            <summary>
+            A distance by which all distances should be scaled in order to assume a uniform circle size.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.StrainTime">
+            <summary>
+            Milliseconds elapsed since the start time of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>, with a minimum of 25ms.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance">
+            <summary>
+            Normalised distance from the "lazy" end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> to the start position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            <para>
+            The "lazy" end position is the position at which the cursor ends up if the previous hitobject is followed with as minimal movement as possible (i.e. on the edge of slider follow circles).
+            </para>
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.MinimumJumpDistance">
+            <summary>
+            Normalised shortest distance to consider for a jump between the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/> and this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+            <remarks>
+            This is bounded from above by <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance"/>, and is smaller than the former if a more natural path is able to be taken through the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </remarks>
+            <example>
+            Suppose a linear slider - circle pattern.
+            <br />
+            Following the slider lazily (see: <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance"/>) will result in underestimating the true end position of the slider as being closer towards the start position.
+            As a result, <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.LazyJumpDistance"/> overestimates the jump distance because the player is able to take a more natural path by following through the slider to its end,
+            such that the jump is felt as only starting from the slider's true end position.
+            <br />
+            Now consider a slider - circle pattern where the circle is stacked along the path inside the slider.
+            In this case, the lazy end position correctly estimates the true end position of the slider and provides the more natural movement path.
+            </example>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.MinimumJumpTime">
+            <summary>
+            The time taken to travel through <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.MinimumJumpDistance"/>, with a minimum value of 25ms.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelDistance">
             <summary>
-            Normalized distance between the start and end position of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            Normalised distance between the start and end position of this <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelTime">
+            <summary>
+            The time taken to travel through <see cref="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.TravelDistance"/>, with a minimum value of 25ms for <see cref="T:MapsetParser.objects.hitobjects.Slider"/> objects.
             </summary>
         </member>
         <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.Angle">
@@ -590,14 +853,41 @@
             Calculated as the angle between the circles (current-2, current-1, current).
             </summary>
         </member>
-        <member name="F:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.StrainTime">
+        <member name="P:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject.HitWindowGreat">
             <summary>
-            Milliseconds elapsed since the start time of the previous <see cref="T:MapsetParser.starrating.osu.preprocessing.OsuDifficultyHitObject"/>, with a minimum of 50ms.
+            Retrieves the full hit window for a Great <see cref="T:MapsetParser.scoring.HitResult"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.scoring.OsuHitWindows.MISS_WINDOW">
+            <summary>
+            osu! ruleset has a fixed miss window regardless of difficulty settings.
             </summary>
         </member>
         <member name="T:MapsetParser.starrating.osu.skills.Aim">
             <summary>
             Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.osu.skills.OsuStrainSkill.DEFAULT_DIFFICULTY_MULTIPLIER">
+            <summary>
+            The default multiplier applied by <see cref="T:MapsetParser.starrating.osu.skills.OsuStrainSkill"/> to the final difficulty value after all other calculations.
+            May be overridden via <see cref="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.DifficultyMultiplier"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.ReducedSectionCount">
+            <summary>
+            The number of sections with the highest strains, which the peak strain reductions will apply to.
+            This is done in order to decrease their impact on the overall difficulty of the map for this skill.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.ReducedStrainBaseline">
+            <summary>
+            The baseline multiplier applied to the section with the biggest strain.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.osu.skills.OsuStrainSkill.DifficultyMultiplier">
+            <summary>
+            The final multiplier to be applied to <see cref="M:MapsetParser.starrating.osu.skills.OsuStrainSkill.DifficultyValue"/> after all other calculations.
             </summary>
         </member>
         <member name="T:MapsetParser.starrating.osu.skills.Speed">
@@ -608,6 +898,11 @@
         <member name="T:MapsetParser.starrating.preprocessing.DifficultyHitObject">
             <summary>
             Wraps a <see cref="T:MapsetParser.objects.HitObject"/> and provides additional information to be used for difficulty calculation.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.Index">
+            <summary>
+            The index of this <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> in the list of all <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.
             </summary>
         </member>
         <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject">
@@ -625,82 +920,643 @@
             Amount of time elapsed between <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject"/> and <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.LastObject"/>.
             </summary>
         </member>
-        <member name="M:MapsetParser.starrating.preprocessing.DifficultyHitObject.#ctor(MapsetParser.objects.HitObject,MapsetParser.objects.HitObject)">
+        <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.StartTime">
+            <summary>
+            Start time of <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.EndTime">
+            <summary>
+            End time of <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.BaseObject"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.preprocessing.DifficultyHitObject.#ctor(MapsetParser.objects.HitObject,MapsetParser.objects.HitObject,System.Collections.Generic.List{MapsetParser.starrating.preprocessing.DifficultyHitObject},System.Int32)">
             <summary>
             Creates a new <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>.
             </summary>
             <param name="hitObject">The <see cref="T:MapsetParser.objects.HitObject"/> which this <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> wraps.</param>
             <param name="lastObject">The last <see cref="T:MapsetParser.objects.HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
-            <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+            <param name="objects">The list of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s in the current beatmap.</param>
+            <param name="index">The index of this <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> in <paramref name="objects"/> list.</param>
         </member>
         <member name="T:MapsetParser.starrating.skills.Skill">
+            <summary>
+            A bare minimal abstract skill for fully custom skill implementations.
+            </summary>
+            <remarks>
+            This class should be considered a "processing" class and not persisted.
+            </remarks>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.Process(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Process a <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>.
+            </summary>
+            <param name="current">The <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> to process.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.Skill.DifficultyValue">
+            <summary>
+            Returns the calculated difficulty value representing all <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that have been processed up to this point.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.skills.StrainDecaySkill">
             <summary>
             Used to processes strain values of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
             and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
             </summary>
         </member>
-        <member name="P:MapsetParser.starrating.skills.Skill.StrainPeaks">
-            <summary>
-            The peak strain for each <see cref="P:MapsetParser.starrating.DifficultyCalculator.SectionLength"/> section of the beatmap.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.skills.Skill.SkillMultiplier">
+        <member name="P:MapsetParser.starrating.skills.StrainDecaySkill.SkillMultiplier">
             <summary>
             Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
             </summary>
         </member>
-        <member name="P:MapsetParser.starrating.skills.Skill.StrainDecayBase">
+        <member name="P:MapsetParser.starrating.skills.StrainDecaySkill.StrainDecayBase">
             <summary>
             Determines how quickly strain decays for the given skill.
             For example a value of 0.15 indicates that strain decays to 15% of its original value in one second.
             </summary>
         </member>
-        <member name="P:MapsetParser.starrating.skills.Skill.DecayWeight">
-            <summary>
-            The weight by which each strain value decays.
-            </summary>
-        </member>
-        <member name="F:MapsetParser.starrating.skills.Skill.Previous">
-            <summary>
-            <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
-            </summary>
-        </member>
-        <member name="P:MapsetParser.starrating.skills.Skill.CurrentStrain">
+        <member name="P:MapsetParser.starrating.skills.StrainDecaySkill.CurrentStrain">
             <summary>
             The current strain level.
             </summary>
         </member>
-        <member name="M:MapsetParser.starrating.skills.Skill.Process(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+        <member name="M:MapsetParser.starrating.skills.StrainDecaySkill.StrainValueOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Calculates the strain value of a <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>. This value is affected by previously processed objects.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.skills.StrainSkill">
+            <summary>
+            Used to processes strain values of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s, keep track of strain levels caused by the processed objects
+            and to calculate a final difficulty value representing the difficulty of hitting all the processed objects.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.StrainSkill.DecayWeight">
+            <summary>
+            The weight by which each strain value decays.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.skills.StrainSkill.SectionLength">
+            <summary>
+            The length of each strain section.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.StrainValueAt(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Returns the strain value at <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>. This value is calculated with or without respect to previous objects.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.Process(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
             <summary>
             Process a <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> and update current strain values accordingly.
             </summary>
         </member>
-        <member name="M:MapsetParser.starrating.skills.Skill.SaveCurrentPeak">
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.saveCurrentPeak">
             <summary>
             Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
             </summary>
         </member>
-        <member name="M:MapsetParser.starrating.skills.Skill.StartNewSectionFrom(System.Double)">
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.startNewSectionFrom(System.Double,MapsetParser.starrating.preprocessing.DifficultyHitObject)">
             <summary>
             Sets the initial strain level for a new section.
             </summary>
             <param name="time">The beginning of the new section in milliseconds.</param>
+            <param name="current">The current hit object.</param>
         </member>
-        <member name="M:MapsetParser.starrating.skills.Skill.GetPeakStrain(System.Double)">
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.CalculateInitialStrain(System.Double,MapsetParser.starrating.preprocessing.DifficultyHitObject)">
             <summary>
             Retrieves the peak strain at a point in time.
             </summary>
             <param name="time">The time to retrieve the peak strain at.</param>
+            <param name="current">The current hit object.</param>
             <returns>The peak strain.</returns>
         </member>
-        <member name="M:MapsetParser.starrating.skills.Skill.DifficultyValue">
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.GetCurrentStrainPeaks">
             <summary>
-            Returns the calculated difficulty value representing all processed <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s.
+            Returns a live enumerable of the peak strains for each <see cref="P:MapsetParser.starrating.skills.StrainSkill.SectionLength"/> section of the beatmap,
+            including the peak of the current section.
             </summary>
         </member>
-        <member name="M:MapsetParser.starrating.skills.Skill.StrainValueOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+        <member name="M:MapsetParser.starrating.skills.StrainSkill.DifficultyValue">
             <summary>
-            Calculates the strain value of a <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>. This value is affected by previously processed objects.
+            Returns the calculated difficulty value representing all <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that have been processed up to this point.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.ColourEvaluator.sigmoid(System.Double,System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            A sigmoid function. It gives a value between (middle - height/2) and (middle + height/2).
+            </summary>
+            <param name="val">The input value.</param>
+            <param name="center">The center of the sigmoid, where the largest gradient occurs and value is equal to middle.</param>
+            <param name="width">The radius of the sigmoid, outside of which values are near the minimum/maximum.</param>
+            <param name="middle">The middle of the sigmoid output.</param>
+            <param name="height">The height of the sigmoid output. This will be equal to max value - min value.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.ColourEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak)">
+            <summary>
+            Evaluate the difficulty of the first note of a <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.ColourEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern)">
+            <summary>
+            Evaluate the difficulty of the first note of a <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.ColourEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns)">
+            <summary>
+            Evaluate the difficulty of the first note of a <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.StaminaEvaluator.speedBonus(System.Double)">
+            <summary>
+            Applies a speed bonus dependent on the time since the last hit performed using this finger.
+            </summary>
+            <param name="interval">The interval between the current and previous note hit using the same finger.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.StaminaEvaluator.availableFingersFor(MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject)">
+            <summary>
+            Determines the number of fingers available to hit the current <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>.
+            Any mono notes that is more than 300ms apart from a colour change will be considered to have more than 2
+            fingers available, since players can hit the same key with multiple fingers.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.evaluators.StaminaEvaluator.EvaluateDifficultyOf(MapsetParser.starrating.preprocessing.DifficultyHitObject)">
+            <summary>
+            Evaluates the minimum mechanical stamina required to play the current object. This is calculated using the
+            maximum possible interval between two hits using the same key, by alternating available fingers for each colour.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern">
+            <summary>
+            Encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>s.
+            <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>s with the same <see cref="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.RunLength"/> are grouped together.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern.MonoStreaks">
+            <summary>
+            <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>s that are grouped together within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern.Parent">
+            <summary>
+            The parent <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/> that contains this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern.Index">
+            <summary>
+            Index of this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/> within it's parent <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern.FirstHitObject">
+            <summary>
+            The first <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern.IsRepetitionOf(MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern)">
+            <summary>
+            Determine if this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/> is a repetition of another <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>. This
+            is a strict comparison and is true if and only if the colour sequence is exactly the same.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern.HasIdenticalMonoLength(MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern)">
+            <summary>
+            Determine if this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/> has the same mono length of another <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak">
+            <summary>
+            Encode colour information for a sequence of <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s. Consecutive <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s
+            of the same colour are encoded within the same <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.HitObjects">
+            <summary>
+            List of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that are encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.Parent">
+            <summary>
+            The parent <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/> that contains this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.Index">
+            <summary>
+            Index of this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/> within it's parent <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.FirstHitObject">
+            <summary>
+            The first <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.LastHitObject">
+            <summary>
+            The last <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.AreCircles">
+            <summary>
+            Whether all objects encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/> are circles.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.AreDons">
+            <summary>
+            Whether all objects encoded within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/> are don hits.
+            Returns false if not a circle.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak.RunLength">
+            <summary>
+            How long the mono pattern encoded within is
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns">
+            <summary>
+            Encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>s, grouped together by back and forth repetition of the same
+            <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>. Also stores the repetition interval between this and the previous <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.max_repetition_interval">
+            <summary>
+            Maximum amount of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>s to look back to find a repetition.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.AlternatingMonoPatterns">
+            <summary>
+            The <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>s that are grouped together within this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.FirstHitObject">
+            <summary>
+            The first <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in this <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.Previous">
+            <summary>
+            The previous <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>. This is used to determine the repetition interval.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.RepetitionInterval">
+            <summary>
+            How many <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/> between the current and previous identical <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>.
+            If no repetition is found this will have a value of <see cref="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.max_repetition_interval"/> + 1.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.isRepetitionOf(MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns)">
+            <summary>
+            Returns true if other is considered a repetition of this pattern. This is true if other's first two payloads
+            have identical mono lengths.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.FindRepetitionInterval">
+            <summary>
+            Finds the closest previous <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/> that has the identical <see cref="F:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns.AlternatingMonoPatterns"/>.
+            Interval is defined as the amount of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/> chunks between the current and repeated patterns.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoColourDifficultyPreprocessor">
+            <summary>
+            Utility class to perform various encodings.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoColourDifficultyPreprocessor.ProcessAndAssign(System.Collections.Generic.List{MapsetParser.starrating.preprocessing.DifficultyHitObject})">
+            <summary>
+            Processes and encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s into a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour"/>s,
+            assigning the appropriate <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour"/>s to each <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoColourDifficultyPreprocessor.encode(System.Collections.Generic.List{MapsetParser.starrating.preprocessing.DifficultyHitObject})">
+            <summary>
+            Encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s into a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>s.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoColourDifficultyPreprocessor.encodeMonoStreak(System.Collections.Generic.List{MapsetParser.starrating.preprocessing.DifficultyHitObject})">
+            <summary>
+            Encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>s into a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>s.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoColourDifficultyPreprocessor.encodeAlternatingMonoPattern(System.Collections.Generic.List{MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak})">
+            <summary>
+            Encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.MonoStreak"/>s into a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>s.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoColourDifficultyPreprocessor.encodeRepeatingHitPattern(System.Collections.Generic.List{MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern})">
+            <summary>
+            Encodes a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.AlternatingMonoPattern"/>s into a list of <see cref="T:MapsetParser.starrating.taiko.preprocessing.Colour.Data.RepeatingHitPatterns"/>s.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour">
+            <summary>
+            Stores colour compression information for a <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.MonoStreak">
+            <summary>
+            The <see cref="F:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.MonoStreak"/> that encodes this note.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.AlternatingMonoPattern">
+            <summary>
+            The <see cref="F:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.AlternatingMonoPattern"/> that encodes this note.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.RepeatingHitPattern">
+            <summary>
+            The <see cref="F:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.RepeatingHitPattern"/> that encodes this note.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.PreviousColourChange">
+            <summary>
+            The closest past <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> that's not the same colour.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.taiko.preprocessing.Colour.TaikoDifficultyHitObjectColour.NextColourChange">
+            <summary>
+            The closest future <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> that's not the same colour.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm">
+            <summary>
+            Represents a rhythm change in a taiko map.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Difficulty">
+            <summary>
+            The difficulty multiplier associated with this rhythm change.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio">
+            <summary>
+            The ratio of current <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.DeltaTime"/>
+            to previous <see cref="F:MapsetParser.starrating.preprocessing.DifficultyHitObject.DeltaTime"/> for the rhythm change.
+            A <see cref="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio"/> above 1 indicates a slow-down; a <see cref="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio"/> below 1 indicates a speed-up.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.#ctor(System.Int32,System.Int32,System.Double)">
+            <summary>
+            Creates an object representing a rhythm change.
+            </summary>
+            <param name="numerator">The numerator for <see cref="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio"/>.</param>
+            <param name="denominator">The denominator for <see cref="F:MapsetParser.starrating.taiko.preprocessing.Rhythm.TaikoDifficultyHitObjectRhythm.Ratio"/></param>
+            <param name="difficulty">The difficulty multiplier associated with this rhythm change.</param>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject">
+            <summary>
+            Represents a single hit object in taiko difficulty calculation.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.monoDifficultyHitObjects">
+            <summary>
+            The list of all <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> of the same colour as this <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in the beatmap.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.MonoIndex">
+            <summary>
+            The index of this <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in <see cref="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.monoDifficultyHitObjects"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.noteDifficultyHitObjects">
+            <summary>
+            The list of all <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> that is either a regular note or finisher in the beatmap
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.NoteIndex">
+            <summary>
+            The index of this <see cref="T:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject"/> in <see cref="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.noteDifficultyHitObjects"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.Rhythm">
+            <summary>
+            The rhythm required to hit this hit object.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.Colour">
+            <summary>
+            Colour data for this hit object. This is used by colour evaluator to calculate colour difficulty, but can be used
+            by other skills in the future.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.#ctor(MapsetParser.objects.HitObject,MapsetParser.objects.HitObject,MapsetParser.objects.HitObject,System.Collections.Generic.List{MapsetParser.starrating.preprocessing.DifficultyHitObject},System.Collections.Generic.List{MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject},System.Collections.Generic.List{MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject},System.Collections.Generic.List{MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject},System.Int32)">
+            <summary>
+            Creates a new difficulty hit object.
+            </summary>
+            <param name="hitObject">The gameplay <see cref="T:MapsetParser.objects.HitObject"/> associated with this difficulty object.</param>
+            <param name="lastObject">The gameplay <see cref="T:MapsetParser.objects.HitObject"/> preceding <paramref name="hitObject"/>.</param>
+            <param name="lastLastObject">The gameplay <see cref="T:MapsetParser.objects.HitObject"/> preceding <paramref name="lastObject"/>.</param>
+            <param name="objects">The list of all <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s in the current beatmap.</param>
+            <param name="centreHitObjects">The list of centre (don) <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s in the current beatmap.</param>
+            <param name="rimHitObjects">The list of rim (kat) <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s in the current beatmap.</param>
+            <param name="noteObjects">The list of <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/>s that is a hit (i.e. not a drumroll or swell) in the current beatmap.</param>
+            <param name="index">The position of this <see cref="T:MapsetParser.starrating.preprocessing.DifficultyHitObject"/> in the <paramref name="objects"/> list.</param>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.common_rhythms">
+            <summary>
+            List of most common rhythm changes in taiko maps.
+            </summary>
+            <remarks>
+            The general guidelines for the values are:
+            <list type="bullet">
+            <item>rhythm changes with ratio closer to 1 (that are <i>not</i> 1) are harder to play,</item>
+            <item>speeding up is <i>generally</i> harder than slowing down (with exceptions of rhythm changes requiring a hand switch).</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.getClosestRhythm(MapsetParser.objects.HitObject,MapsetParser.objects.HitObject)">
+            <summary>
+            Returns the closest rhythm change from <see cref="F:MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject.common_rhythms"/> required to hit this object.
+            </summary>
+            <param name="lastObject">The gameplay <see cref="T:MapsetParser.objects.HitObject"/> preceding this one.</param>
+            <param name="lastLastObject">The gameplay <see cref="T:MapsetParser.objects.HitObject"/> preceding <paramref name="lastObject"/>.</param>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.skills.Colour">
+            <summary>
+            Calculates the colour coefficient of taiko difficulty.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Peaks.norm(System.Double,System.Double[])">
+            <summary>
+            Returns the <i>p</i>-norm of an <i>n</i>-dimensional vector.
+            </summary>
+            <param name="p">The value of <i>p</i> to calculate the norm for.</param>
+            <param name="values">The coefficients of the vector.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Peaks.DifficultyValue">
+            <summary>
+            Returns the combined star rating of the beatmap, calculated using peak strains from all sections of the map.
+            </summary>
+            <remarks>
+            For each section, the peak strains of all separate skills are combined into a single peak strain for the section.
+            The resulting partial rating of the beatmap is a weighted sum of the combined peaks (higher peaks are weighted more).
+            </remarks>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.skills.Rhythm">
+            <summary>
+            Calculates the rhythm coefficient of taiko difficulty.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.skills.Rhythm.strain_decay">
+            <summary>
+            The note-based decay for rhythm strain.
+            </summary>
+            <remarks>
+            <see cref="P:MapsetParser.starrating.taiko.skills.Rhythm.StrainDecayBase"/> is not used here, as it's time- and not note-based.
+            </remarks>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.skills.Rhythm.rhythm_history_max_length">
+            <summary>
+            Maximum number of entries in <see cref="F:MapsetParser.starrating.taiko.skills.Rhythm.rhythmHistory"/>.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.skills.Rhythm.rhythmHistory">
+            <summary>
+            Contains the last <see cref="F:MapsetParser.starrating.taiko.skills.Rhythm.rhythm_history_max_length"/> changes in note sequence rhythms.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.skills.Rhythm.currentStrain">
+            <summary>
+            Contains the rolling rhythm strain.
+            Used to apply per-note decay.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.skills.Rhythm.notesSinceRhythmChange">
+            <summary>
+            Number of notes since the last rhythm change has taken place.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Rhythm.repetitionPenalties(MapsetParser.starrating.taiko.preprocessing.TaikoDifficultyHitObject)">
+            <summary>
+            Returns a penalty to apply to the current hit object caused by repeating rhythm changes.
+            </summary>
+            <remarks>
+            Repetitions of more recent patterns are associated with a higher penalty.
+            </remarks>
+            <param name="hitObject">The current hit object being considered.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Rhythm.samePattern(System.Int32,System.Int32)">
+            <summary>
+            Determines whether the rhythm change pattern starting at <paramref name="start"/> is a repeat of any of the
+            <paramref name="mostRecentPatternsToCompare"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Rhythm.repetitionPenalty(System.Int32)">
+            <summary>
+            Calculates a single rhythm repetition penalty.
+            </summary>
+            <param name="notesSince">Number of notes since the last repetition of a rhythm change.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Rhythm.patternLengthPenalty(System.Int32)">
+            <summary>
+            Calculates a penalty based on the number of notes since the last rhythm change.
+            Both rare and frequent rhythm changes are penalised.
+            </summary>
+            <param name="patternLength">Number of notes since the last rhythm change.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Rhythm.speedPenalty(System.Double)">
+            <summary>
+            Calculates a penalty for objects that do not require alternating hands.
+            </summary>
+            <param name="deltaTime">Time (in milliseconds) since the last hit object.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Rhythm.resetRhythmAndStrain">
+            <summary>
+            Resets the rolling strain value and <see cref="F:MapsetParser.starrating.taiko.skills.Rhythm.notesSinceRhythmChange"/> counter.
+            </summary>
+        </member>
+        <member name="T:MapsetParser.starrating.taiko.skills.Stamina">
+            <summary>
+            Calculates the stamina coefficient of taiko difficulty.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.skills.Stamina.#ctor">
+            <summary>
+            Creates a <see cref="T:MapsetParser.starrating.taiko.skills.Stamina"/> skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.TaikoDifficultyAttributes.StaminaDifficulty">
+            <summary>
+            The difficulty corresponding to the stamina skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.TaikoDifficultyAttributes.RhythmDifficulty">
+            <summary>
+            The difficulty corresponding to the rhythm skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.TaikoDifficultyAttributes.ColourDifficulty">
+            <summary>
+            The difficulty corresponding to the colour skill.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.TaikoDifficultyAttributes.PeakDifficulty">
+            <summary>
+            The difficulty corresponding to the hardest parts of the map.
+            </summary>
+        </member>
+        <member name="F:MapsetParser.starrating.taiko.TaikoDifficultyAttributes.GreatHitWindow">
+            <summary>
+            The perceived hit window for a GREAT hit inclusive of rate-adjusting mods (DT/HT/etc).
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.taiko.TaikoDifficultyCalculator.rescale(System.Double)">
+            <summary>
+            Applies a final re-scaling of the star rating.
+            </summary>
+            <param name="sr">The raw star rating value before re-scaling.</param>
+        </member>
+        <member name="T:MapsetParser.starrating.utils.LimitedCapacityQueue`1">
+            <summary>
+            An indexed queue with limited capacity.
+            Respects first-in-first-out insertion order.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Count">
+            <summary>
+            The number of elements in the queue.
+            </summary>
+        </member>
+        <member name="P:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Full">
+            <summary>
+            Whether the queue is full (adding any new items will cause removing existing ones).
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityQueue`1.#ctor(System.Int32)">
+            <summary>
+            Constructs a new <see cref="T:MapsetParser.starrating.utils.LimitedCapacityQueue`1"/>
+            </summary>
+            <param name="capacity">The number of items the queue can hold.</param>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Clear">
+            <summary>
+            Removes all elements from the <see cref="T:MapsetParser.starrating.utils.LimitedCapacityQueue`1"/>.
+            </summary>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Dequeue">
+            <summary>
+            Removes an item from the front of the <see cref="T:MapsetParser.starrating.utils.LimitedCapacityQueue`1"/>.
+            </summary>
+            <returns>The item removed from the front of the queue.</returns>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Enqueue(`0)">
+            <summary>
+            Adds an item to the back of the <see cref="T:MapsetParser.starrating.utils.LimitedCapacityQueue`1"/>.
+            If the queue is holding <see cref="P:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Count"/> elements at the point of addition,
+            the item at the front of the queue will be removed.
+            </summary>
+            <param name="item">The item to be added to the back of the queue.</param>
+        </member>
+        <member name="P:MapsetParser.starrating.utils.LimitedCapacityQueue`1.Item(System.Int32)">
+            <summary>
+            Retrieves the item at the given index in the queue.
+            </summary>
+            <param name="index">
+            The index of the item to retrieve.
+            The item with index 0 is at the front of the queue
+            (it was added the earliest).
+            </param>
+        </member>
+        <member name="M:MapsetParser.starrating.utils.LimitedCapacityQueue`1.GetEnumerator">
+            <summary>
+            Enumerates the queue from its start to its end.
             </summary>
         </member>
         <member name="T:MapsetParser.starrating.utils.LimitedCapacityStack`1">

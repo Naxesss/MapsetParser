@@ -55,51 +55,19 @@ namespace MapsetParser.settings
         public float GetCircleRadius() =>
             32.0f * (1.0f - 0.7f * (circleSize - 5) / 5);
 
-        struct DiffRange
-        {
-            public readonly double lower;
-            public readonly double middle;
-            public readonly double upper;
-
-            public DiffRange(double lower, double middle, double upper)
-            {
-                this.lower = lower;
-                this.middle = middle;
-                this.upper = upper;
-            }
-        }
-
-        private double DifficultyRange(double difficulty, DiffRange range) =>
-            DifficultyRange(difficulty, range.lower, range.middle, range.upper);
-
-        private double DifficultyRange(double difficulty, double lower, double middle, double upper) =>
+        /// <summary> Returns a value between the upper, middle, and lower ranges,
+        /// based on the given difficulty value (0-10). </summary>
+        public static double DifficultyRange(double difficulty, (double min, double average, double max) range) =>
             difficulty < 5
-                ? middle + (upper - middle) * (5 - difficulty) / 5
-                : middle - (middle - lower) * (difficulty - 5) / 5;
+                ? range.average + (range.max - range.average) * (5 - difficulty) / 5
+                : range.average - (range.average - range.min) * (difficulty - 5) / 5;
 
         /// <summary> Returns the time from where the object begins fading in to where it is fully opaque. </summary>
         public double GetFadeInTime() =>
-            DifficultyRange(approachRate, 450, 1200, 1800);
+            DifficultyRange(approachRate, (450, 1200, 1800));
 
         /// <summary> Returns the time from where the object is fully opaque to where it is on the timeline. </summary>
         public double GetPreemptTime() =>
-            DifficultyRange(approachRate, 300, 800, 1200);
-
-        public enum HitType
-        {
-            Great300,
-            Ok100,
-            Meh50
-        }
-
-        private readonly Dictionary<HitType, DiffRange> hitRanges = new Dictionary<HitType, DiffRange>()
-        {
-            { HitType.Great300, new DiffRange(20, 50, 80)    },
-            { HitType.Ok100,    new DiffRange(60, 100, 140)  },
-            { HitType.Meh50,    new DiffRange(100, 150, 200) }
-        };
-
-        public double GetHitWindow(HitType hitType) =>
-            DifficultyRange(overallDifficulty, hitRanges[hitType]);
+            DifficultyRange(approachRate, (300, 800, 1200));
     }
 }
