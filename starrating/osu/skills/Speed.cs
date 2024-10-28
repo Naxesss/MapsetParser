@@ -12,7 +12,7 @@ namespace MapsetParser.starrating.osu.skills
     /// <summary>
     /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
-    public class Speed : Skill
+    public class Speed : StrainDecaySkill
     {
         private const double single_spacing_threshold = 125;
 

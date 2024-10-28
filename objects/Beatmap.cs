@@ -12,6 +12,7 @@ using MapsetParser.statics;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
 using MapsetParser.starrating.osu;
+using MapsetParser.starrating.taiko;
 using MapsetParser.starrating;
 
 namespace MapsetParser.objects
@@ -97,21 +98,29 @@ namespace MapsetParser.objects
             
             timingLines = GetTimingLines(lines);
             hitObjects  = GetHitobjects(lines);
-
-            if (generalSettings.mode != Mode.Standard)
-                return;
-
-            // Stacking is standard-only.
-            ApplyStacking();
+            
+            if (generalSettings.mode == Mode.Standard)
+                // Stacking is standard-only.
+                ApplyStacking();
 
             if (starRating != null)
-                this.starRating = starRating.Value;
-            else
             {
-                DifficultyAttributes attributes = new OsuDifficultyCalculator(this).Calculate();
-                difficultyAttributes = attributes;
-                this.starRating      = attributes.StarRating;
+                this.starRating = starRating.Value;
+                return;
             }
+
+            DifficultyAttributes attributes = generalSettings.mode switch
+            {
+                Mode.Standard => new OsuDifficultyCalculator(this).Calculate(),
+                Mode.Taiko    => new TaikoDifficultyCalculator(this).Calculate(),
+                _             => null
+            };
+
+            if (attributes == null)
+                return;
+            
+            difficultyAttributes = attributes;
+            this.starRating = attributes.StarRating;
         }
 
         /*

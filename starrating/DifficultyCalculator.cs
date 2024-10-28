@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using MapsetParser.objects;
-using MapsetParser.starrating;
 using MapsetParser.starrating.preprocessing;
 using MapsetParser.starrating.skills;
 using System;
@@ -26,22 +25,12 @@ namespace MapsetParser.starrating
         }
 
         /// <summary>
-        /// Calculates the difficulty of the beatmap using a specific mod combination.
+        /// Calculates the difficulty of the beatmap.
         /// </summary>
-        /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
         public DifficultyAttributes Calculate()
         {
             return Calculate(beatmap);
-        }
-
-        /// <summary>
-        /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
-        /// </summary>
-        /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<DifficultyAttributes> CalculateAll()
-        {
-            yield return Calculate();
         }
 
         private DifficultyAttributes Calculate(Beatmap beatmap)
@@ -64,8 +53,8 @@ namespace MapsetParser.starrating
                 {
                     foreach (Skill s in skills)
                     {
-                        s.SaveCurrentPeak();
-                        s.StartNewSectionFrom(currentSectionEnd);
+                        (s as StrainSkill)?.saveCurrentPeak();
+                        (s as StrainSkill)?.startNewSectionFrom(currentSectionEnd, h);
                     }
 
                     currentSectionEnd += sectionLength;
@@ -77,7 +66,7 @@ namespace MapsetParser.starrating
 
             // The peak strain will not be saved for the last section in the above loop
             foreach (Skill s in skills)
-                s.SaveCurrentPeak();
+                (s as StrainSkill)?.saveCurrentPeak();
 
             return CreateDifficultyAttributes(beatmap, skills);
         }
@@ -93,24 +82,21 @@ namespace MapsetParser.starrating
         /// <summary>
         /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
-        /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
+        /// <param name="beatmap">The <see cref="Beatmap"/> whose difficulty was calculated.</param>
         /// <param name="skills">The skills which processed the beatmap.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         protected abstract DifficultyAttributes CreateDifficultyAttributes(Beatmap beatmap, Skill[] skills);
 
         /// <summary>
-        /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
+        /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="Beatmap"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
-        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        /// <param name="beatmap">The <see cref="Beatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
         protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(Beatmap beatmap);
 
         /// <summary>
-        /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
+        /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="Beatmap"/>.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param>
+        /// <param name="beatmap">The <see cref="Beatmap"/> whose difficulty will be calculated.</param>
         /// <returns>The <see cref="Skill"/>s.</returns>
         protected abstract Skill[] CreateSkills(Beatmap beatmap);
     }

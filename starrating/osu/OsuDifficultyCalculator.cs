@@ -10,6 +10,8 @@ using MapsetParser.starrating.skills;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MapsetParser.scoring;
+using MapsetParser.starrating.osu.scoring;
 using static MapsetParser.settings.DifficultySettings;
 
 namespace MapsetParser.starrating.osu
@@ -31,9 +33,12 @@ namespace MapsetParser.starrating.osu
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
+            
+            HitWindows hitWindows = new OsuHitWindows();
+            hitWindows.SetDifficulty(beatmap.difficultySettings.overallDifficulty);
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)beatmap.difficultySettings.GetHitWindow(HitType.Great300);
+            double hitWindowGreat = (int)hitWindows.WindowFor(HitResult.Great);
             double preempt = (int)beatmap.difficultySettings.GetPreemptTime();
 
             int maxCombo = beatmap.hitObjects.Count;
