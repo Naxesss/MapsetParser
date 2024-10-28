@@ -1,3 +1,5 @@
+# DEPRECATED / Now part of [MapsetVerifier](https://github.com/Naxesss/MapsetVerifier)
+
 # MapsetParser
 MapsetParser is a parser library for beatmapsets from the rhythm game osu! made in C# .NET Core. This parser not only makes the data in .osu files more easily accessible, but also keeps track of the entire song folder of a given mapset, including the path to files inside sub-folders.
 
